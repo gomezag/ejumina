@@ -1,0 +1,29 @@
+
+<script nonce="{{request.csp_nonce}}">
+
+var availableTags = [[
+    {% for cliente in personas %}
+    [
+      "{{cliente.nombre}}",
+      "{{cliente.pk}}",
+    ],
+    {% endfor %}
+    ],
+    "{{evento.pk}}"
+];
+autocomplete(document.getElementById("searchbar"), availableTags);
+document.getElementById("searchbar").value = "{{keyword}}";
+document.getElementById("search-button").addEventListener('click', getPosts);
+// Get the input field
+var input = document.getElementById("searchbar");
+input.addEventListener("keydown", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("search-button").click();
+  }
+});
+
+</script>

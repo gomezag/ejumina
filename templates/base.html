@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Eju Chupe</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+</head>
+<body class="body">
+
+<div class="content-body">
+
+<h1>
+Bienvenido, {{ usuario }}
+</h1>
+{% block content %}
+{% endblock %}
+</div>
+{% block dialog %}
+{% endblock %}
+</body>
+</html>

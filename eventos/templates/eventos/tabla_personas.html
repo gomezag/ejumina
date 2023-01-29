@@ -1,0 +1,37 @@
+<table class="tabla_personas" id="tabla_personas">
+    <tr>
+        <th onclick="sortTable(0)">
+            Invitaciones
+        </th>
+        <th onclick="sortTable(0)">
+            Frees
+        </th>
+        <th onclick="sortTable(1);">
+            Nombre
+        </th>
+        <th onclick="sortTable(2);">
+            Grupo
+        </th>
+    </tr>
+    {% for persona in personas %}
+        <tr>
+            <td>
+                {{persona.invitacion_set.all | length}}
+            </td>
+            <td>
+                {{persona.free_set.all | length}}
+            </td>
+            <td>
+                <a href="/e/{{evento.pk}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
+            </td>
+            <td>
+                {% for lista in persona.listainvitados_set.all %}
+                    {{lista.nombre}}
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
