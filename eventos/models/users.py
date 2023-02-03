@@ -1,3 +1,10 @@
+"""
+Propietario: grIT
+Contacto: agustin.gomez.mansilla@gmail.com
+
+Use of this code for any commercial purpose is NOT AUTHORIZED.
+El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
+"""
 from django.contrib.auth.models import User
 from django.db.models import OneToOneField, ManyToManyField, ForeignKey
 from django.db.models import Model, CASCADE, SET_NULL
