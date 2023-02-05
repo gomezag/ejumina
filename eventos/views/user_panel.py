@@ -18,9 +18,9 @@ from django.db.models.base import ObjectDoesNotExist
 from eventos.utils import read_client_list
 
 
+
 @method_decorator(login_required, name='get')
-@method_decorator(login_required, name='post')
-class UserPanel(View):
+class PanelEvento(View):
 
     def get_evento(self, rget):
         evento = rget.get('evento')
@@ -45,12 +45,11 @@ class UserPanel(View):
         c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente=None)
         return c
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, evento, *args, **kwargs):
         user = Usuario.objects.get(user=request.user)
         if user is None:
             return GenericViewError('User is None')
         # Check query
-        evento = self.get_evento(request.GET)
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
         c['persona_form'] = PersonaForm(evento)
