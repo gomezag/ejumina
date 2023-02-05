@@ -63,13 +63,6 @@ class UserPanel(View):
         form = InvitacionAssignForm(request.POST)
         evento = self.get_evento(request.POST)
         usuario = Usuario.objects.get(user=request.user)
-
-        form.instance.evento = evento
-        form.instance.vendedor = usuario
-        form.instance.administrador = usuario
-        print(form.is_valid())
-        print(form.__dict__)
-        print(form.errors.renderer)
         if form.is_valid():
             form.save(evento, usuario)
         # if kwargs.get('import', None):
