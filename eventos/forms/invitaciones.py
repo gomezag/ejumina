@@ -33,21 +33,35 @@ class ListaInvitadosForm(forms.ModelForm):
 
 
 class InvitacionAssignForm(forms.ModelForm):
-
-    evento = models.ForeignKey('Evento', models.DO_NOTHING, db_column='name')
+    cliente = forms.CharField(widget=forms.TextInput(attrs={'class': 'cliente_search'}))
 
     class Meta:
         model = Invitacion
-        fields = ['cliente']
+        fields = ['cliente', 'lista']
 
     def __init__(self, *args, **kwargs):
         super(InvitacionAssignForm, self).__init__()
-        self.fields['cliente'].widget = forms.TextInput(attrs={'class': 'cliente_search'})
+
+    def clean_cliente(self):
+        cliente = super(InvitacionAssignForm, self).clean_cliente()
+        if cliente:
+            cliente = cliente.split(" ").remove('')
+            try:
+                cliente = Persona.objects.get(nombre=cliente)
+            except models.ObjectDoesNotExist:
+                cliente = Persona(nombre=cliente)
+                cliente.save()
+        else:
+            raise forms.ValidationError('Este campo no puede estar vacío.')
+        return cliente
 
     def save(self, evento, usuario):
         instance = super(InvitacionAssignForm, self).save(commit=False)
         assert isinstance(evento, Evento), TypeError('evento should be of type Evento')
         instance.evento = evento
+        instance.vendedor = usuario
+        instance.estado = 'ACT'
+        instance.administrador = usuario
         instance.save()
         return instance
 

@@ -31,7 +31,12 @@
 <div class="modal" id="lista-dialog">
       <div class="modal-content">
           <span id='lista-close' class="close">&times;</span>
-          {{lista_form.as_p}}
+          <form method="post" action="">
+              {% csrf_token %}
+                {{lista_form.as_p}}
+              <input type="submit" value="Agregar">
+          </form>
+
       </div>
 </div>
 {% include 'eventos/modal_setup.html' with ModalName='lista'%}
