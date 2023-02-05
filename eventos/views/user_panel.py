@@ -22,14 +22,6 @@ from eventos.utils import read_client_list
 @method_decorator(login_required, name='get')
 class PanelEvento(View):
 
-    def get_evento(self, rget):
-        evento = rget.get('evento')
-        try:
-            evento = Evento.objects.get(pk=evento)
-        except ObjectDoesNotExist:
-            evento = Evento.objects.all()[0]
-        return evento
-
     def get_context_data(self, user, evento=None, persona=None):
         c = dict()
         c['usuario'] = user.nombre
