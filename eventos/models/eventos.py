@@ -10,11 +10,8 @@ from django.db.models.fields import CharField
 
 
 ESTADOS_EVENTO = [
-    ('NOP', 'No Publicado'),
-    ('PUB', 'Publicado'),
-    ('ONG', 'Puertas Abiertas'),
-    ('DON', 'Realizado'),
-    ('CAN', 'Cancelado'),
+    ('INA', 'Inactivo'),
+    ('ACT', 'Activo'),
 ]
 
 
