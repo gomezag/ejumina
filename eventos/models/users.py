@@ -10,11 +10,6 @@ from django.db.models import OneToOneField, ManyToManyField, ForeignKey
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField
 
-ROLES_USUARIO = [
-    (0, 'Admin'),
-    (1, 'EventManager'),
-    (2, 'R.R.P.P.'),
-]
 
 ESTADOS_CLIENTES = [
     ('ACT', 'Activo'),
@@ -32,6 +27,11 @@ class Persona(Model):
 
 
 class Usuario(Model):
+    ROLES_USUARIO = [
+        (0, 'Admin'),
+        (1, 'Bouncer'),
+        (2, 'R.R.P.P.'),
+    ]
     user = OneToOneField(User, on_delete=CASCADE)
     rol = IntegerField(choices=ROLES_USUARIO)
     nombre = CharField(max_length=30)
