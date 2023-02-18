@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from .permissions import UsuarioEsRRPP, UsuarioEsAdmin, UsuarioEsBouncer, UsuarioEsAdminOrRRPP
 from django.contrib.auth.models import User
+from django.db.models import ObjectDoesNotExist
+from eventos.models import *
 
 
 class EventoRRPPView(APIView):
@@ -23,7 +25,7 @@ class EventoRRPPView(APIView):
 
 class EventoBouncerView(APIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [UsuarioEsRRPP]
+    permission_classes = [UsuarioEsBouncer]
 
     def get(self, request, format=None):
         """
@@ -32,6 +34,17 @@ class EventoBouncerView(APIView):
         :param format:
         :return:
         """
+        bouncer_raw = request.get('user', None)
+        evento_raw = request.get('evento', None)
+        try:
+            evento = Evento.objects.filter(name=evento_raw)
+        except ObjectDoesNotExist:
+            return Response(status=500, data='No se encuentra el evento!')
+        # Permission class deberia asegurar que esto exista.
+        user = Usuario.objects.get(nombre=bouncer_raw)
+        # TODO: Eventos deberia tener usuarios (rrpp o bouncer) habilitados para verlo.
+        invitacion_set = Invitacion.objects.filter(evento=evento)
+        personas = Persona.objects.filter(invitacion_set)
 
 
 class RRPPView(APIView):

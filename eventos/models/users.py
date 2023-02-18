@@ -34,7 +34,7 @@ class Usuario(Model):
     ]
     user = OneToOneField(User, on_delete=CASCADE)
     rol = IntegerField(choices=ROLES_USUARIO)
-    nombre = CharField(max_length=30)
+    nombre = CharField(max_length=30, unique=True)
     persona = ForeignKey(Persona, null=True, blank=False, on_delete=SET_NULL)
 
     def __str__(self):

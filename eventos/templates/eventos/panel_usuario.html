@@ -9,18 +9,21 @@
     {{evento.name}}
 </h2>
 <h4>
-    Invitaciones: {{invi_dadas | length}} / {{evento.invitacion_set.all | length}}
+    Invitaciones: {{invi_dadas | length}} / {{invi_totales | length}}
 </h4>
-<input id="searchbar" type="text">
-<button id="search-button">Search</button>
+<input class="input" id="searchbar" type="text">
+<button class="button" id="search-button">Search</button>
 {% include 'eventos/tabla_personas.html' %}
 {% include 'eventos/autocomplete_setup.html' %}
 {% endblock %}
 {% block dialog %}
-<div>
-    <button id="add-persona" class="plus-button blue">+</button>
-    <button id="add-lista" class="plus-button green">+</button>
+<div class="button-container">
+    <button id="add-persona" class="plus-button blue"><i class="fa fa-plus-circle"></i></button>
+    <button id="add-lista" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
+
+
+
 <div class="modal" id="persona-dialog">
       <div class="modal-content">
           <span id='persona-close' class="close">&times;</span>

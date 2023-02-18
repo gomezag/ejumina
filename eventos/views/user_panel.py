@@ -10,13 +10,12 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 from django.views import View
 from django.views.generic import GenericViewError
 from django.shortcuts import render
-from eventos.models import Usuario, Evento, Persona
+from eventos.models import Usuario, Evento, Persona, ListaInvitados, Invitacion
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from eventos.forms import PersonaForm, ListaInvitadosForm, InvitacionAssignForm
 from django.db.models.base import ObjectDoesNotExist
 from eventos.utils import read_client_list
-
 
 
 @method_decorator(login_required, name='get')
@@ -25,16 +24,12 @@ class PanelEvento(View):
     def get_context_data(self, user, evento=None, persona=None):
         c = dict()
         c['usuario'] = user.nombre
-        if evento:
-            c['evento'] = evento
+        if evento and not isinstance(evento, Evento):
+            c['evento'] = Evento.objects.get(id=evento)
         else:
             c['evento'] = Evento.objects.all()[0]
-        if persona is None:
-            c['personas'] = Persona.objects.all().order_by('nombre')
-        else:
-            c['personas'] = Persona.objects.filter(nombre__icontains=persona)
 
-        c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente=None)
+        c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente=None, vendedor=user)
         return c
 
     def get(self, request, evento, *args, **kwargs):
@@ -46,13 +41,26 @@ class PanelEvento(View):
         c = self.get_context_data(user, evento, persona)
         c['persona_form'] = PersonaForm(evento)
         c['lista_form'] = InvitacionAssignForm()
+        print(c['evento'].invitacion_set.all())
+        c['invi_totales'] = len(c['evento'].invitacion_set.all())
+        c['personas'] = []
+        for persona in Persona.objects.all():
+            try:
+                invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
+                listas = ListaInvitados.objects.filter(personas=persona).distinct()
+            except ObjectDoesNotExist:
+                invitaciones = listas = []
 
+            c['personas'].append({'nombre': persona.nombre,
+                                  'pk': persona.pk,
+                                  'invitaciones': len(invitaciones),
+                                  'listas': list(listas)})
         return render(request, 'eventos/panel_usuario.html', context=c)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, evento, *args, **kwargs):
 
         form = InvitacionAssignForm(request.POST)
-        evento = self.get_evento(request.POST)
+        evento = Evento.objects.get(id=evento)
         usuario = Usuario.objects.get(user=request.user)
         if form.is_valid():
             form.save(evento, usuario)

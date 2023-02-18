@@ -16,16 +16,16 @@
     {% for persona in personas %}
         <tr>
             <td>
-                {{persona.invitacion_set.all | length}}
+                {{persona.invitaciones}}
             </td>
             <td>
-                {{persona.free_set.all | length}}
+                0
             </td>
             <td>
                 <a href="/e/{{evento.pk}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
             </td>
             <td>
-                {% for lista in persona.listainvitados_set.all %}
+                {% for lista in persona.listas %}
                     {{lista.nombre}}
                     {% if not forloop.last %}
                         ,

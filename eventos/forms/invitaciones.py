@@ -54,9 +54,9 @@ class InvitacionAssignForm(forms.ModelForm):
         instance.evento = evento
         instance.vendedor = usuario
         instance.estado = 'ACT'
-        instance.administrador = usuario
         instance.cliente = cliente
         instance.save()
+        instance.administrador.add(usuario)
         return instance
 
 
