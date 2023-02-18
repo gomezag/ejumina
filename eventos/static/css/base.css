@@ -7,6 +7,9 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 .body {
     background-color: black;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 .content-body {
@@ -25,7 +28,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .tabla_personas {
-    width: 90%;
+    width: 90hv;
     border: 4px solid;
 }
 
@@ -49,11 +52,17 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .autocomplete-items {
-    position: relative;
+    background-color: white;
+    width: 300px;
+    max-height: 300px;
 }
 
 .opciones {
-    color: white;
+    color: black;
+}
+
+.autocomplete-active {
+    background-color: darkkhaki;
 }
 
 .active {
@@ -101,25 +110,38 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   cursor: pointer;
 }
 
+.button-container {
+    display: flex;
+    justify-content: right;
+
+}
+
+.modal-content {
+
+}
+
 .plus-button {
     background-color: white;
     color: black;
-    font-size: 80px;
+    font-size: 45px;
     padding: 0;
-    margin: 0 0;
+    margin-left: 20px;
     width: 50px;
     height: 50px;
     border-radius: 25px;
-    display: inline-block;
-    line-height: 30px;
-    border: 5px solid white;
+    display: flex;
+    justify-content: center;
+    line-height: 45px;
+    border: 3px solid white;
 }
     .plus-button.green {
         background-color: green;
+        color: white;
     }
 
     .plus-button.blue {
         background-color: blue;
+        color: white;
     }
 /* Smartphones in portrait */
 @media only screen

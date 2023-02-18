@@ -14,6 +14,10 @@ var availableTags = [[
 autocomplete(document.getElementById("searchbar"), availableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
 document.getElementById("search-button").addEventListener('click', getPosts);
+window.addEventListener("load",function() {
+    autocomplete(document.getElementById("id_persona"), availableTags);
+    document.getElementById("id_persona").value = "{{keyword}}";
+});
 // Get the input field
 var input = document.getElementById("searchbar");
 input.addEventListener("keydown", function(event) {
