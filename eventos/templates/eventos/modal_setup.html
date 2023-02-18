@@ -26,7 +26,7 @@ document.body.addEventListener("keydown", function(event) {
 window.onclick = function(event) {
     var all_modals = Array.from(document.getElementsByClassName("modal"));
     if (all_modals.includes(event.target)) {
-        all_modals.map(e => {e.style.display='none';});
+        all_modals.map(e => {e.classList.remove('is-active');});
     }
 }
 </script>

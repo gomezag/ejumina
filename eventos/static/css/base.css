@@ -59,6 +59,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .opciones {
     color: black;
+    font-size: 45px;
 }
 
 .autocomplete-active {
@@ -73,7 +74,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
  /* The Modal (background) */
-.modal {
+.modal- {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -91,6 +92,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
+  font-size: 35px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }

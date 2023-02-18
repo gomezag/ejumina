@@ -18,26 +18,29 @@
 {% endblock %}
 {% block dialog %}
 <div class="button-container">
-    <button id="add-persona" class="plus-button blue"><i class="fa fa-plus-circle"></i></button>
     <button id="add-lista" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
 
-
-
-<div class="modal" id="persona-dialog">
-      <div class="modal-content">
-          <span id='persona-close' class="close">&times;</span>
-          {{persona_form.as_p}}
-      </div>
-</div>
-{% include 'eventos/modal_setup.html' with ModalName='persona'%}
 <div class="modal" id="lista-dialog">
       <div class="modal-content">
           <span id='lista-close' class="close">&times;</span>
           <form method="post" action="">
               {% csrf_token %}
-                {{lista_form.as_p}}
-              <input type="submit" value="Agregar">
+                {% for field in lista_form %}
+                        <p>{{field.label}}</p>
+                    {% if field.id_for_label == 'id_lista' %}
+                    <div class="select">
+                    {% else %}
+                        <p>
+                    {% endif %}
+                        {{field}}
+                    {% if field.id_for_label == 'id_lista' %}
+                    </div>
+                    {% else %}
+                        </p>
+                    {% endif %}
+                {% endfor %}
+              <input type="submit" class="button is-info" value="Agregar">
           </form>
 
       </div>

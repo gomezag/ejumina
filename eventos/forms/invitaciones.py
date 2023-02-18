@@ -39,6 +39,16 @@ class InvitacionAssignForm(forms.ModelForm):
         model = Invitacion
         fields = ['persona', 'lista']
 
+    def __init__(self, *args, **kwargs):
+        super(InvitacionAssignForm, self).__init__(*args, **kwargs)
+        self.fields['persona'].widget.attrs['class'] = 'input'
+
+
+    def __init__(self, *args, **kwargs):
+        queryset = ListaInvitados.objects.filter(administradores__in=[kwargs.pop('usuario')])
+        super(InvitacionAssignForm, self).__init__(*args, **kwargs)
+        self.fields['lista'].queryset = queryset
+
     def save(self, evento, usuario):
         cliente_name = self.cleaned_data['persona'].split(" ")
         try:

@@ -40,7 +40,7 @@ class PanelEvento(View):
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
         c['persona_form'] = PersonaForm(evento)
-        c['lista_form'] = InvitacionAssignForm()
+        c['lista_form'] = InvitacionAssignForm(usuario=Usuario.objects.get(user=request.user))
         print(c['evento'].invitacion_set.all())
         c['invi_totales'] = len(c['evento'].invitacion_set.all())
         c['personas'] = []
@@ -59,7 +59,7 @@ class PanelEvento(View):
 
     def post(self, request, evento, *args, **kwargs):
 
-        form = InvitacionAssignForm(request.POST)
+        form = InvitacionAssignForm(request.POST, usuario=Usuario.objects.get(user=request.user))
         evento = Evento.objects.get(id=evento)
         usuario = Usuario.objects.get(user=request.user)
         if form.is_valid():

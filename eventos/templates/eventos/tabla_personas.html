@@ -1,4 +1,4 @@
-<table class="tabla_personas" id="tabla_personas">
+<table class="tabla_personas table" id="tabla_personas">
     <tr>
         <th onclick="sortTable(0)">
             Invitaciones
@@ -10,7 +10,7 @@
             Nombre
         </th>
         <th onclick="sortTable(2);">
-            Grupo
+            Lista
         </th>
     </tr>
     {% for persona in personas %}
@@ -26,7 +26,7 @@
             </td>
             <td>
                 {% for lista in persona.listas %}
-                    {{lista.nombre}}
+                    <p style="color:{{lista.color}}">{{lista.nombre}} </p>
                     {% if not forloop.last %}
                         ,
                     {% endif %}
