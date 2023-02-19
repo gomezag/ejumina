@@ -1,8 +1,8 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <p class="navbar-item">
+    <a class="navbar-item" href="/">
       Bienvenido, {{usuario.nombre}}
-    </p>
+    </a>
 
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
       <span aria-hidden="true"></span>
@@ -13,9 +13,20 @@
 
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
-      <a class="navbar-item" href="/">
-        Eventos
-      </a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Eventos
+        </a>
+
+        <div class="navbar-dropdown is-active">
+          {% for evento in eventos %}
+            <a class="navbar-item" href="/e/{{evento.pk}}">
+              {{evento.name}}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
 
       <a class="navbar-item" href="/personas">
         Personas
@@ -28,9 +39,15 @@
     <div class="navbar-end">
       <div class="navbar-item">
         <div class="buttons">
+          {% if not request.user.id %}
           <a class="button is-light" href="/accounts/login">
             Log in
           </a>
+          {% else %}
+          <a class="button is-light" href="/accounts/logout">
+            Log out
+          </a>
+          {% endif %}
         </div>
       </div>
     </div>

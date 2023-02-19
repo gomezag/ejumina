@@ -1,0 +1,21 @@
+<script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'
+            nonce="{{request.csp_nonce}}"></script>
+<script nonce="{{request.csp_nonce}}">
+   var onSubmit = function(token) {
+     document.getElementById("login-form").submit();
+     console.log('submitted');
+   };
+ </script>
+<script nonce="{{request.csp_nonce}}">
+
+    grecaptcha.ready(function() {
+        grecaptcha.execute('{{recaptcha_site_key}}', {action: 'contact'})
+        .then(function(token) {
+            ginput = document.createElement('input');
+            ginput.type = "hidden";
+            ginput.name = "g-recaptcha-response";
+            ginput.value = token;
+            document.getElementById("login-form").appendChild(ginput);
+        });
+    });
+</script>

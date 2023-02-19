@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 from django.db.models import OneToOneField, ManyToManyField, ForeignKey
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField
-
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 ESTADOS_CLIENTES = [
     ('ACT', 'Activo'),
@@ -31,6 +32,7 @@ class Usuario(Model):
         (0, 'Admin'),
         (1, 'Bouncer'),
         (2, 'R.R.P.P.'),
+        (3, 'Guest')
     ]
     user = OneToOneField(User, on_delete=CASCADE)
     rol = IntegerField(choices=ROLES_USUARIO)
@@ -47,3 +49,17 @@ class Grupo(Model):
 
     def __str__(self):
         return f"{self.nombre}"
+
+
+@receiver(pre_save, sender=User, dispatch_uid="user_count")
+def crear_usuario(sender, instance, **kwargs):
+    if not instance.id:
+        usuario = Usuario()
+        usuario.user = instance
+        usuario.rol = 3
+        usuario.nombre = instance.username
+        persona = Persona()
+        persona.nombre = usuario.nombre
+        persona.save()
+        usuario.persona = persona
+        usuario.save()

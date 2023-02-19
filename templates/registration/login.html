@@ -4,10 +4,11 @@
 
 {% block content %}
 <h2 class="title is-2">Log In</h2>
-<form class="body-form" method="post">
+<form class="body-form" id="login-form" method="post">
   {% csrf_token %}
   {{ form.as_p }}
   <button class="button" type="submit">Log In</button>
   <a href="{% url 'password_reset' %}">Olvidaste la contraseña?</a>
 </form>
+{% include 'google_captcha_setup.html' %}
 {% endblock %}

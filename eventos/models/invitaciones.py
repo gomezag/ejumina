@@ -16,7 +16,6 @@ COLORES = [
     ('#0057e7', 'Blue'),
     ('#d62d20', 'Red'),
     ('#ffa700', 'Yellow'),
-    ('#ffffff', 'White'),
 ]
 
 
@@ -39,7 +38,6 @@ class ListaInvitados(models.Model):
 
 
 class Invitacion(models.Model):
-    administrador = ManyToManyField(Usuario, blank=False, related_name='habilitadas')
     estado = CharField(max_length=3, choices=ESTADOS_INVITACION)
     evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
     vendedor = ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=False)
@@ -59,4 +57,4 @@ class Free(models.Model):
     lista = ForeignKey(ListaInvitados, null=True, on_delete=models.CASCADE, blank=True)
 
     def __str__(self):
-        return f"Free a {self.evento} - {self.get_estado_display()}"
+        return f"Free a {self.evento} - {self.get_estado_display()} - {self.vendedor.nombre} a {self.cliente}"

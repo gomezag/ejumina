@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'js/autocomplete.js' %}"></script>
+<script src="{% static 'js/sort.js' %}"></script>
+
+<h2 class="title is-2">
+    {{evento.name}}
+</h2>
+<h4 class="title is-3">
+    Invitaciones: {{invi_dadas | length}} / {{invi_totales | length}}
+</h4>
+<input class="input" id="searchbar" type="text">
+<button class="button" id="search-button">Search</button>
+{% include 'eventos/tablas/tabla_personas.html' %}
+{% include 'eventos/setups/autocomplete_setup.html' %}
+{% endblock %}
+{% block dialog %}
+<div class="button-container">
+    <button id="add-lista" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
+</div>
+
+<div class="modal" id="lista-dialog">
+      <div class="modal-content">
+          <span id='lista-close' class="close">&times;</span>
+          {% include 'eventos/forms/persona-form.html' %}
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
+
+{% endblock %}
