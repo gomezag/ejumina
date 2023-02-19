@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.db.models import OneToOneField, ManyToManyField, ForeignKey
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 ESTADOS_CLIENTES = [
@@ -51,9 +51,11 @@ class Grupo(Model):
         return f"{self.nombre}"
 
 
-@receiver(pre_save, sender=User, dispatch_uid="user_count")
+@receiver(post_save, sender=User, dispatch_uid="user_count")
 def crear_usuario(sender, instance, **kwargs):
-    if not instance.id:
+    try:
+        usuario = Usuario.objects.get(user=instance)
+    except Usuario.DoesNotExist:
         usuario = Usuario()
         usuario.user = instance
         usuario.rol = 3
