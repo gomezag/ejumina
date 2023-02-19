@@ -50,5 +50,13 @@ class Invitacion(models.Model):
         return f"Invitacion a {self.evento} - {self.get_estado_display()}"
 
 
-class Free(Invitacion):
-    pass
+class Free(models.Model):
+    administrador = ManyToManyField(Usuario, blank=False, related_name='frees')
+    estado = CharField(max_length=3, choices=ESTADOS_INVITACION, null=False)
+    evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
+    vendedor = ForeignKey(Usuario, on_delete=models.CASCADE, null=False, blank=False)
+    cliente = ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True)
+    lista = ForeignKey(ListaInvitados, null=True, on_delete=models.CASCADE, blank=True)
+
+    def __str__(self):
+        return f"Free a {self.evento} - {self.get_estado_display()}"

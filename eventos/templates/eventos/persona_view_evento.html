@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="title is-1">
+   {{evento.name}}
+</h1>
+<h2 class="title is-2">
+     {{persona.nombre}}
+</h2>
+
+<div class="container body-form">
+<p>
+    Invitaciones: {{invitaciones | length }}
+</p>
+
+<button
+{% if invitaciones %}
+    class="active button" onclick="usar_invi({{invitaciones.0.pk}});"
+{% else %}
+    class="inactive button" disabled
+{% endif %}
+> Usar Invitacion </button>
+</div>
+<form class="body-form" action="" method="post">
+    {{ form.as_p }}
+    <input class="button is-info" value="Invitar" type="submit">
+</form>
+{% endblock %}

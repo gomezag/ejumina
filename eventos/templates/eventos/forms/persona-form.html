@@ -1,0 +1,20 @@
+<form class="modal-form" method="post" action="">
+  {% csrf_token %}
+    {% for field in persona_form %}
+        <p>{{field.label}}</p>
+        {% if field.id_for_label == 'id_lista' %}
+        <div class="select">
+        {% else %}
+        <p>
+        {% endif %}
+            {{field}}
+        {% if field.id_for_label != 'id_lista' %}
+        </p>
+        {% else %}
+        </div>
+        {% endif %}
+    {% endfor %}
+    <div>
+  <input type="submit" class="button is-info modal-button" value="Agregar">
+    </div>
+</form>

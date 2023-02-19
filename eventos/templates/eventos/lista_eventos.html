@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'js/sort.js' %}"></script>
+
+<h1 class="title is-1"> Eventos </h1>
+{% include 'eventos/tablas/tabla_eventos.html' %}
+{% include 'eventos/setups/autocomplete_setup.html' %}
+{% endblock %}

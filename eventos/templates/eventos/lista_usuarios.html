@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'js/autocomplete.js' %}"></script>
+<script src="{% static 'js/sort.js' %}"></script>
+
+<input class="input" id="searchbar" type="text">
+<button class="button" id="search-button">Search</button>
+{% include 'eventos/tablas/tabla_usuarios.html' %}
+{% include 'eventos/setups/autocomplete_setup.html' %}
+{% endblock %}

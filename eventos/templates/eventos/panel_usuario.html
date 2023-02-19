@@ -5,16 +5,16 @@
 <script src="{% static 'js/autocomplete.js' %}"></script>
 <script src="{% static 'js/sort.js' %}"></script>
 
-<h2>
+<h2 class="title is-2">
     {{evento.name}}
 </h2>
-<h4>
+<h4 class="title is-3">
     Invitaciones: {{invi_dadas | length}} / {{invi_totales | length}}
 </h4>
 <input class="input" id="searchbar" type="text">
 <button class="button" id="search-button">Search</button>
-{% include 'eventos/tabla_personas.html' %}
-{% include 'eventos/autocomplete_setup.html' %}
+{% include 'eventos/tablas/tabla_personas.html' %}
+{% include 'eventos/setups/autocomplete_setup.html' %}
 {% endblock %}
 {% block dialog %}
 <div class="button-container">
@@ -24,27 +24,9 @@
 <div class="modal" id="lista-dialog">
       <div class="modal-content">
           <span id='lista-close' class="close">&times;</span>
-          <form method="post" action="">
-              {% csrf_token %}
-                {% for field in lista_form %}
-                        <p>{{field.label}}</p>
-                    {% if field.id_for_label == 'id_lista' %}
-                    <div class="select">
-                    {% else %}
-                        <p>
-                    {% endif %}
-                        {{field}}
-                    {% if field.id_for_label == 'id_lista' %}
-                    </div>
-                    {% else %}
-                        </p>
-                    {% endif %}
-                {% endfor %}
-              <input type="submit" class="button is-info" value="Agregar">
-          </form>
-
+          {% include 'eventos/forms/persona-form.html' %}
       </div>
 </div>
-{% include 'eventos/modal_setup.html' with ModalName='lista'%}
+{% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
 
 {% endblock %}

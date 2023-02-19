@@ -12,24 +12,42 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     width: 100%;
 }
 
+.title {
+    color: white;
+}
+
 .content-body {
     display: flex;
     flex-direction: column;
     z-index: 1;
-    align-self: flex-end;
     align-items: center;
-    margin-right: 3%;
-    margin-left: 3%;
     max-width: 80%;
-    width: 80%;
-    margin-bottom: 50px;
     row-gap: 15px;
+}
+
+.tabla-personas {
+    width: 90vw;
+    border: 4px solid;
+    font-size: 4vw;
+
+
+}
+
+.tabla-personas input {
+    font-size: 3vw;
+}
+
+.navbar {
+    background-color: black;
+    font-size: 3vw;
+}
+
+.navbar-burger {
     color: white;
 }
 
-.tabla_personas {
-    width: 90hv;
-    border: 4px solid;
+.navbar-brand a {
+    color: white;
 }
 
 .tabla_personas>tbody>tr {
@@ -53,13 +71,13 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .autocomplete-items {
     background-color: white;
-    width: 300px;
-    max-height: 300px;
+    width: 250px;
+    max-height: 250px;
 }
 
 .opciones {
     color: black;
-    font-size: 45px;
+    font-size: 30px;
 }
 
 .autocomplete-active {
@@ -74,7 +92,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
  /* The Modal (background) */
-.modal- {
+.modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -92,7 +110,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
-  font-size: 35px;
+  font-size: 20px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
@@ -104,7 +122,6 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   font-size: 28px;
   font-weight: bold;
 }
-
 .close:hover,
 .close:focus {
   color: black;
@@ -112,10 +129,38 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   cursor: pointer;
 }
 
+.body-form {
+    color: white;
+    justify-content: center;
+    row-gap: 15px;
+    display:flex;
+    flex-direction: column;
+}
+
+/* Submit button for modal form */
+.button.modal-button{
+    margin-top: 10px;
+}
+
+.navbar-brand p.navbar-item {
+    color: white;
+}
+
+/* Forms inside modal dialogs */
+.modal-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-form input {
+    width: 100%;
+}
+
 .button-container {
     display: flex;
     justify-content: right;
-
 }
 
 .modal-content {
@@ -145,37 +190,19 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
         background-color: blue;
         color: white;
     }
-/* Smartphones in portrait */
-@media only screen
-  and (min-device-width: 100px)
-  and (max-device-width: 860px)
-  and (orientation: portrait) {
-
-    .content-body{
-        overflow-y:auto;
-        margin-right: 4%;
-        margin-left: 4%;
-        width: 92%;
-        align-self: center;
-        max-width: 92%;
-        font-size: 25pt;
-    }
-
-
-}
-
 
 /* Smartphones in landscape */
 @media only screen
   and (min-device-width: 100px)
-  and (max-device-width: 871px)
-  and (orientation: landscape) {
+  and (max-device-width: 871px){
+    .persona.input {
+        font-size: 5vw;
+    }
+    .plus-button.green {
+    font-size: 5.8vh;
+    width: 6vh;
+    height: 6vh;
+    border-radius: 3vh;
 
-    .content-body{
-        overflow:auto;
-        right: 0;
-        top: 25%;
-        width: 80%;
-        max-width: 80%;
     }
 }

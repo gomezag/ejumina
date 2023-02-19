@@ -48,6 +48,7 @@ class InvitacionAssignForm(forms.ModelForm):
         queryset = ListaInvitados.objects.filter(administradores__in=[kwargs.pop('usuario')])
         super(InvitacionAssignForm, self).__init__(*args, **kwargs)
         self.fields['lista'].queryset = queryset
+        self.fields['persona'].widget.attrs['class']='input persona'
 
     def save(self, evento, usuario):
         cliente_name = self.cleaned_data['persona'].split(" ")
@@ -71,3 +72,18 @@ class InvitacionAssignForm(forms.ModelForm):
 
 
 InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0)
+
+
+class MultiInviAssignToPersona(forms.Form):
+    invitaciones = forms.IntegerField(min_value=0)
+    frees = forms.IntegerField(min_value=0)
+
+    def __init__(self, usuario, *args, **kwargs):
+        super(MultiInviAssignToPersona, self).__init__(*args, **kwargs)
+        max_frees = Free.objects.filter(vendedor=usuario).count()
+        self.fields['frees'].widget.attrs['max'] = max_frees
+        for name, field in self.fields.items():
+            field.widget.attrs['class'] = 'input'
+
+    def save(self):
+        print(self.cleaned_data)

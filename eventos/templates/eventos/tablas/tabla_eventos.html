@@ -1,0 +1,19 @@
+<table class="tabla-personas table" id="tabla_personas">
+    <tr>
+        <th onclick="sortTable(0)">
+            Nombre
+        </th>
+        <th onclick="sortTable(0)">
+            Fecha
+        </th>
+    </tr>
+    {% for evento in eventos %}
+        <tr>
+            <td>
+                <a href="/e/{{evento.pk}}">{{evento.name}}</a>
+            </td>
+            <td>
+
+            </td>
+    {% endfor %}
+</table>

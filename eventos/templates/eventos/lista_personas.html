@@ -2,36 +2,13 @@
 {% load static %}
 
 {% block content %}
+<h2 class="title is-2">Personas </h2>
+{% include 'eventos/tablas/tabla_personas_noevent.html' %}
 
-    <table class="tabla_personas tabla">
-        {% for persona in personas %}
-            <tr>
-                <td>
-                    {{persona.nombre}}
-                </td>
-                <td>
-                    {% for grupo in persona.grupo_set.all %}
-                        {{grupo.nombre}}
-                        {% if not forloop.last %}
-                            ,
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <td>
-                    <form method="POST" action="">
-                       {% csrf_token %}
-                        <input type="hidden" name="delete" value="{{persona.pk}}">
-                        <input type="submit" value="DELETE">
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <form method="post">
+    <form class="body-form" method="post">
         {% csrf_token %}
         {{form.as_p}}
-        <input type="submit"> </input>
+        <input class="button is-light" type="submit" value="Registrar persona"> </input>
     </form>
 
 {% endblock %}

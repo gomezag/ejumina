@@ -14,17 +14,14 @@ from eventos.models import Usuario, Grupo, Persona
 from eventos.forms import PersonaForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from ..forms import InvitacionAssignFormset
+from eventos.forms import InvitacionAssignFormset
+from .basic_view import BasicView
 
 
 @method_decorator(login_required, name='get')
-class ListaPersona(View):
+class ListaPersona(BasicView):
     def get_context_data(self, user, persona=None):
-        c = {}
-        try:
-            c['usuario'] = user.persona.nombre
-        except AttributeError:
-            c['usuario'] = ' cliente.'
+        c = super(ListaPersona, self).get_context_data(user)
         c['personas'] = Persona.objects.all()
         if persona is None:
             c['form'] = PersonaForm()
@@ -34,7 +31,7 @@ class ListaPersona(View):
 
     def get(self, request, *args, **kwargs):
 
-        user = Usuario.objects.get(user=request.user)
+        user = request.user
         c = self.get_context_data(user)
 
         return render(request=request, template_name='eventos/lista_personas.html', context=c)
@@ -49,9 +46,7 @@ class ListaPersona(View):
         else:
             form = PersonaForm(data=request.POST)
             if form.is_valid():
-                persona = form.save()
-                grupos = form.cleaned_data.get('grupos')
-                for grupo in grupos:
-                    grupo.miembros.add(persona)
-        return self.get(request)
+                form.save()
+        c = self.get_context_data(request.user)
+        return render(request, 'eventos/lista_personas.html', context=c)
 
