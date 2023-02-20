@@ -209,4 +209,8 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .table { font-size: 2rem;}
     .navbar-item { font-size: 2rem;}
     .button { font-size: 2rem;}
+.navbar-brand i{font-size:4rem;}
+.modal-content {font-size:2rem;}
+.modal-content input{font-size: 2rem;}
+.navbar-burger {height:5rem;width:5rem;}
 }
