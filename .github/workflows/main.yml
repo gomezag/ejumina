@@ -1,0 +1,16 @@
+name: Build & Deploy
+on:
+  push:
+    tags:
+      - 'api-calls'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create SSH key
+        uses: D3rHase/ssh-command-action@{version}
+        with:
+          host: ${{secrets.NC_HOST}} # Remote server address / ip - required
+          user: ${{secrets.NC_USR}} # Remote server user - required
+          private_key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
+          command: echo 'hello world'
