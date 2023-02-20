@@ -5,6 +5,14 @@ Contacto: agustin.gomez.mansilla@gmail.com
 Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
+
+
+.autocomplete-items {
+    background-color: white;
+    width: 250px;
+    max-height: 250px;
+}
+
 .body {
     background-color: black;
     position: absolute;
@@ -12,9 +20,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     width: 100%;
 }
 
-.title {
-    color: white;
+.autocomplete-active {
+    background-color: darkkhaki;
 }
+
 
 .content-body {
     display: flex;
@@ -25,21 +34,12 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     row-gap: 15px;
 }
 
-.tabla-personas {
-    width: 90vw;
-    border: 4px solid;
-    font-size: 30px;
-
-
-}
-
-.tabla-personas input {
-    font-size: 25px;
-}
-
 .navbar {
     background-color: black;
-    font-size: 25px;
+}
+
+.navbar-item {
+    font-size: 1rem;
 }
 
 .navbar-burger {
@@ -48,6 +48,21 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .navbar-brand a {
     color: white;
+}
+
+.navbar-brand p.navbar-item {
+    color: white;
+}
+
+
+.tabla-personas {
+    width: 90vw;
+    border: 4px solid;
+    font-size: 1rem;
+}
+
+.tabla-personas input {
+    font-size: 1rem;
 }
 
 .tabla_personas>tbody>tr {
@@ -69,19 +84,13 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     border: 1pt solid;
 }
 
-.autocomplete-items {
-    background-color: white;
-    width: 250px;
-    max-height: 250px;
+.title {
+    color: white;
 }
 
 .opciones {
     color: black;
-    font-size: 30px;
-}
-
-.autocomplete-active {
-    background-color: darkkhaki;
+    font-size: 1rem;
 }
 
 .active {
@@ -110,7 +119,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
-  font-size: 20px;
+  font-size: 2rem;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
@@ -119,7 +128,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .close {
   color: #aaa;
   float: right;
-  font-size: 28px;
+  font-size: 1rem;
   font-weight: bold;
 }
 .close:hover,
@@ -129,21 +138,9 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   cursor: pointer;
 }
 
-.body-form {
-    color: white;
-    justify-content: center;
-    row-gap: 15px;
-    display:flex;
-    flex-direction: column;
-}
-
 /* Submit button for modal form */
 .button.modal-button{
     margin-top: 10px;
-}
-
-.navbar-brand p.navbar-item {
-    color: white;
 }
 
 /* Forms inside modal dialogs */
@@ -158,15 +155,26 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     width: 100%;
 }
 
-.button-container {
-    display: flex;
-    justify-content: right;
-}
 
 .modal-content {
 
 }
+/* End Modal */
 
+.body-form {
+    color: white;
+    justify-content: center;
+    row-gap: 15px;
+    display:flex;
+    flex-direction: column;
+}
+
+
+
+.button-container {
+    display: flex;
+    justify-content: right;
+}
 .plus-button {
     margin-right: 30px;
     background-color: white;
@@ -195,16 +203,5 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 @media only screen
   and (min-device-width: 100px)
   and (max-device-width: 871px){
-    .persona.input {
-        font-size: 20px;
-    }
-    .plus-button.green {
 
-    }
-    .tabla-personas{
-        font-size: 15px;
-    }
-    .tabla-personas input{
-        font-size: 15px;
-    }
 }

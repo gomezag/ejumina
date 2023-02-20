@@ -29,7 +29,9 @@ class ListaInvitadosForm(forms.ModelForm):
 
     class Meta:
         model = ListaInvitados
-        fields = '__all__'
+        fields = ['nombre', 'administradores', 'color']
+
+
 
 
 class InvitacionAssignForm(forms.ModelForm):
@@ -92,7 +94,6 @@ class MultiInviAssignToPersona(forms.Form):
             field.widget.attrs['class'] = 'input'
 
     def save(self, user, persona, evento):
-        user = Usuario.objects.get(user=user)
         n_frees = self.cleaned_data.get('frees')
         n_invis = self.cleaned_data.get('invitaciones')
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)

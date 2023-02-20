@@ -16,7 +16,7 @@
     {% for persona in usuarios %}
         <tr>
             <td>
-                <a href="/u/{{persona.pk}}">{{persona.nombre}}</a>
+                <a href="/u/{{persona.pk}}">{{persona.first_name}} {{persona.last_name}}</a>
             </td>
             <td>
                 {{persona.get_rol_display}}

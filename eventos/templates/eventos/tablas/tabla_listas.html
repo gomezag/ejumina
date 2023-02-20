@@ -1,0 +1,25 @@
+<table class="tabla-personas table" id="tabla_personas">
+    <tr>
+        <th onclick="sortTable(0)">
+            Nombre
+        </th>
+        <th onclick="sortTable(0);">
+            Admins.
+        </th>
+    </tr>
+    {% for lista in listas %}
+        <tr>
+            <td>
+                {{lista.nombre}}
+            </td>
+            <td>
+                {% for user in lista.administradores.all %}
+                    {{user.first_name}}
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

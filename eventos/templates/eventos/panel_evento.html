@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block breadcrumbs %}
+    <li class=""><a href="#">Eventos</a></li>
+    <li class="is-active"><a href="/e/{{evento.pk}}">{{evento.name}}</a></li>
+{% endblock %}
 
 {% block content %}
 <script src="{% static 'js/autocomplete.js' %}"></script>

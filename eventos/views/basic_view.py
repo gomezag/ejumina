@@ -1,15 +1,24 @@
 from django.views import View
-from eventos.models import Usuario, Evento
+from eventos.models import Evento
 from django.shortcuts import render
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponseRedirect
 
 
-class BasicView(View):
+class BasicView(UserPassesTestMixin, View):
     template_name = None
+
+    def test_func(self):
+        return self.request.user.is_authenticated
+
+    def handle_no_permission(self):
+        return HttpResponseRedirect('/accounts/login')
 
     def get_context_data(self, user, *args, **kwargs):
         c = dict()
-        c['usuario'] = Usuario.objects.get(user=user)
+        c['usuario'] = user
         c['eventos'] = Evento.objects.all()
+        c['back'] = '/'
 
         return c
 
@@ -18,4 +27,9 @@ class BasicView(View):
 
 
 class AdminView(BasicView):
-    pass
+
+    def handle_no_permission(self):
+        return HttpResponseRedirect('/')
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()

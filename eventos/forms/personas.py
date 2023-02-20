@@ -19,3 +19,14 @@ class PersonaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PersonaForm, self).__init__(*args, **kwargs)
+
+
+class EventoForm(forms.ModelForm):
+
+    class Meta:
+        model = Evento
+        fields = ['name', 'fecha']
+
+    def save(self, *args, **kwargs):
+        self.instance.estado = 'ACT'
+        super().save(*args, **kwargs)

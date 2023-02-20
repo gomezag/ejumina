@@ -10,7 +10,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 from django.views import View
 from django.shortcuts import render
-from eventos.models import Usuario, Grupo, Persona
+from eventos.models import Usuario, Persona
 from eventos.forms import PersonaForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator

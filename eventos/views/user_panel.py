@@ -14,7 +14,6 @@ from django.db.models.base import ObjectDoesNotExist
 from .basic_view import *
 
 
-@method_decorator(login_required, name='get')
 class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
@@ -47,7 +46,7 @@ class PanelEvento(BasicView):
         # Check query
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
-        c['persona_form'] = InvitacionAssignForm(usuario=c['usuario'])
+        c['persona_form'] = PersonaForm()
         c['invi_totales'] = len(c['evento'].invitacion_set.all())
 
         return super().get(request, c)
@@ -56,18 +55,16 @@ class PanelEvento(BasicView):
 
         evento = Evento.objects.get(id=evento)
         user = request.user
-        c = self.get_context_data(user, evento, None)
-        form = InvitacionAssignForm(request.POST, usuario=c['usuario'])
+        form = PersonaForm(request.POST)
 
         if form.is_valid():
-            form.save(evento, c['usuario'])
+            form.save()
 
-        c['persona_form'] = PersonaForm(evento)
-        c['lista_form'] = form
-        return super().get(request, c)
+        c = self.get_context_data(user, evento, None)
+        c['persona_form'] = form
+        return render(request, self.template_name, context=c)
 
 
-@method_decorator(login_required, name='get')
 class PanelEventoPersona(BasicView):
     template_name = 'eventos/persona_view_evento.html'
 
@@ -78,20 +75,21 @@ class PanelEventoPersona(BasicView):
         c['evento'] = evento
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
+        c['back'] = '/e/{}'.format(evento.pk)
         return c
 
     def get(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(pk=evento)
         c = self.get_context_data(request.user, persona, evento)
-        usuario = Usuario.objects.get(user=request.user)
+        usuario = request.user
         c['form'] = MultiInviAssignToPersona(usuario, persona)
         return super().get(request, c)
 
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(pk=evento)
-        form = MultiInviAssignToPersona(Usuario.objects.get(user=request.user), persona, data=request.POST)
+        form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
         if form.is_valid():
             form.save(request.user, persona, evento)
         c = self.get_context_data(request.user, persona, evento)
@@ -99,37 +97,6 @@ class PanelEventoPersona(BasicView):
         return super().get(request, c)
 
 
-@method_decorator(login_required, name='get')
-class ListaUsuarios(AdminView):
-    template_name = 'eventos/lista_usuarios.html'
-
-    def get_context_data(self, user, *args, **kwargs):
-        c = super(ListaUsuarios, self).get_context_data(user)
-        c['usuarios'] = Usuario.objects.all()
-        return c
-
-    def get(self, request, *args, **kwargs):
-        c = self.get_context_data(request.user)
-
-        return super().get(request, c)
-
-
-@method_decorator(login_required, name='get')
-class ListaEventos(BasicView):
-    template_name = 'eventos/lista_eventos.html'
-
-    def get_context_data(self, user, *args, **kwargs):
-        c = super().get_context_data(user)
-        c['eventos'] = Evento.objects.all()
-        return c
-
-    def get(self, request):
-        user = request.user
-        c = self.get_context_data(user)
-        return super().get(request, c)
-
-
-@method_decorator(login_required, name='get')
 class PanelUsuario(AdminView):
     template_name = 'eventos/panel_usuario.html'
 
@@ -138,6 +105,7 @@ class PanelUsuario(AdminView):
         id_usuario = kwargs.pop('id_usuario')
         c['id_usuario'] = Usuario.objects.get(id=id_usuario)
         c['id_eventos'] = []
+        c['back'] = '/usuarios'
         for evento in Evento.objects.all():
             c['id_eventos'].append({'frees_total': evento.free_set.filter(vendedor=c['id_usuario']).count(),
                                     'frees': evento.free_set.filter(vendedor=c['id_usuario'], cliente__isnull=False).count(),
@@ -156,10 +124,71 @@ class PanelUsuario(AdminView):
     def post(self, request, *args, **kwargs):
         id_vendedor = kwargs.get('id_usuario')
         vendedor = Usuario.objects.get(id=id_vendedor)
-        user = Usuario.objects.get(user=request.user)
+        user = request.user
         form = FreeAssignToUserForm(request.POST)
         if form.is_valid():
             form.save(user, vendedor)
         c = self.get_context_data(request.user, *args, **kwargs)
         c['form'] = form
         return super().get(request, c)
+
+
+class ListaListasInvitados(AdminView):
+    template_name = 'eventos/lista_listas_invitados.html'
+
+    def get_context_data(self, user, *args, **kwargs):
+        c = super().get_context_data(user)
+        c['listas'] = ListaInvitados.objects.all()
+        return c
+
+    def get(self, request):
+        user = request.user
+        c = self.get_context_data(user)
+        c['form'] = ListaInvitadosForm()
+        return super().get(request, c)
+
+    def post(self, request):
+        c = self.get_context_data(request.user)
+        form = ListaInvitadosForm(request.POST)
+        if form.is_valid():
+            form.save()
+        c['form'] = form
+        return render(request, self.template_name, context=c)
+
+
+class ListaUsuarios(AdminView):
+    template_name = 'eventos/lista_usuarios.html'
+
+    def get_context_data(self, user, *args, **kwargs):
+        c = super(ListaUsuarios, self).get_context_data(user)
+        c['usuarios'] = Usuario.objects.all()
+        return c
+
+    def get(self, request, *args, **kwargs):
+        c = self.get_context_data(request.user)
+
+        return super().get(request, c)
+
+
+class ListaEventos(BasicView):
+    template_name = 'eventos/lista_eventos.html'
+
+    def get_context_data(self, user, *args, **kwargs):
+        c = super().get_context_data(user)
+        c['eventos'] = Evento.objects.all()
+        return c
+
+    def get(self, request):
+        user = request.user
+        c = self.get_context_data(user)
+        c['form'] = EventoForm()
+        return super().get(request, c)
+
+    def post(self, request):
+        c = self.get_context_data(request.user)
+        form = EventoForm(request.POST)
+        if form.is_valid():
+            form.save()
+        c['form'] = form
+        return render(request, self.template_name, context=c)
+
