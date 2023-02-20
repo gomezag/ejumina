@@ -5,28 +5,64 @@ Contacto: agustin.gomez.mansilla@gmail.com
 Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
+
+
+.autocomplete-items {
+    background-color: white;
+    width: 250px;
+    max-height: 250px;
+}
+
 .body {
     background-color: black;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
+
+.autocomplete-active {
+    background-color: darkkhaki;
+}
+
 
 .content-body {
     display: flex;
     flex-direction: column;
     z-index: 1;
-    align-self: flex-end;
     align-items: center;
-    margin-right: 3%;
-    margin-left: 3%;
     max-width: 80%;
-    width: 80%;
-    margin-bottom: 50px;
     row-gap: 15px;
+}
+
+.navbar {
+    background-color: black;
+}
+
+.navbar-item {
+    font-size: 1rem;
+}
+
+.navbar-burger {
     color: white;
 }
 
-.tabla_personas {
-    width: 90%;
+.navbar-brand a {
+    color: white;
+}
+
+.navbar-brand p.navbar-item {
+    color: white;
+}
+
+
+.tabla-personas {
+    width: 90vw;
     border: 4px solid;
+    font-size: 1rem;
+}
+
+.tabla-personas input {
+    font-size: 1rem;
 }
 
 .tabla_personas>tbody>tr {
@@ -48,12 +84,13 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     border: 1pt solid;
 }
 
-.autocomplete-items {
-    position: relative;
+.title {
+    color: white;
 }
 
 .opciones {
-    color: white;
+    color: black;
+    font-size: 1rem;
 }
 
 .active {
@@ -82,6 +119,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
+  font-size: 2rem;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
@@ -90,10 +128,9 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .close {
   color: #aaa;
   float: right;
-  font-size: 28px;
+  font-size: 1rem;
   font-weight: bold;
 }
-
 .close:hover,
 .close:focus {
   color: black;
@@ -101,57 +138,79 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   cursor: pointer;
 }
 
+/* Submit button for modal form */
+.button.modal-button{
+    margin-top: 10px;
+}
+
+/* Forms inside modal dialogs */
+.modal-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-form input {
+    width: 100%;
+}
+
+
+.modal-content {
+
+}
+/* End Modal */
+
+.body-form {
+    color: white;
+    justify-content: center;
+    row-gap: 15px;
+    display:flex;
+    flex-direction: column;
+}
+
+
+
+.button-container {
+    display: flex;
+    justify-content: right;
+}
 .plus-button {
+    margin-right: 30px;
     background-color: white;
     color: black;
-    font-size: 80px;
-    padding: 0;
-    margin: 0 0;
-    width: 50px;
-    height: 50px;
-    border-radius: 25px;
-    display: inline-block;
-    line-height: 30px;
-    border: 5px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid white;
+    font-size: 4.5vh;
+    width: 6vh;
+    height: 6vh;
+    border-radius: 3vh;
+
 }
     .plus-button.green {
         background-color: green;
+        color: white;
     }
 
     .plus-button.blue {
         background-color: blue;
+        color: white;
     }
-/* Smartphones in portrait */
-@media only screen
-  and (min-device-width: 100px)
-  and (max-device-width: 860px)
-  and (orientation: portrait) {
-
-    .content-body{
-        overflow-y:auto;
-        margin-right: 4%;
-        margin-left: 4%;
-        width: 92%;
-        align-self: center;
-        max-width: 92%;
-        font-size: 25pt;
-    }
-
-
-}
-
 
 /* Smartphones in landscape */
 @media only screen
   and (min-device-width: 100px)
-  and (max-device-width: 871px)
-  and (orientation: landscape) {
-
-    .content-body{
-        overflow:auto;
-        right: 0;
-        top: 25%;
-        width: 80%;
-        max-width: 80%;
-    }
+  and (max-device-width: 871px){
+    .body-form { font-size: 2rem;}
+    .body-form input { font-size: 2rem;}
+    .body-form select { font-size: 2rem;}
+    .table { font-size: 2rem;}
+    .navbar-item { font-size: 2rem;}
+    .button { font-size: 2rem;}
+.navbar-brand i{font-size:4rem;}
+.modal-content {font-size:2rem;}
+.modal-content input{font-size: 2rem;}
+.navbar-burger {height:5rem;width:5rem;}
 }

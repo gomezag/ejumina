@@ -1,0 +1,36 @@
+<table class="tabla-personas table" id="tabla_personas">
+    <tr>
+        <th onclick="sortTable(0)">
+            Nombre
+        </th>
+        <th onclick="sortTable(0)">
+            Rol
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+
+        </th>
+    </tr>
+    {% for persona in usuarios %}
+        <tr>
+            <td>
+                <a href="/u/{{persona.pk}}">{{persona.first_name}} {{persona.last_name}}</a>
+            </td>
+            <td>
+                {% for group in persona.groups.all%} {{group}} {% endfor %}
+            </td>
+            <td>
+                {{persona.persona.estado}}
+            </td>
+            <td>
+                <form method="POST" action="">
+                       {% csrf_token %}
+                        <input type="hidden" name="delete" value="{{persona.pk}}">
+                        <input class="button is-danger" type="submit" value="DELETE">
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

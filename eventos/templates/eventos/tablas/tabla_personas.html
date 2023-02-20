@@ -1,0 +1,34 @@
+<table class="tabla-personas table" id="tabla_personas">
+    <tr>
+        <th onclick="sortTable(0)">
+            Inv.
+        </th>
+        <th onclick="sortTable(0)">
+            Free
+        </th>
+        <th onclick="sortTable(0);">
+            Nombre
+        </th>
+        <th onclick="sortTable(0);">
+            Lista
+        </th>
+    </tr>
+    {% for persona in personas %}
+        <tr>
+            <td>
+                {{persona.invitaciones}}
+            </td>
+            <td>
+                {{persona.frees}}
+            </td>
+            <td>
+                <a href="/e/{{evento.pk}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
+            </td>
+            <td>
+                {% for lista in persona.listas %}
+                    <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

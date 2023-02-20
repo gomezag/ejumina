@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}
+    <li class="is-active"><a href="#">Listas</a></li>
+{% endblock %}
+
+{% block content %}
+<script src="{% static 'js/sort.js' %}"></script>
+
+<h1 class="title is-1"> Listas </h1>
+{% include 'eventos/tablas/tabla_listas.html' %}
+
+<form class="body-form" action="" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" class="button is-info" value="Crear Lista">
+</form>
+
+{% endblock %}

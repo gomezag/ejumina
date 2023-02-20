@@ -9,29 +9,42 @@ function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
   var currentFocus;
-  /*execute a function when someone writes in the text field:*/
+   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function(e) {
       var a, b, i, val = this.value;
+      console.log(val);
       /*close any already open lists of autocompleted values*/
       closeAllLists();
       if (!val) { return false;}
       currentFocus = -1;
       /*create a DIV element that will contain the items (values):*/
+      container = document.createElement("DIV");
+      container.setAttribute("id", this.id+"automplete-list-container");
+      container.setAttribute("class", "container");
       a = document.createElement("DIV");
       a.setAttribute("id", this.id + "autocomplete-list");
-      a.setAttribute("class", "autocomplete-items");
+      a.setAttribute("class", "autocomplete-items panel");
       /*append the DIV element as a child of the autocomplete container:*/
-      this.parentNode.appendChild(a);
+      container.appendChild(a);
+      this.parentNode.insertBefore(container, this.nextSibling);
       /*for each item in the array...*/
-      for (i = 0; i < arr.length; i++) {
+      for (i = 0; i < arr[0].length; i++) {
         /*check if the item starts with the same letters as the text field value:*/
+        console.log(arr[0][i][0]);
         if (arr[0][i][0].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
-          b.innerHTML = "<a href='/e/"+arr[1]+"/p/"+arr[0][i][1]+"/'> "+arr[0][i][0]+"</a>";
+          if(inp.id == 'id_persona') {
+              b.innerHTML = "<p>"+arr[0][i][0]+"</p>";
+              console.log(b.innerHTML);
+          }
+          else{
+              b.innerHTML = "<a href='/e/"+arr[1]+"/p/"+arr[0][i][1]+"/'> "+arr[0][i][0]+"</a>";
+              console.log(b.innerHTML);
+          }
           b.classList.add('opciones');
-          console.log(b.innerHTML);
+          b.classList.add('li');
           /*insert a input field that will hold the current array item's value:*/
          // b.innerHTML += "</a>"
           b.innerHTML += "<input type='hidden' value='" + arr[0][i][0] + "'>";
@@ -114,6 +127,6 @@ function getPosts(){
         console.log(url)
         window.location.href = url;
     }
-    }
+}
 
 
