@@ -6,7 +6,7 @@
    {{id_usuario.nombre}}
 </h1>
 <h2 class="title is-2">
-     {{id_usuario.get_rol_display}}
+{% for group in persona.groups.all%} {{group}} {% endfor %}
 </h2>
 
 <form class="body-form" action="" method="post">
