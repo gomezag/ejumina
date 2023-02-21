@@ -20,7 +20,7 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
-        c = super(PanelEvento, self).get_context_data(user, *args, **kwargs)
+        c = super().get_context_data(user, *args, **kwargs)
         if evento and not isinstance(evento, Evento):
             c['evento'] = Evento.objects.get(id=evento)
         else:
@@ -175,7 +175,7 @@ class ListaUsuarios(AdminView):
     template_name = 'eventos/lista_usuarios.html'
 
     def get_context_data(self, user, *args, **kwargs):
-        c = super(ListaUsuarios, self).get_context_data(user)
+        c = super().get_context_data(user)
         c['usuarios'] = Usuario.objects.all()
         return c
 
@@ -207,3 +207,18 @@ class ListaEventos(BasicView):
         c['form'] = form
         return render(request, self.template_name, context=c)
 
+
+class ImportView(BasicView):
+    template_name = 'eventos/lista_usuarios.html'
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        c = self.get_context_data(user)
+
+        return render(request, self.template_name, context=c)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        c = self.get_context_data(user)
+
+        return render(request, self.template_name, context=c)

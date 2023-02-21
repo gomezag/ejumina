@@ -177,11 +177,9 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     font-size: 2rem;
 }
 
-
-
 .button-container {
     position: fixed;
-    bottom: 10px;
+    bottom: 30px;
     right: 10px;
 
 }
