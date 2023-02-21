@@ -9,21 +9,70 @@
      {{persona.nombre}}
 </h2>
 
-<div class="container body-form">
-<p>
-    Invitaciones: {{invitaciones | length }}
-</p>
-<p>
-    Frees: {{frees | length }}
-</p>
-<button
-{% if invitaciones %}
-    class="active button" onclick="usar_invi({{invitaciones.0.pk}});"
-{% else %}
-    class="inactive button" disabled
-{% endif %}
-> Usar Invitacion </button>
-</div>
+<table class="table tabla-personas">
+    <tr>
+        <th>
+            RRPP
+        </th>
+        <th>
+            Inv.
+        </th>
+        <th>
+            Free
+        </th>
+        <th>
+            Lista
+        </th>
+        <th>
+
+        </th>
+        <th>
+
+        </th>
+    </tr>
+    {% for invitacion in invitaciones %}
+        <tr>
+            <td>
+                {{invitacion.rrpp}}
+            </td>
+            <td>
+                {{invitacion.cant}}
+            </td>
+            <td>
+                {{invitacion.frees}}
+            </td>
+            <td>
+                {{invitacion.lista}}
+            </td>
+            <td>
+                <button class="button is-success">
+                    Usar
+                </button>
+            </td>
+            <td>
+                <button class="button is-danger">
+                    Borrar
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+<!--<div class="container body-form">-->
+<!--<p>-->
+<!--    Invitaciones: {{invitaciones | length }}-->
+<!--</p>-->
+<!--<p>-->
+<!--    Frees: {{frees | length }}-->
+<!--</p>-->
+<!--<button-->
+<!--{% if invitaciones %}-->
+<!--    class="active button" onclick="usar_invi({{invitaciones.0.pk}});"-->
+<!--{% else %}-->
+<!--    class="inactive button" disabled-->
+<!--{% endif %}-->
+<!--&gt; Usar Invitacion </button>-->
+<!--</div>-->
 <form class="body-form" action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}

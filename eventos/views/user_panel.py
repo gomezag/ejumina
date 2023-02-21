@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from eventos.forms import *
 from django.db.models.base import ObjectDoesNotExist
+from django.db.models import Count
 from .basic_view import *
 
 
@@ -75,6 +76,17 @@ class PanelEventoPersona(BasicView):
         c['evento'] = evento
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
+        c['invitaciones'] = []
+        for invi in Invitacion.objects.filter(evento=evento).values('vendedor', 'lista').annotate(cant=Count('lista')):
+            vendedor = Usuario.objects.get(pk=invi['vendedor'])
+            lista = ListaInvitados.objects.get(pk=invi['lista'])
+            c['invitaciones'].append({
+                'rrpp': vendedor.first_name,
+                'cant': invi['cant'],
+                'frees': Free.objects.filter(evento=evento, vendedor=vendedor, lista=lista, cliente=persona).count(),
+                'lista': lista.nombre
+            })
+
         c['back'] = '/e/{}'.format(evento.pk)
         return c
 
@@ -112,6 +124,7 @@ class PanelUsuario(AdminView):
                                     'invis': evento.invitacion_set.filter(vendedor=c['id_usuario']).count(),
                                     'nombre': evento.name,
                                     'id': evento.id})
+
         return c
 
     def get(self, request, *args, **kwargs):

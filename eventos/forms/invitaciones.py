@@ -98,10 +98,10 @@ class MultiInviAssignToPersona(forms.Form):
         n_invis = self.cleaned_data.get('invitaciones')
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
 
-        if n_frees>0:
+        if n_frees > 0:
             for n in range(n_frees):
                 try:
-                    free = free_set.pop(0)
+                    free = free_set[n]
                 except IndexError:
                     self.add_error('frees', 'No tenés suficientes frees!')
                     break
