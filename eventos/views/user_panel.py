@@ -209,7 +209,7 @@ class ListaEventos(BasicView):
 
 
 class ImportView(BasicView):
-    template_name = 'eventos/lista_usuarios.html'
+    template_name = 'eventos/excel_import.html'
 
     def get(self, request, *args, **kwargs):
         user = request.user
