@@ -13,6 +13,7 @@ from eventos.forms import *
 from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from .basic_view import *
+from django.db.models import Q
 
 
 class PanelEvento(BasicView):
@@ -29,7 +30,7 @@ class PanelEvento(BasicView):
             try:
                 invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
                 frees = Free.objects.filter(evento=c['evento'], cliente=persona)
-                listas = ListaInvitados.objects.filter(personas=persona).distinct()
+                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento)|Q(personas_free=persona, free__evento=evento)).distinct()
             except ObjectDoesNotExist:
                 invitaciones = listas = []
 
@@ -78,7 +79,7 @@ class PanelEventoPersona(BasicView):
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = []
-        for invi in Invitacion.objects.filter(evento=evento).values('vendedor', 'lista').annotate(cant=Count('lista')):
+        for invi in Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(cant=Count('lista')):
             vendedor = Usuario.objects.get(pk=invi['vendedor'])
             lista = ListaInvitados.objects.get(pk=invi['lista'])
             c['invitaciones'].append({

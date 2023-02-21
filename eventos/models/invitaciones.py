@@ -29,7 +29,8 @@ ESTADOS_INVITACION = [
 
 class ListaInvitados(models.Model):
     color = CharField(max_length=9, choices=COLORES, null=False, default='#0057e7')
-    personas = ManyToManyField(Persona, blank=True, through='Invitacion')
+    personas = ManyToManyField(Persona, blank=True, through='Invitacion', related_name='invitados')
+    personas_free = ManyToManyField(Persona, blank=True, through='Free', related_name='invitados_free')
     administradores = ManyToManyField(Usuario, blank=True)
     nombre = CharField(max_length=15, null=False, blank=False)
 
