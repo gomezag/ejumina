@@ -32,48 +32,6 @@ class ListaInvitadosForm(forms.ModelForm):
         fields = ['nombre', 'administradores', 'color']
 
 
-
-
-class InvitacionAssignForm(forms.ModelForm):
-    persona = forms.CharField()
-
-    class Meta:
-        model = Invitacion
-        fields = ['persona', 'lista']
-
-    def __init__(self, *args, **kwargs):
-        super(InvitacionAssignForm, self).__init__(*args, **kwargs)
-        self.fields['persona'].widget.attrs['class'] = 'input'
-
-    def __init__(self, *args, **kwargs):
-        queryset = ListaInvitados.objects.filter(administradores__in=[kwargs.pop('usuario')])
-        super(InvitacionAssignForm, self).__init__(*args, **kwargs)
-        self.fields['lista'].queryset = queryset
-        self.fields['persona'].widget.attrs['class']='input persona'
-
-    def save(self, evento, usuario):
-        cliente_name = self.cleaned_data['persona'].split(" ")
-        try:
-            cliente_name.remove('')
-        except ValueError:
-            pass
-        cliente_name = ' '.join(cliente_name)
-        cliente, created = Persona.objects.get_or_create(
-            nombre=cliente_name
-        )
-        instance = super(InvitacionAssignForm, self).save(commit=False)
-        assert isinstance(evento, Evento), TypeError('evento should be of type Evento')
-        instance.evento = evento
-        instance.vendedor = usuario
-        instance.estado = 'ACT'
-        instance.cliente = cliente
-        instance.save()
-        return instance
-
-
-InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0)
-
-
 class MultiInviAssignToPersona(forms.Form):
     invitaciones = forms.IntegerField(min_value=0, initial=0)
     frees = forms.IntegerField(min_value=0, initial=0)
@@ -84,11 +42,13 @@ class MultiInviAssignToPersona(forms.Form):
         self.fields['lista'].queryset = ListaInvitados.objects.filter(administradores__in=[usuario])
 
         max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
-        min_frees = Free.objects.filter(vendedor=usuario, cliente=persona).count()
-        min_invis = Invitacion.objects.filter(vendedor=usuario, cliente=persona).count()
+        if persona:
+            min_frees = Free.objects.filter(vendedor=usuario, cliente=persona).count()
+            self.fields['frees'].widget.attrs['min'] = -min_frees
+            min_invis = Invitacion.objects.filter(vendedor=usuario, cliente=persona).count()
+            self.fields['invitaciones'].widget.attrs['min'] = -min_invis
+
         self.fields['frees'].widget.attrs['max'] = max_frees
-        self.fields['frees'].widget.attrs['min'] = -min_frees
-        self.fields['invitaciones'].widget.attrs['min'] = -min_invis
 
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'input'
@@ -118,6 +78,23 @@ class MultiInviAssignToPersona(forms.Form):
                 invi.evento = evento
                 invi.save()
 
+
+class InvitacionAssignForm(MultiInviAssignToPersona):
+    persona = forms.CharField()
+
+    def __init__(self, user, *args, **kwargs):
+        super(InvitacionAssignForm, self).__init__(user, None, *args, **kwargs)
+        self.fields['persona'].widget.attrs['class'] = 'input persona'
+
+    def save(self, user, evento):
+        nombre = self.cleaned_data['persona']
+        persona, created = Persona.objects.get_or_create(nombre=nombre)
+        if created:
+            persona.save()
+        super().save(user, persona, evento)
+
+
+InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0, exclude=['id'])
 
 class FreeAssignToUserForm(forms.Form):
     free = forms.IntegerField(min_value=0)

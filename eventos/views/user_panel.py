@@ -47,7 +47,7 @@ class PanelEvento(BasicView):
         # Check query
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
-        c['persona_form'] = PersonaForm()
+        c['persona_form'] = InvitacionAssignForm(request.user)
         c['invi_totales'] = len(c['evento'].invitacion_set.all())
 
         return super().get(request, c)
@@ -56,10 +56,10 @@ class PanelEvento(BasicView):
 
         evento = Evento.objects.get(id=evento)
         user = request.user
-        form = PersonaForm(request.POST)
+        form = InvitacionAssignForm(request.user, data=request.POST)
 
         if form.is_valid():
-            form.save()
+            form.save(request.user, evento)
 
         c = self.get_context_data(user, evento, None)
         c['persona_form'] = form
