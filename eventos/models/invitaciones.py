@@ -57,4 +57,4 @@ class Free(models.Model):
     lista = ForeignKey(ListaInvitados, null=True, on_delete=models.CASCADE, blank=True)
 
     def __str__(self):
-        return f"Free a {self.evento} - {self.get_estado_display()} - {self.vendedor.nombre} a {self.cliente}"
+        return f"Free a {str(self.evento)} - {self.get_estado_display()} - {self.vendedor.name} a {self.cliente}"

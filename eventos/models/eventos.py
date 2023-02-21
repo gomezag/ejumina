@@ -22,4 +22,4 @@ class Evento(Model):
     fecha = DateField(default=now)
 
     def __str__(self):
-        return " - ".join([self.estado, self.name, self.fecha])
+        return " - ".join([self.estado, self.name, str(self.fecha)])
