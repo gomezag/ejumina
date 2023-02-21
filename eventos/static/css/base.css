@@ -20,6 +20,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     width: 100%;
 }
 
+.body input {
+    font-size: 3rem;
+}
+
 .autocomplete-active {
     background-color: darkkhaki;
 }
@@ -90,7 +94,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .opciones {
     color: black;
-    font-size: 1rem;
+    font-size: 3rem;
 }
 
 .active {
@@ -167,6 +171,9 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     row-gap: 15px;
     display:flex;
     flex-direction: column;
+}
+.body-form input {
+    font-size: 2rem;
 }
 
 
