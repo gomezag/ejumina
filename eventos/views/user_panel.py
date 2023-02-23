@@ -7,8 +7,6 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from eventos.forms import *
 from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
@@ -22,7 +20,7 @@ class PanelEvento(BasicView):
     def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
         if evento and not isinstance(evento, Evento):
-            c['evento'] = Evento.objects.get(id=evento)
+            c['evento'] = Evento.objects.get(slug=evento)
         else:
             c['evento'] = Evento.objects.all()[0]
         c['personas'] = []
@@ -30,7 +28,8 @@ class PanelEvento(BasicView):
             try:
                 invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
                 frees = Free.objects.filter(evento=c['evento'], cliente=persona)
-                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento)|Q(personas_free=persona, free__evento=evento)).distinct()
+                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=c['evento'].pk) |
+                                                       Q(personas_free=persona, free__evento=c['evento'].pk)).distinct()
             except ObjectDoesNotExist:
                 invitaciones = listas = []
 
@@ -56,7 +55,7 @@ class PanelEvento(BasicView):
 
     def post(self, request, evento, *args, **kwargs):
 
-        evento = Evento.objects.get(id=evento)
+        evento = Evento.objects.get(slug=evento)
         user = request.user
         form = InvitacionAssignForm(request.user, data=request.POST)
 
@@ -72,7 +71,7 @@ class PanelEventoPersona(BasicView):
     template_name = 'eventos/persona_view_evento.html'
 
     def get_context_data(self, user, persona, evento, *args, **kwargs):
-        c = super(PanelEventoPersona, self).get_context_data(user, *args, **kwargs)
+        c = super().get_context_data(user, *args, **kwargs)
         invitaciones = persona.invitacion_set.filter(evento=evento)
         c['persona'] = persona
         c['evento'] = evento
@@ -86,7 +85,8 @@ class PanelEventoPersona(BasicView):
                 'rrpp': vendedor.first_name,
                 'cant': invi['cant'],
                 'frees': Free.objects.filter(evento=evento, vendedor=vendedor, lista=lista, cliente=persona).count(),
-                'lista': lista.nombre
+                'lista': lista.nombre,
+                'lista_id': lista.pk
             })
 
         c['back'] = '/e/{}'.format(evento.pk)
@@ -94,7 +94,7 @@ class PanelEventoPersona(BasicView):
 
     def get(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
-        evento = Evento.objects.get(pk=evento)
+        evento = Evento.objects.get(slug=evento)
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
         c['form'] = MultiInviAssignToPersona(usuario, persona)

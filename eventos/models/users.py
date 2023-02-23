@@ -5,8 +5,7 @@ Contacto: agustin.gomez.mansilla@gmail.com
 Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
-from django.contrib.auth.models import User, AbstractBaseUser, AbstractUser
-from django.db.models import OneToOneField, ManyToManyField, ForeignKey
+from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField
 from django.db.models.signals import pre_save

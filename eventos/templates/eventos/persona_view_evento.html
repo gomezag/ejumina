@@ -50,9 +50,13 @@
                 </button>
             </td>
             <td>
-                <button class="button is-danger">
-                    Borrar
-                </button>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete" value="1">
+                    <input type="hidden" name="lista" value="{{invitacion.lista_id}}">
+                    <input type="submit" class="button is-danger" value="Borrar">
+                </form>
+
             </td>
         </tr>
     {% endfor %}
