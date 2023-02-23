@@ -12,6 +12,7 @@ from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from .basic_view import *
 from django.db.models import Q
+from django.core.validators import integer_validator, validate_slug
 
 
 class PanelEvento(BasicView):
@@ -102,10 +103,21 @@ class PanelEventoPersona(BasicView):
 
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
-        evento = Evento.objects.get(pk=evento)
-        form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
-        if form.is_valid():
-            form.save(request.user, persona, evento)
+        evento = Evento.objects.get(slug=evento)
+        if request.POST.get('delete', None):
+            try:
+                integer_validator(request.POST['lista'])
+                lista = ListaInvitados.objects.get(pk=request.POST['lista'])
+            except:
+                return HttpResponseRedirect('/')
+            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=request.user,
+                                                     lista=lista)
+            print('delete {}'.format(invitaciones))
+            form = MultiInviAssignToPersona(request.user, persona)
+        else:
+            form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
+            if form.is_valid():
+                form.save(request.user, persona, evento)
         c = self.get_context_data(request.user, persona, evento)
         c['form'] = form
         return super().get(request, c)
