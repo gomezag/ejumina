@@ -41,9 +41,12 @@ class PanelEvento(BasicView):
                                   'invitaciones': invitaciones.count(),
                                   'frees': frees.count(),
                                   'listas': list(listas)})
-        c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario']).exclude(cliente=None).count()
-        c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario']).exclude(cliente=None).count()
-        c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario']).count()
+        c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
+                                                            evento=c['evento'].pk).exclude(cliente=None).count()
+        c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario'],
+                                                       evento=c['evento'].pk).exclude(cliente=None).count()
+        c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
+                                                       evento=c['evento'].pk).count()
         return c
 
     def get(self, request, evento, *args, **kwargs):
