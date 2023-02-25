@@ -18,6 +18,7 @@ from eventos.forms import *
 from eventos.views.basic_view import *
 from eventos.utils import parse_excel_import
 
+
 class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
@@ -85,8 +86,10 @@ class PanelEventoPersona(BasicView):
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = []
-        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(invis=Count('lista')))
-        frees = list(Free.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(frees=Count('lista')))
+        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(
+            invis=Count('lista')))
+        frees = list(Free.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(
+            frees=Count('lista')))
         all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor'], x['lista']))
         for common, group in itertools.groupby(all_invis, key=lambda x: (x['vendedor'], x['lista'])):
             vendedor = Usuario.objects.get(pk=common[0])
@@ -96,7 +99,7 @@ class PanelEventoPersona(BasicView):
                 'lista_id': lista.pk,
                 'invis': 0,
                 'frees': 0,
-                }
+            }
             [r.update(g) for g in group]
             r.update({'lista': lista.nombre})
             c['invitaciones'].append(r)
@@ -151,7 +154,8 @@ class PanelUsuario(AdminView):
         c['back'] = '/usuarios'
         for evento in Evento.objects.all():
             c['id_eventos'].append({'frees_total': evento.free_set.filter(vendedor=c['id_usuario']).count(),
-                                    'frees': evento.free_set.filter(vendedor=c['id_usuario'], cliente__isnull=False).count(),
+                                    'frees': evento.free_set.filter(vendedor=c['id_usuario'],
+                                                                    cliente__isnull=False).count(),
                                     'invis': evento.invitacion_set.filter(vendedor=c['id_usuario']).count(),
                                     'nombre': evento.name,
                                     'id': evento.id})
@@ -265,7 +269,7 @@ class ImportView(BasicView):
                         lista = ListaInvitados.objects.get(nombre=entry['lista'])
 
                     except ObjectDoesNotExist:
-                        errors='Lista no existe. Esta entrada se ignora'
+                        errors = 'Lista no existe. Esta entrada se ignora'
                         lista = entry['lista']
                     if not errors:
                         try:
