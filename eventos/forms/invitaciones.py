@@ -92,6 +92,7 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
 
 InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0, exclude=['id'])
 
+
 class FreeAssignToUserForm(forms.Form):
     free = forms.IntegerField(min_value=0)
     evento = forms.ModelChoiceField(queryset=Evento.objects.all())

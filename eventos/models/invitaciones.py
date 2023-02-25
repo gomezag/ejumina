@@ -41,7 +41,7 @@ class ListaInvitados(models.Model):
 class Invitacion(models.Model):
     estado = CharField(max_length=3, choices=ESTADOS_INVITACION)
     evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
-    vendedor = ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=False)
+    vendedor = ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=False)
     cliente = ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True)
     lista = ForeignKey(ListaInvitados, null=False, on_delete=models.CASCADE, blank=False)
 
