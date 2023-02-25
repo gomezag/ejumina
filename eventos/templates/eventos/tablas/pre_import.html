@@ -1,0 +1,39 @@
+<table class="tabla-personas table">
+    <tr>
+    <th>
+
+        Nombre
+    </th>
+    <th>
+       Invitaciones
+    </th>
+    <th>
+        Frees
+    </th>
+    <th>
+        Lista
+    </th>
+    <th>
+        Aviso
+    </th>
+    </tr>
+    {% for invitacion in invitaciones %}
+    <tr>
+    <td>
+        {{invitacion.persona.nombre}}
+    </td>
+    <td>
+        {{invitacion.invis}}
+    </td>
+    <td>
+        {{invitacion.frees}}
+    </td>
+    <td>
+        {{invitacion.lista.nombre}}
+    </td>
+    <td>
+        {{invitacion.errors.0.1}}
+    </td>
+    </tr>
+    {% endfor %}
+</table>

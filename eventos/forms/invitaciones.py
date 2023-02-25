@@ -114,4 +114,4 @@ class FreeAssignToUserForm(forms.Form):
 
 class ExcelImportForm(forms.Form):
     file = forms.FileField(validators=[file_size])
-
+    evento = forms.ModelChoiceField(queryset=Evento.objects.all())

@@ -17,5 +17,6 @@ urlpatterns = [
     path('u/<int:id_usuario>', PanelUsuario.as_view()),
     path('', ListaEventos.as_view()),
     path('listas', ListaListasInvitados.as_view()),
-    path('importar', ImportView.as_view())
+    path('importar', ImportView.as_view()),
+    path('importar/confirmar/', ImportExcelToEvento.as_view())
 ]

@@ -24,10 +24,13 @@ def parse_excel_import(f):
         assert header[3].value.lower() == 'lista', "Cuarta columna tiene que llamarse Lista"
     except Exception as e:
         raise ValueError(str(e))
+    frees = 0
     for row in rows:
         if all([r.value is not None for r in row]):
             results.append({'nombre': row[0].value, 'invis': row[1].value, 'frees': row[2].value, 'lista': row[3].value})
-    return results
+            frees += row[2].value
+
+    return frees, results
 
 
 def unique_slugify(instance, value, slug_field_name='slug', queryset=None,

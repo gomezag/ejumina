@@ -13,6 +13,7 @@ from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from django.db.models import Q
 from django.core.validators import integer_validator
+from django.core import serializers
 
 from eventos.forms import *
 from eventos.views.basic_view import *
@@ -246,47 +247,103 @@ class ImportView(BasicView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
+        parsed_data = request.session.get('parsed_data', None)
+        evento_pk = request.session.get('evento_pk', None)
+        if parsed_data and evento_pk:
+            evento = Evento.objects.get(pk=evento_pk)
+            extras = {
+                'invitaciones': parsed_data,
+                'evento': evento
+            }
+        else:
+            request.session.pop('parsed_data', None)
+            request.session.pop('evento_pk', None)
+            extras = {'form': ExcelImportForm()}
         c = self.get_context_data(user)
-        c['form'] = ExcelImportForm()
-
+        c.update(extras)
         return render(request, self.template_name, context=c)
 
     def post(self, request, *args, **kwargs):
         user = request.user
         form = ExcelImportForm(request.POST, request.FILES)
+        parsed = None
+        evento_slug = None
         if form.is_valid():
             try:
-                res = parse_excel_import(request.FILES['file'])
+                frees, res = parse_excel_import(request.FILES['file'])
             except ValueError as e:
                 form.errors['file'] = [str(e)]
                 res = False
-
+            evento = form.cleaned_data['evento']
+            total_frees = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True).count()
+            if frees > total_frees:
+                form.errors['file'] = ["El excel asigna más frees de los que podes asignar al evento {}. Frees asignados:{}. Frees disponibles: {}.".format(
+                    evento.name, frees, total_frees
+                )]
+                res = False
             if res:
                 parsed = []
                 for entry in res:
-                    errors = None
+                    errors = []
                     try:
                         lista = ListaInvitados.objects.get(nombre=entry['lista'])
-
+                        lista = {'nombre': lista.nombre, 'pk': lista.pk}
                     except ObjectDoesNotExist:
-                        errors = 'Lista no existe. Esta entrada se ignora'
-                        lista = entry['lista']
-                    if not errors:
-                        try:
-                            persona = Persona.objects.get(nombre=entry['nombre'])
-                        except ObjectDoesNotExist:
-                            errors = 'Persona no existe. Se creara nueva'
-                            persona = entry['nombre']
-                    else:
-                        persona = entry['nombre']
-
+                        errors.append(('lista', 'Lista no existe. Se ignora esta entrada.'))
+                        lista = {'nombre': entry['lista']}
+                    try:
+                        persona = Persona.objects.get(nombre=entry['nombre'])
+                        persona = {'nombre': persona.nombre, 'pk': persona.pk}
+                    except ObjectDoesNotExist:
+                        errors.append(('persona', 'Persona no existe. Se creara nueva'))
+                        persona = {'nombre': entry['nombre']}
+                    frees = int(entry['frees'])
+                    invis = int(entry['invis'])
+                    if integer_validator(frees) and integer_validator(invis):
+                        errors.append(('lista', "Error leyendo frees o invis. Se ignora esta entrada."))
                     parsed.append({
                         'persona': persona,
                         'lista': lista,
+                        'frees': frees,
+                        'invis': invis,
                         'errors': errors
                     })
-                print(parsed)
+                request.session.update({'parsed_data': parsed, 'evento_pk': evento.pk})
+                return self.get(request)
 
         c = self.get_context_data(user)
+        c['invitaciones'] = parsed
         c['form'] = form
         return render(request, self.template_name, context=c)
+
+
+class ImportExcelToEvento(BasicView):
+    def get(self, request):
+        request.session.pop('parsed_data', None)
+        request.session.pop('evento_pk', None)
+
+        return HttpResponseRedirect('/importar')
+
+    def post(self, request):
+        parsed_data = request.session.pop('parsed_data', None)
+        evento_pk = request.session.pop('evento_pk', None)
+        evento = Evento.objects.get(pk=evento_pk)
+        if parsed_data and evento:
+            frees = list(Free.objects.filter(vendedor=request.user, evento=evento, cliente__isnull=True))
+            for row in parsed_data:
+                if 'lista' not in [r[0] for r in row['errors']]:
+                    persona, created = Persona.objects.get_or_create(nombre=row['persona']['nombre'])
+                    lista = ListaInvitados.objects.get(pk=row['lista']['pk'])
+                    for n in range(row['invis']):
+                        invi = Invitacion()
+                        invi.vendedor = request.user
+                        invi.cliente = persona
+                        invi.lista = lista
+                        invi.evento = evento
+                        invi.save()
+                    for n in range(row['frees']):
+                        free = frees.pop(0)
+                        free.cliente = persona
+                        free.lista = lista
+                        free.save()
+        return HttpResponseRedirect('/e/{}'.format(evento.slug))
