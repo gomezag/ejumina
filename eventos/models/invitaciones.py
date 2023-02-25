@@ -32,7 +32,7 @@ class ListaInvitados(models.Model):
     personas = ManyToManyField(Persona, blank=True, through='Invitacion', related_name='invitados')
     personas_free = ManyToManyField(Persona, blank=True, through='Free', related_name='invitados_free')
     administradores = ManyToManyField(Usuario, blank=True)
-    nombre = CharField(max_length=15, null=False, blank=False)
+    nombre = CharField(max_length=25, null=False, blank=False, unique=True)
 
     def __str__(self):
         return self.nombre
