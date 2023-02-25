@@ -9,11 +9,10 @@
      {{persona.nombre}}
 </h2>
 
+{% include 'eventos/tablas/tabla_invitaciones.html' %}
+
 <form class="body-form" action="" method="post">
     {% csrf_token %}
     {% include 'eventos/forms/multiassign-form.html' %}
 </form>
-
-{% include 'eventos/tablas/tabla_invitaciones.html' %}
-
 {% endblock %}

@@ -10,10 +10,7 @@
 </h2>
 
 <h5 class="title is-5"> Asignar Frees: </h5>
-<form class="body-form" action="" method="post">
-    {% csrf_token %}
-    {% include 'eventos/forms/evento-form.html' %}
-</form>
+
 
 <table class="table">
     <th>
@@ -39,5 +36,10 @@
     </tr>
     {% endfor %}
 </table>
+
+<form class="body-form" action="" method="post">
+    {% csrf_token %}
+    {% include 'eventos/forms/evento-form.html' %}
+</form>
 
 {% endblock %}
