@@ -2,4 +2,4 @@ django
 python-dotenv
 gunicorn
 mysqlclient
-pandas
+openpyxl
