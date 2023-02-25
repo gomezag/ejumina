@@ -24,7 +24,7 @@
 
         <div class="navbar-dropdown is-active">
           {% for evento in eventos %}
-            <a class="navbar-item" href="/e/{{evento.pk}}">
+            <a class="navbar-item" href="/e/{{evento.slug}}">
               {{evento.name}}
             </a>
           {% endfor %}
