@@ -225,6 +225,7 @@ class ListaUsuarios(AdminView):
         reset = request.POST.get('reset', None)
         if delete:
             print('deleting: {}'.format(delete))
+            form = NewUserForm()
         elif reset:
             target = Usuario.objects.get(pk=reset)
             pwd_form = PasswordResetForm(data={
