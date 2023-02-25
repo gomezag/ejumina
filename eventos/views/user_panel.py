@@ -9,13 +9,14 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 import itertools
 
-from eventos.forms import *
 from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
-from .basic_view import *
 from django.db.models import Q
 from django.core.validators import integer_validator
 
+from eventos.forms import *
+from eventos.views.basic_view import *
+from eventos.utils import parse_excel_import
 
 class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
@@ -242,11 +243,46 @@ class ImportView(BasicView):
     def get(self, request, *args, **kwargs):
         user = request.user
         c = self.get_context_data(user)
+        c['form'] = ExcelImportForm()
 
         return render(request, self.template_name, context=c)
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        c = self.get_context_data(user)
+        form = ExcelImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                res = parse_excel_import(request.FILES['file'])
+            except ValueError as e:
+                form.errors['file'] = [str(e)]
+                res = False
 
+            if res:
+                parsed = []
+                for entry in res:
+                    errors = None
+                    try:
+                        lista = ListaInvitados.objects.get(nombre=entry['lista'])
+
+                    except ObjectDoesNotExist:
+                        errors='Lista no existe. Esta entrada se ignora'
+                        lista = entry['lista']
+                    if not errors:
+                        try:
+                            persona = Persona.objects.get(nombre=entry['nombre'])
+                        except ObjectDoesNotExist:
+                            errors = 'Persona no existe. Se creara nueva'
+                            persona = entry['nombre']
+                    else:
+                        persona = entry['nombre']
+
+                    parsed.append({
+                        'persona': persona,
+                        'lista': lista,
+                        'errors': errors
+                    })
+                print(parsed)
+
+        c = self.get_context_data(user)
+        c['form'] = form
         return render(request, self.template_name, context=c)

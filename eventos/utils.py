@@ -1,10 +1,33 @@
-from openpyxl import load_workbook
 import re
+import os
+
+from openpyxl import load_workbook
 from django.template.defaultfilters import slugify
 
 
-def parse_excel_import(file):
-    workbook = load_workbook()
+def parse_excel_import(f):
+    extension = os.path.splitext(str(f))[1]
+    if extension != '.xlsx':
+        raise ValueError('Archivo tiene que tener extension .xlsx')
+    try:
+        wb = load_workbook(f)
+        ws = wb.worksheets[0]
+    except Exception as e:
+        raise ValueError('Error al leer el archivo. Asegurate que tenga una hoja y los datos esten ahí')
+    results = []
+    rows = ws.rows
+    header = next(rows)
+    try:
+        assert header[0].value.lower() == 'nombre', "Primera columna tiene que llamarse nombre"
+        assert header[1].value.lower() == 'frees', "Segunda columna tiene que llamarse frees"
+        assert header[2].value.lower() == 'invis', "Tercera columna tiene que llamarse invis"
+        assert header[3].value.lower() == 'lista', "Cuarta columna tiene que llamarse Lista"
+    except Exception as e:
+        raise ValueError(str(e))
+    for row in rows:
+        if all([r.value is not None for r in row]):
+            results.append({'nombre': row[0].value, 'invis': row[1].value, 'frees': row[2].value, 'lista': row[3].value})
+    return results
 
 
 def unique_slugify(instance, value, slug_field_name='slug', queryset=None,

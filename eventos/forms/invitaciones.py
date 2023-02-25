@@ -6,9 +6,10 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django import forms
-from django.db import models
-from ..models import *
 from django.forms.widgets import Widget
+
+from eventos.models import *
+from eventos.forms.validators import *
 
 
 class DisplayOnlyField(Widget):
@@ -42,11 +43,6 @@ class MultiInviAssignToPersona(forms.Form):
         self.fields['lista'].queryset = ListaInvitados.objects.filter(administradores__in=[usuario])
 
         max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
-        #if persona:
-            #min_frees = Free.objects.filter(vendedor=usuario, cliente=persona).count()
-            #self.fields['frees'].widget.attrs['min'] = -min_frees
-            #min_invis = Invitacion.objects.filter(vendedor=usuario, cliente=persona).count()
-            #self.fields['invitaciones'].widget.attrs['min'] = -min_invis
 
         self.fields['frees'].widget.attrs['max'] = max_frees
 
@@ -114,4 +110,8 @@ class FreeAssignToUserForm(forms.Form):
             free.save()
             free.administrador.set([user])
             free.save()
+
+
+class ExcelImportForm(forms.Form):
+    file = forms.FileField(validators=[file_size])
 
