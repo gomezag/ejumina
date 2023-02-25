@@ -1,21 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if form %}
-<form class="body-form" action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% include 'eventos/forms/import-form.html' %}
-</form>
-{% endif %}
-
-{% if invitaciones %}
-    <h4 class="title is-4"> Verifica los datos del excel: </h4>
-    <h5 class="title is-5"> Evento: {{evento.name}} </h5>
-    {% include 'eventos/tablas/pre_import.html' %}
-    <form class="body-form" method="post" action="importar/confirmar/">
+    {% if form %}
+    <form class="body-form" action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="submit" class="button is-info" value="Importar">
+        {% include 'eventos/forms/import-form.html' %}
     </form>
-    <a class="button is-danger" href="importar/confirmar">Cancelar</a>
-{% endif %}
+    {% endif %}
+
+    {% if import_errors %}
+        <p> Errores en la ultima importacion: </p>
+        {% for persona, lista, error in import_errors %}
+            <p>
+                Nombre: {{persona}} - Lista: {{lista}} - Error: {{error}}
+            </p>
+        {% endfor %}
+    {% endif %}
+
+    {% if invitaciones %}
+        <h4 class="title is-4"> Verifica los datos del excel: </h4>
+        <h5 class="title is-5"> Evento: {{evento.name}} </h5>
+        {% include 'eventos/tablas/pre_import.html' %}
+        <form class="body-form" method="post" action="importar/confirmar/">
+            {% csrf_token %}
+            <input type="submit" class="button is-info" value="Importar">
+        </form>
+        <a class="button is-danger" href="importar/confirmar">Cancelar</a>
+    {% endif %}
 {% endblock %}

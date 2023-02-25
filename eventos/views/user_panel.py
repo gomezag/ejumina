@@ -282,7 +282,9 @@ class ImportView(BasicView):
         user = request.user
         parsed_data = request.session.get('parsed_data', None)
         evento_pk = request.session.get('evento_pk', None)
+        import_errors = request.session.get('import_errors', None)
         if parsed_data and evento_pk:
+            request.session.pop('import_errors', None)
             evento = Evento.objects.get(pk=evento_pk)
             extras = {
                 'invitaciones': parsed_data,
@@ -292,6 +294,9 @@ class ImportView(BasicView):
             request.session.pop('parsed_data', None)
             request.session.pop('evento_pk', None)
             extras = {'form': ExcelImportForm()}
+            if import_errors:
+                extras.update({'import_errors': import_errors})
+
         c = self.get_context_data(user)
         c.update(extras)
         return render(request, self.template_name, context=c)
@@ -361,22 +366,21 @@ class ImportExcelToEvento(BasicView):
         parsed_data = request.session.pop('parsed_data', None)
         evento_pk = request.session.pop('evento_pk', None)
         evento = Evento.objects.get(pk=evento_pk)
+        errors = []
         if parsed_data and evento:
-            frees = list(Free.objects.filter(vendedor=request.user, evento=evento, cliente__isnull=True))
             for row in parsed_data:
                 if 'lista' not in [r[0] for r in row['errors']]:
-                    persona, created = Persona.objects.get_or_create(nombre=row['persona']['nombre'])
-                    lista = ListaInvitados.objects.get(pk=row['lista']['pk'])
-                    for n in range(row['invis']):
-                        invi = Invitacion()
-                        invi.vendedor = request.user
-                        invi.cliente = persona
-                        invi.lista = lista
-                        invi.evento = evento
-                        invi.save()
-                    for n in range(row['frees']):
-                        free = frees.pop(0)
-                        free.cliente = persona
-                        free.lista = lista
-                        free.save()
+                    form = InvitacionAssignForm(request.user, data={
+                        'persona': row['persona']['nombre'],
+                        'lista': row['lista']['pk'],
+                        'frees': row['frees'],
+                        'invitaciones': row['invis']
+                    })
+                    if form.is_valid():
+                        form.save(request.user, evento)
+                    else:
+                        errors.append((row['persona']['nombre'], row['lista']['nombre'], form.errors))
+        if errors:
+            request.session.update({'import_errors': errors})
+            return HttpResponseRedirect('/importar')
         return HttpResponseRedirect('/e/{}'.format(evento.slug))
