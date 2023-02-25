@@ -53,7 +53,7 @@ class MultiInviAssignToPersona(forms.Form):
         n_frees = self.cleaned_data.get('frees')
         n_invis = self.cleaned_data.get('invitaciones')
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
-
+        assert user in list(self.cleaned_data.get('lista').administradores.all())
         if n_frees > 0:
             for n in range(n_frees):
                 try:
