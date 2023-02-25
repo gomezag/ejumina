@@ -183,6 +183,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     right: 10px;
 
 }
+
+.errors {
+    color: red;
+}
+
 .plus-button {
     margin-right: 30px;
     background-color: white;

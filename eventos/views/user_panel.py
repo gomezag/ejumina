@@ -13,6 +13,7 @@ from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from django.db.models import Q
 from django.core.validators import integer_validator
+from django.contrib.auth.forms import PasswordResetForm
 
 from eventos.forms import *
 from eventos.views.basic_view import *
@@ -221,8 +222,22 @@ class ListaUsuarios(AdminView):
 
     def post(self, request, *args, **kwargs):
         delete = request.POST.get('delete', None)
+        reset = request.POST.get('reset', None)
         if delete:
             print('deleting: {}'.format(delete))
+        elif reset:
+            target = Usuario.objects.get(pk=reset)
+            pwd_form = PasswordResetForm(data={
+                'email': target.email
+            })
+            if pwd_form.is_valid():
+                print('password reset sent!')
+                pwd_form.save(
+                    request=request,
+                    use_https=True,
+                    email_template_name='registration/password_reset_email.html'
+                )
+            form = NewUserForm()
         else:
             form = NewUserForm(request.POST)
             if form.is_valid():

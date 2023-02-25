@@ -33,7 +33,7 @@
             </td>
             <td>
                 <form method="post" class="table-form" action=""
-                onsubmit="confirm('Seguro que queres borrar estas entradas?');">
+                onsubmit="return confirm('Seguro que queres borrar estas entradas?');">
                     {% csrf_token %}
                     <input type="hidden" name="delete" value="1">
                     <input type="hidden" name="lista" value="{{invitacion.lista_id}}">

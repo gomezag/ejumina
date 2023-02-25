@@ -23,9 +23,9 @@ class UserLoginForm(AuthenticationForm):
 class NewUserForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['username', 'password', 'groups', 'first_name', 'email']
+        fields = ['username', 'groups', 'first_name', 'email']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['groups'].queryset = Group.objects.exclude(name='superuser')
-        self.fields['password'].widget = forms.PasswordInput()
+        self.fields['groups'].required = True
