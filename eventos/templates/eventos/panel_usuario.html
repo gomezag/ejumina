@@ -3,16 +3,16 @@
 
 {% block content %}
 <h1 class="title is-1">
-   {{id_usuario.nombre}}
+   {{id_usuario.first_name}}
 </h1>
 <h2 class="title is-2">
 {% for group in persona.groups.all%} {{group}} {% endfor %}
 </h2>
 
+<h5 class="title is-5"> Asignar Frees: </h5>
 <form class="body-form" action="" method="post">
     {% csrf_token %}
-    {{form.as_p}}
-    <input class="button is-info" value="Dar Frees" type="submit">
+    {% include 'eventos/forms/evento-form.html' %}
 </form>
 
 <table class="table">
@@ -28,7 +28,7 @@
     {% for evento in id_eventos %}
     <tr>
         <td>
-            <a href="/e/{{evento.id}}">{{evento.nombre}}</a>
+            <a href="/e/{{evento.slug}}">{{evento.nombre}}</a>
         </td>
         <td>
             {{evento.frees}}/{{evento.frees_total}}

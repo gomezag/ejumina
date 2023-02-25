@@ -13,7 +13,6 @@
 
 <form class="body-form" action="" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input class="button is-info" value="Invitar" type="submit">
+    {% include 'eventos/forms/multiassign-form.html' %}
 </form>
 {% endblock %}

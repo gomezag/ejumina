@@ -1,0 +1,17 @@
+
+{% for field in form %}
+    <p>{{field.label}}</p>
+    <p>{{field.errors}}</p>
+    {% if field.id_for_label == 'id_evento' %}
+    <div class="select">
+    {% else %}
+    <p>
+    {% endif %}
+        {{field}}
+    {% if field.id_for_label != 'id_evento' %}
+    </p>
+    {% else %}
+    </div>
+    {% endif %}
+{% endfor %}
+<input type="submit" class="button is-info" value="Agregar Usuario">
