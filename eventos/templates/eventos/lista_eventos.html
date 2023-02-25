@@ -11,10 +11,11 @@
 {% include 'eventos/tablas/tabla_eventos.html' %}
 {% include 'eventos/setups/autocomplete_setup.html' %}
 
+{% if form %}
 <form class="body-form" action="" method="post">
     {% csrf_token %}
     {{form.as_p}}
     <input type="submit" class="button is-info" value="Crear Evento">
 </form>
-
+{% endif %}
 {% endblock %}

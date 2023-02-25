@@ -244,10 +244,13 @@ class ListaEventos(BasicView):
     def get(self, request):
         user = request.user
         c = self.get_context_data(user)
-        c['form'] = EventoForm()
+        if request.user.groups.filter(name='admin').exists():
+            c['form'] = EventoForm()
         return super().get(request, c)
 
     def post(self, request):
+        if not request.user.groups.filter(name='admin').exists():
+            return self.get(request)
         c = self.get_context_data(request.user)
         form = EventoForm(request.POST)
         if form.is_valid():
