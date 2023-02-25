@@ -93,12 +93,16 @@ if os.environ.get('DB_ENGINE', 'SQLITE3') == 'MYSQL':
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PWD'),
         'HOST': os.getenv('DB_HOST'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 else:
     engine = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    options = {}
 DATABASES = {
     'default': engine
 }
