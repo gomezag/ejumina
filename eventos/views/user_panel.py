@@ -105,7 +105,7 @@ class PanelEventoPersona(BasicView):
             r.update({'lista': lista.nombre})
             c['invitaciones'].append(r)
 
-        c['back'] = '/e/{}'.format(evento.pk)
+        c['back'] = '/e/{}'.format(evento.slug)
         return c
 
     def get(self, request, persona, evento, *args, **kwargs):
