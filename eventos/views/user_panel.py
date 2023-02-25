@@ -7,12 +7,14 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
+import itertools
+
 from eventos.forms import *
 from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from .basic_view import *
 from django.db.models import Q
-from django.core.validators import integer_validator, validate_slug
+from django.core.validators import integer_validator
 
 
 class PanelEvento(BasicView):
@@ -79,16 +81,21 @@ class PanelEventoPersona(BasicView):
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = []
-        for invi in Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(cant=Count('lista')):
-            vendedor = Usuario.objects.get(pk=invi['vendedor'])
-            lista = ListaInvitados.objects.get(pk=invi['lista'])
-            c['invitaciones'].append({
+        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(invis=Count('lista')))
+        frees = list(Free.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(frees=Count('lista')))
+        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor'], x['lista']))
+        for common, group in itertools.groupby(all_invis, key=lambda x: (x['vendedor'], x['lista'])):
+            vendedor = Usuario.objects.get(pk=common[0])
+            lista = ListaInvitados.objects.get(pk=common[1])
+            r = {
                 'rrpp': vendedor.first_name,
-                'cant': invi['cant'],
-                'frees': Free.objects.filter(evento=evento, vendedor=vendedor, lista=lista, cliente=persona).count(),
-                'lista': lista.nombre,
-                'lista_id': lista.pk
-            })
+                'lista_id': lista.pk,
+                'invis': 0,
+                'frees': 0,
+                }
+            [r.update(g) for g in group]
+            r.update({'lista': lista.nombre})
+            c['invitaciones'].append(r)
 
         c['back'] = '/e/{}'.format(evento.pk)
         return c
@@ -108,11 +115,12 @@ class PanelEventoPersona(BasicView):
             try:
                 integer_validator(request.POST['lista'])
                 lista = ListaInvitados.objects.get(pk=request.POST['lista'])
-            except:
+            except Exception as e:
                 return HttpResponseRedirect('/')
             invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=request.user,
                                                      lista=lista)
-            print('delete {}'.format(invitaciones))
+            for invi in invitaciones:
+                invi.delete()
             form = MultiInviAssignToPersona(request.user, persona)
         else:
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)

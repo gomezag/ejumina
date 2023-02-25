@@ -42,11 +42,11 @@ class MultiInviAssignToPersona(forms.Form):
         self.fields['lista'].queryset = ListaInvitados.objects.filter(administradores__in=[usuario])
 
         max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
-        if persona:
-            min_frees = Free.objects.filter(vendedor=usuario, cliente=persona).count()
-            self.fields['frees'].widget.attrs['min'] = -min_frees
-            min_invis = Invitacion.objects.filter(vendedor=usuario, cliente=persona).count()
-            self.fields['invitaciones'].widget.attrs['min'] = -min_invis
+        #if persona:
+            #min_frees = Free.objects.filter(vendedor=usuario, cliente=persona).count()
+            #self.fields['frees'].widget.attrs['min'] = -min_frees
+            #min_invis = Invitacion.objects.filter(vendedor=usuario, cliente=persona).count()
+            #self.fields['invitaciones'].widget.attrs['min'] = -min_invis
 
         self.fields['frees'].widget.attrs['max'] = max_frees
 
