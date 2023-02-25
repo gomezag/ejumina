@@ -122,6 +122,11 @@ class PanelEventoPersona(BasicView):
                 return HttpResponseRedirect('/')
             invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=request.user,
                                                      lista=lista)
+            frees = Free.objects.filter(cliente=persona, vendedor=request.user,
+                                        lista=lista)
+            for free in frees:
+                free.cliente = None
+                free.save()
             for invi in invitaciones:
                 invi.delete()
             form = MultiInviAssignToPersona(request.user, persona)
