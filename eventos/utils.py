@@ -2,7 +2,9 @@ import re
 import os
 
 from openpyxl import load_workbook
+
 from django.template.defaultfilters import slugify
+
 
 
 def parse_excel_import(f):
@@ -27,8 +29,8 @@ def parse_excel_import(f):
     frees = 0
     for row in rows:
         if all([r.value is not None for r in row]):
-            results.append({'nombre': row[0].value, 'invis': row[1].value, 'frees': row[2].value, 'lista': row[3].value})
-            frees += row[2].value
+            results.append({'nombre': row[0].value, 'invis': row[2].value, 'frees': row[1].value, 'lista': row[3].value})
+            frees += row[1].value
 
     return frees, results
 
@@ -101,3 +103,4 @@ def _slug_strip(value, separator='-'):
             re_sep = re.escape(separator)
         value = re.sub(r'^%s+|%s+$' % (re_sep, re_sep), '', value)
     return value
+

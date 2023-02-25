@@ -13,7 +13,6 @@ from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count
 from django.db.models import Q
 from django.core.validators import integer_validator
-from django.core import serializers
 
 from eventos.forms import *
 from eventos.views.basic_view import *
@@ -153,13 +152,14 @@ class PanelUsuario(AdminView):
         c['id_usuario'] = Usuario.objects.get(id=id_usuario)
         c['id_eventos'] = []
         c['back'] = '/usuarios'
+        c['persona'] = user
         for evento in Evento.objects.all():
             c['id_eventos'].append({'frees_total': evento.free_set.filter(vendedor=c['id_usuario']).count(),
                                     'frees': evento.free_set.filter(vendedor=c['id_usuario'],
                                                                     cliente__isnull=False).count(),
                                     'invis': evento.invitacion_set.filter(vendedor=c['id_usuario']).count(),
                                     'nombre': evento.name,
-                                    'id': evento.id})
+                                    'slug': evento.slug})
 
         return c
 
@@ -215,8 +215,22 @@ class ListaUsuarios(AdminView):
 
     def get(self, request, *args, **kwargs):
         c = self.get_context_data(request.user)
-
+        form = NewUserForm()
+        c['form'] = form
         return super().get(request, c)
+
+    def post(self, request, *args, **kwargs):
+        delete = request.POST.get('delete', None)
+        if delete:
+            print('deleting: {}'.format(delete))
+        else:
+            form = NewUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+        c = self.get_context_data(request.user)
+        c['form'] = form
+        return render(request, self.template_name, context=c)
 
 
 class ListaEventos(BasicView):
@@ -267,7 +281,6 @@ class ImportView(BasicView):
         user = request.user
         form = ExcelImportForm(request.POST, request.FILES)
         parsed = None
-        evento_slug = None
         if form.is_valid():
             try:
                 frees, res = parse_excel_import(request.FILES['file'])
@@ -286,7 +299,7 @@ class ImportView(BasicView):
                 for entry in res:
                     errors = []
                     try:
-                        lista = ListaInvitados.objects.get(nombre=entry['lista'])
+                        lista = ListaInvitados.objects.get(nombre=entry['lista'], administradores__in=[request.user])
                         lista = {'nombre': lista.nombre, 'pk': lista.pk}
                     except ObjectDoesNotExist:
                         errors.append(('lista', 'Lista no existe. Se ignora esta entrada.'))
@@ -309,6 +322,7 @@ class ImportView(BasicView):
                         'errors': errors
                     })
                 request.session.update({'parsed_data': parsed, 'evento_pk': evento.pk})
+
                 return self.get(request)
 
         c = self.get_context_data(user)
