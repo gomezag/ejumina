@@ -7,6 +7,12 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 
 
+:root {
+--fontsize: 35px;
+--fontsize-l: 35px;
+--fontsize-s: 17px;
+}
+
 .autocomplete-items {
     background-color: white;
     width: 250px;
@@ -22,7 +28,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .body input {
-    font-size: 3rem;
+    font-size: var(--fontsize-l);
 }
 
 .autocomplete-active {
@@ -44,7 +50,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .navbar-item {
-    font-size: 1rem;
+    font-size: var(--fontsize-s);
 }
 
 .navbar-burger {
@@ -63,11 +69,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .tabla-personas {
     width: 90vw;
     border: 4px solid;
-    font-size: 1rem;
+    font-size: var(--fontsize-s);
 }
 
 .tabla-personas input {
-    font-size: 1rem;
+    font-size: var(--fontsize-s);
 }
 
 .tabla_personas>tbody>tr {
@@ -95,7 +101,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .opciones {
     color: black;
-    font-size: 3rem;
+    font-size: var(--fontsize-l);
 }
 
 .active {
@@ -124,7 +130,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
-  font-size: 2rem;
+  font-size: var(--fontsize);
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
@@ -133,7 +139,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .close {
   color: #aaa;
   float: right;
-  font-size: 1rem;
+  font-size: var(--fontsize-s);
   font-weight: bold;
 }
 .close:hover,
@@ -177,7 +183,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .card-content .field p {
     margin: 10px;
-    font-size: 2rem;
+    font-size: var(--fontsize);
 }
 
 .card-content {
@@ -185,11 +191,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .card {
-    font-size: 2rem;
+    font-size: var(--fontsize);
 }
 
 .table-form input {
-    font-size: 2rem;
+    font-size: var(--fontsize);
 }
 
 .body-form {
@@ -209,16 +215,16 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .int-input input{
     width: 150px;
-    font-size: 2rem;
+    font-size: var(--fontsize);
 }
 
 .body-form .label {
     color:white;
-    font-size: 3rem;
+    font-size: var(--fontsize-l);
 }
 
 .body-form .field input {
-    font-size: 2rem;
+    font-size: var(--fontsize);
 }
 
 .body-content {
@@ -267,16 +273,16 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 @media only screen
   and (min-device-width: 100px)
   and (max-device-width: 871px){
-    .body-form { font-size: 2rem;}
-    .body-form input { font-size: 1.5rem;}
-    .body-form select { font-size: 2rem;}
-    .table { font-size: 2.3rem;}
-    .table input {font-size: 2.3rem;}
-    .navbar-item { font-size: 2.3rem;}
-    .button { font-size: 2rem;}
-    .navbar-brand i{font-size:4rem;}
-    .modal-content {font-size:2rem;}
-    .modal-content input{font-size: 2rem;}
-    .navbar-burger {height:5rem;width:5rem;}
-    .body-content {font-size: 2rem;}
+    .body-form { font-size: var(--fontsize);}
+    .body-form input { font-size: var(--fontsize);}
+    .body-form select { font-size:var(--fontsize);}
+    .table { font-size: var(--fontsize);}
+    .table input {font-size: var(--fontsize);}
+    .navbar-item { font-size: var(--fontsize-l);}
+    .button { font-size: var(--fontsize);}
+    .navbar-brand i{font-size:var(--fontsize);}
+    .modal-content {font-size:var(--fontsize);}
+    .modal-content input{font-size: var(--fontsize);}
+    .navbar-burger {height:100px;width:100px;}
+    .body-content {font-size: var(--fontsize);}
 }
