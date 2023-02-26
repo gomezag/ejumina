@@ -283,7 +283,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .searchbar { font-size: var(--fontsize-l);}
     .navbar-brand i{font-size:var(--fontsize);}
     .modal-content {font-size:var(--fontsize);}
-    .modal-content input{font-size: var(--fontsize);}
+    .modal-content input{font-size: var(--fontsize-l);}
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
 }
