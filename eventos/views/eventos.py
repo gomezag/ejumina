@@ -114,22 +114,26 @@ class PanelEventoPersona(BasicView):
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = []
-        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(
-            invis=Count('lista')))
-        frees = list(Free.objects.filter(evento=evento, cliente=persona).values('vendedor', 'lista').annotate(
-            frees=Count('lista')))
-        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor'], x['lista']))
-        for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor'], x['lista'])):
-            vendedor = Usuario.objects.get(pk=common[0])
+        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).
+                     values('vendedor__first_name', 'lista__pk', 'lista__nombre').annotate(
+                     invis=Count('lista'),
+                     used_invis=Count('lista', filter=Q(estado='USA'))))
+        frees = list(Free.objects.filter(evento=evento, cliente=persona).
+                     values('vendedor__first_name', 'lista__pk', 'lista__nombre').annotate(
+                     frees=Count('lista'),
+                     used_frees=Count('lista', filter=Q(estado='USA'))))
+        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor__first_name'], x['lista__pk']))
+        for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor__first_name'], x['lista__pk'])):
             lista = ListaInvitados.objects.get(pk=common[1])
             r = {
-                'rrpp': vendedor.first_name,
+                'rrpp': common[0],
                 'lista_id': lista.pk,
                 'invis': 0,
                 'frees': 0,
+                'used_invis': 0,
+                'used_frees': 0
             }
             [r.update(i) for i in invis]
-            r.update({'lista': lista.nombre})
             c['invitaciones'].append(r)
 
         c['back'] = '/e/{}'.format(evento.slug)

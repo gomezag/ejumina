@@ -10,6 +10,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 :root {
 --fontsize: 35px;
 --fontsize-l: 45px;
+--fontsize-xl: 60px;
 --fontsize-s: 17px;
 }
 
@@ -109,6 +110,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 .inactive {
     color: red;
+}
+.back-button {
+    font-size: var(--fontsize);
+    margin: 15px;
 }
 
  /* The Modal (background) */
@@ -288,4 +293,5 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .modal-content label {font-size: var(--fontsize);}
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
+    .back-button i{font-size: var(--fontsize-xl);}
 }
