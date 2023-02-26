@@ -104,3 +104,7 @@ def _slug_strip(value, separator='-'):
         value = re.sub(r'^%s+|%s+$' % (re_sep, re_sep), '', value)
     return value
 
+
+def validate_in_group(groups, valids):
+    return any([g in groups for g in valids])
+

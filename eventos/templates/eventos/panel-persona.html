@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h2 class="title is-2">
+     {{persona.nombre}}
+</h2>
+
+{% for evento in eventos_info %}
+    {{ evento.name }}
+    {% with evento.invis as invitaciones %}
+        {% include 'eventos/tablas/tabla_invitaciones.html' %}
+    {% endwith %}
+{% endfor %}
+
+<h5 class="title is-5"> Asignar Entradas: </h5>
+
+<form class="body-form" action="" method="post">
+    {% csrf_token %}
+    {% include 'eventos/forms/multiassign-form.html' %}
+</form>
+{% endblock %}

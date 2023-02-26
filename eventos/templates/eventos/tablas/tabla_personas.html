@@ -21,10 +21,10 @@
     {% for persona in personas %}
         <tr>
             <td>
-                {{persona.invitaciones}}
+                {{persona.invis_disponibles}} ({{persona.invis}})
             </td>
             <td>
-                {{persona.frees}}
+                {{persona.frees_disponibles}} ({{persona.frees}})
             </td>
             <td>
                 <a href="/e/{{evento.slug}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
@@ -36,7 +36,14 @@
             </td>
             {% if 'entrada' in groups or 'admin' in groups %}
             <td>
-                <button class="button is-info">Check-in</button>
+                <form action="" method="post" onsubmit='return confirm("Hacer check-in a {{persona.nombre}}?");'>
+                    {% csrf_token %}
+                    <input type="hidden" value="{{persona.invis_disponibles}}" name="n_invis">
+                    <input type="hidden" value="{{persona.frees_disponibles}}" name="n_frees">
+                    <input type="hidden" value="{{persona.pk}}" name="persona">
+                    <input type="hidden" value="True" name="checkin">
+                <input type="submit" class="button is-info" value="Check-in">
+                </form>
             </td>
             {% endif %}
         </tr>

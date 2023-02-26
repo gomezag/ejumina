@@ -1,6 +1,15 @@
+"""
+/*
+Propietario: grIT
+Contacto: agustin.gomez.mansilla@gmail.com
+
+Use of this code for any commercial purpose is NOT AUTHORIZED.
+El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
+*/
+"""
 from django.views import View
 from django.contrib.auth.forms import authenticate, AuthenticationForm
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
 

@@ -18,5 +18,6 @@ urlpatterns = [
     path('', ListaEventos.as_view()),
     path('listas', ListaListasInvitados.as_view()),
     path('importar', ImportView.as_view()),
-    path('importar/confirmar/', ImportExcelToEvento.as_view())
+    path('importar/confirmar/', ImportExcelToEvento.as_view()),
+    path('p/<int:persona>/', PanelPersona.as_view()),
 ]

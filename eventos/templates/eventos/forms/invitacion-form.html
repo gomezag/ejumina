@@ -1,5 +1,5 @@
 
-{% for field in persona_form %}
+{% for field in persona_form.visible_fields %}
 <div class="field">
     <label class="label">{{field.label}}</label>
     {% if field.id_for_label == 'id_lista' %}
@@ -16,4 +16,9 @@
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 {% endfor %}
-  <input type="submit" class="button is-info modal-button" value="Agregar">
+ {% for field in persona_form.hidden_fields %}
+     <div style="display:none;">{{ field }}</div>
+ {% endfor %}
+<div class="field">
+  <input type="submit" class="button is-info modal-button" value="Invitar">
+</div>

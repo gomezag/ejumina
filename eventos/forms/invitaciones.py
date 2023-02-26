@@ -63,6 +63,7 @@ class MultiInviAssignToPersona(forms.Form):
                     break
                 free.cliente = persona
                 free.lista = self.cleaned_data.get('lista')
+                free.estado = 'ACT'
                 free.save()
 
         if n_invis>0:
@@ -72,11 +73,13 @@ class MultiInviAssignToPersona(forms.Form):
                 invi.vendedor = user
                 invi.lista = self.cleaned_data.get('lista')
                 invi.evento = evento
+                invi.estado = 'ACT'
                 invi.save()
 
 
 class InvitacionAssignForm(MultiInviAssignToPersona):
     persona = forms.CharField()
+    invitar = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
     def __init__(self, user, *args, **kwargs):
         super(InvitacionAssignForm, self).__init__(user, None, *args, **kwargs)
@@ -116,3 +119,39 @@ class FreeAssignToUserForm(forms.Form):
 class ExcelImportForm(forms.Form):
     file = forms.FileField(validators=[file_size])
     evento = forms.ModelChoiceField(queryset=Evento.objects.all())
+
+
+class CheckInForm(forms.Form):
+    evento = forms.ModelChoiceField(queryset=Evento.objects.all())
+    persona = forms.ModelChoiceField(queryset=Persona.objects.all())
+    check_invis = forms.IntegerField()
+    check_frees = forms.IntegerField()
+
+    def is_valid(self, **kwargs):
+        r = super().is_valid()
+        if r:
+            persona = self.cleaned_data['persona']
+            evento = self.cleaned_data['evento']
+            n_invis = self.cleaned_data['check_invis']
+            n_frees = self.cleaned_data['check_frees']
+            if n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT').count():
+                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                return False
+            if n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='ACT').count():
+                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                return False
+        return r
+
+    def save(self):
+        persona = self.cleaned_data['persona']
+        evento = self.cleaned_data['evento']
+        n_invis = self.cleaned_data['check_invis']
+        n_frees = self.cleaned_data['check_frees']
+        invis = list(Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT'))
+        frees = list(Free.objects.filter(cliente=persona, evento=evento, estado='ACT'))
+        for n in range(n_invis):
+            invis[n].estado = 'USA'
+            invis[n].save()
+        for n in range(n_frees):
+            frees[n].estado = 'USA'
+            frees[n].save()

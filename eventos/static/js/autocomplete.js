@@ -18,15 +18,13 @@ function autocomplete(inp, arr) {
       if (!val) { return false;}
       currentFocus = -1;
       /*create a DIV element that will contain the items (values):*/
-      container = document.createElement("DIV");
-      container.setAttribute("id", this.id+"automplete-list-container");
-      container.setAttribute("class", "container");
+
       a = document.createElement("DIV");
       a.setAttribute("id", this.id + "autocomplete-list");
       a.setAttribute("class", "autocomplete-items panel");
       /*append the DIV element as a child of the autocomplete container:*/
-      container.appendChild(a);
-      this.parentNode.insertBefore(container, this.nextSibling);
+
+      this.parentNode.insertBefore(a, this.nextSibling);
       /*for each item in the array...*/
       for (i = 0; i < arr[0].length; i++) {
         /*check if the item starts with the same letters as the text field value:*/
@@ -109,6 +107,7 @@ function autocomplete(inp, arr) {
       if (elmnt != x[i] && elmnt != inp) {
       x[i].parentNode.removeChild(x[i]);
     }
+
   }
 }
 /*execute a function when someone clicks in the document:*/
