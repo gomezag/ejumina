@@ -4,11 +4,15 @@
     <label class="label">{{field.label}}</label>
     {% if field.id_for_label == 'id_evento' %}
     <span class="select">
+    {% elif field.id_for_label == 'id_free' %}
+    <div class="control int-input">
     {% else %}
     <div class="control">
     {% endif %}
         {{field}}
-    {% if field.id_for_label != 'id_evento' %}
+    {% if field.id_for_label == 'id_free' %}
+    </div>
+    {% elif field.id_for_label != 'id_evento' %}
     </div>
     {% else %}
     </span>
@@ -16,4 +20,6 @@
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 {% endfor %}
+<div class="field">
   <input type="submit" class="button is-info modal-button" value="Asignar Frees">
+</div>

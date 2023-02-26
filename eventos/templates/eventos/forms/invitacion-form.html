@@ -1,21 +1,24 @@
-
-{% for field in persona_form.visible_fields %}
-<div class="field">
-    <label class="label">{{field.label}}</label>
-    {% if field.id_for_label == 'id_lista' %}
-    <span class="select">
-    {% else %}
-    <div class="control">
-    {% endif %}
-        {{field}}
-    {% if field.id_for_label != 'id_lista' %}
+<div class="field is-grouped">
+    <div class="field int-input">
+        <label class="label">{{persona_form.invitaciones.label}}</label>
+        <div class="control">{{persona_form.invitaciones}}</div>
     </div>
-    {% else %}
-    </span>
-    {% endif %}
-    <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
+    <div class="field int-input">
+        <label class="label">{{persona_form.frees.label}}</label>
+        <div class="control">{{persona_form.frees}}</div>
+    </div>
 </div>
-{% endfor %}
+<div class="field">
+    <label class="label">{{persona_form.lista.label}}</label>
+    <span class="select">
+        {{persona_form.lista}}
+    </span>
+</div>
+<div class="field">
+    <label class="label">{{persona_form.persona.label}}</label>
+    <div class="control">{{persona_form.persona}}</div>
+</div>
+
  {% for field in persona_form.hidden_fields %}
      <div style="display:none;">{{ field }}</div>
  {% endfor %}

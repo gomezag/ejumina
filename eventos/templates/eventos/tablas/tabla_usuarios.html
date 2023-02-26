@@ -1,45 +1,35 @@
-<table class="tabla-personas table" id="tabla_personas">
-    <tr>
-        <th onclick="sortTable(0)">
-            Nombre
-        </th>
-        <th onclick="sortTable(0)">
-            Rol
-        </th>
-        <th>
-            Status
-        </th>
-        <th>
-
-        </th>
-    </tr>
-    {% for persona in usuarios %}
-        <tr>
-            <td>
-                <a href="/u/{{persona.pk}}">{{persona.first_name}} {{persona.last_name}}</a>
-            </td>
-            <td>
-                {% for group in persona.groups.all%} {{group}} {% endfor %}
-            </td>
-            <td>
-                {{persona.persona.estado}}
-            </td>
-            <td>
-                <form method="POST" action=""
-                        onsubmit="return confirm('Enviar correo a este usuario?');">
-                       {% csrf_token %}
-                        <input type="hidden" name="reset" value="{{persona.pk}}">
-                        <input class="button is-info" type="submit" value="Reset Password">
-                </form>
-            </td>
-            <td>
-                <form method="POST" action=""
-                        onsubmit="return confirm('Borrar este usuario? \n Mira que se borran TODAS las entradas! \n Segurísimo?');">
-                       {% csrf_token %}
-                        <input type="hidden" name="delete" value="{{persona.pk}}">
-                        <input class="button is-danger" type="submit" value="DELETE">
-                </form>
-            </td>
-        </tr>
+<div class="tile is-ancestor">
+    <div class="tile is-vertical">
+    {% for user in usuarios %}
+        <div class="tile is-child">
+            <div class="card">
+                <header class="card-header">
+                <p class="card-header-title">
+                  <a href="/u/{{user.pk}}">{{user.first_name}} </a>
+                </p>
+                </header>
+                <div class="card-content">
+                    <div class="field is-grouped">
+                        <p class="subtitle is-6">Email: </p>
+                        <p class="subtitle is-6">{{user.email}}</p>
+                    </div>
+                    <div class="field is-grouped">
+                        <form method="POST" action="" class="table-form"
+                                onsubmit="return confirm('Enviar correo a este usuario?');">
+                               {% csrf_token %}
+                                <input type="hidden" name="reset" value="{{persona.pk}}">
+                                <input class="button is-info" type="submit" value="Reset Password">
+                        </form>
+                        <form method="POST" action="" class="table-form"
+                                onsubmit="return confirm('Borrar este usuario? \n Mira que se borran TODAS las entradas! \n Segurísimo?');">
+                               {% csrf_token %}
+                                <input type="hidden" name="delete" value="{{persona.pk}}">
+                                <input class="button is-danger" type="submit" value="DELETE">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endfor %}
-</table>
+    </div>
+</div>

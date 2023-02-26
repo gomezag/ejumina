@@ -156,6 +156,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     align-items: center;
 }
 
+.modal-form .field{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 .modal-form input {
     width: 100%;
 }
@@ -166,14 +171,58 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 /* End Modal */
 
+.table-form{
+    padding:10px;
+}
+
+.card-content .field p {
+    margin: 10px;
+    font-size: 2rem;
+}
+
+.card-content {
+
+}
+
+.card {
+    font-size: 2rem;
+}
+
+.table-form input {
+    font-size: 2rem;
+}
+
 .body-form {
     color: white;
     justify-content: center;
+    align-items: center;
     row-gap: 15px;
     display:flex;
     flex-direction: column;
 }
-.body-form input {
+
+.body-form .field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.int-input input{
+    width: 150px;
+    font-size: 2rem;
+}
+
+.body-form .label {
+    color:white;
+    font-size: 3rem;
+}
+
+.body-form .field input {
+    font-size: 2rem;
+}
+
+.body-content {
+    color: white;
     font-size: 2rem;
 }
 
@@ -229,4 +278,5 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .modal-content {font-size:2rem;}
     .modal-content input{font-size: 2rem;}
     .navbar-burger {height:5rem;width:5rem;}
+    .body-content {font-size: 2rem;}
 }
