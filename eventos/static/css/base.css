@@ -219,13 +219,14 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   and (min-device-width: 100px)
   and (max-device-width: 871px){
     .body-form { font-size: 2rem;}
-    .body-form input { font-size: 2rem;}
+    .body-form input { font-size: 1.5rem;}
     .body-form select { font-size: 2rem;}
-    .table { font-size: 2rem;}
-    .navbar-item { font-size: 2rem;}
+    .table { font-size: 2.3rem;}
+    .table input {font-size: 2.3rem;}
+    .navbar-item { font-size: 2.3rem;}
     .button { font-size: 2rem;}
-.navbar-brand i{font-size:4rem;}
-.modal-content {font-size:2rem;}
-.modal-content input{font-size: 2rem;}
-.navbar-burger {height:5rem;width:5rem;}
+    .navbar-brand i{font-size:4rem;}
+    .modal-content {font-size:2rem;}
+    .modal-content input{font-size: 2rem;}
+    .navbar-burger {height:5rem;width:5rem;}
 }
