@@ -1,0 +1,3 @@
+Sitemap: https://therealagustin.com/sitemap.xml
+User-Agent: *
+Disallow: /

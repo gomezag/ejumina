@@ -10,6 +10,7 @@ from django.contrib import admin
 from django.urls import path, include, reverse
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sitemaps.views import sitemap
+from django.views.generic import TemplateView
 from eventos.views import LoginView
 from eventos.forms import UserLoginForm
 
@@ -24,10 +25,9 @@ urlpatterns = [
         name='login'
     ),
     path("accounts/", include("django.contrib.auth.urls")),
-    path('api/', include('api.urls')),
     path('', include('eventos.urls')),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
-
 
 
 class StaticViewSitemap(Sitemap):
@@ -36,7 +36,7 @@ class StaticViewSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return ['main', 'terms-and-conditions', 'about']
+        return []
 
     def location(self, item):
         return reverse(item)
@@ -48,10 +48,11 @@ class FeaturedViewSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return ['catalog', 'event-catalog']
+        return ['login']
 
     def location(self, item):
         return reverse(item)
+
 
 sitemaps = {
     'static': StaticViewSitemap,
