@@ -19,6 +19,32 @@ from eventos.views.basic_view import *
 from eventos.utils import validate_in_group
 
 
+class ListaEventos(BasicView):
+    template_name = 'eventos/lista_eventos.html'
+
+    def get_context_data(self, user, *args, **kwargs):
+        c = super().get_context_data(user)
+        c['eventos'] = Evento.objects.all()
+        return c
+
+    def get(self, request):
+        user = request.user
+        c = self.get_context_data(user)
+        if request.user.groups.filter(name='admin').exists():
+            c['form'] = EventoForm()
+        return super().get(request, c)
+
+    def post(self, request):
+        if not request.user.groups.filter(name='admin').exists():
+            return self.get(request)
+        c = self.get_context_data(request.user)
+        form = EventoForm(request.POST)
+        if form.is_valid():
+            form.save()
+        c['form'] = form
+        return render(request, self.template_name, context=c)
+
+
 class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
@@ -42,9 +68,9 @@ class PanelEvento(BasicView):
             c['personas'].append({'nombre': persona.nombre,
                                   'pk': persona.pk,
                                   'invis': invitaciones.count(),
-                                  'invis_disponibles': invitaciones.filter(estado='ACT').count(),
+                                  'invis_usadas': invitaciones.filter(estado='USA').count(),
                                   'frees': frees.count(),
-                                  'frees_disponibles': frees.filter(estado='ACT').count(),
+                                  'frees_usadas': frees.filter(estado='USA').count(),
                                   'listas': list(listas)})
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
@@ -174,28 +200,3 @@ class PanelEventoPersona(BasicView):
         c['form'] = form
         return super().get(request, c)
 
-
-class ListaEventos(BasicView):
-    template_name = 'eventos/lista_eventos.html'
-
-    def get_context_data(self, user, *args, **kwargs):
-        c = super().get_context_data(user)
-        c['eventos'] = Evento.objects.all()
-        return c
-
-    def get(self, request):
-        user = request.user
-        c = self.get_context_data(user)
-        if request.user.groups.filter(name='admin').exists():
-            c['form'] = EventoForm()
-        return super().get(request, c)
-
-    def post(self, request):
-        if not request.user.groups.filter(name='admin').exists():
-            return self.get(request)
-        c = self.get_context_data(request.user)
-        form = EventoForm(request.POST)
-        if form.is_valid():
-            form.save()
-        c['form'] = form
-        return render(request, self.template_name, context=c)

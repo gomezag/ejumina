@@ -21,10 +21,10 @@
     {% for persona in personas %}
         <tr>
             <td>
-                {{persona.invis_disponibles}} ({{persona.invis}})
+                {{persona.invis}} ({{persona.invis_usadas}})
             </td>
             <td>
-                {{persona.frees_disponibles}} ({{persona.frees}})
+                {{persona.frees}} ({{persona.frees_usadas}})
             </td>
             <td>
                 <a href="/e/{{evento.slug}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
