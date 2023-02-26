@@ -195,7 +195,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .table-form input {
-    font-size: var(--fontsize);
+    font-size: var(--fontsize-l);
 }
 
 .body-form {
@@ -215,7 +215,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .int-input input{
     width: 150px;
-    font-size: var(--fontsize);
+    font-size: var(--fontsize-l);
 }
 
 .body-form .label {
@@ -274,10 +274,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
   and (min-device-width: 100px)
   and (max-device-width: 871px){
     .body-form { font-size: var(--fontsize);}
-    .body-form input { font-size: var(--fontsize);}
+    .body-form input { font-size: var(--fontsize-l);}
     .body-form select { font-size:var(--fontsize);}
     .table { font-size: var(--fontsize);}
-    .table input {font-size: var(--fontsize);}
+    .table input {font-size: var(--fontsize-l);}
     .navbar-item { font-size: var(--fontsize-l);}
     .button { font-size: var(--fontsize);}
     .searchbar { font-size: var(--fontsize-l);}
