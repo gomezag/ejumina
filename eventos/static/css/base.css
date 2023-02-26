@@ -285,6 +285,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .modal-content {font-size:var(--fontsize);}
     .modal-content input{font-size: var(--fontsize-l);}
     .modal-content .select {font-size: var(--fontsize-l);}
+    .modal-content label {font-size: var(--fontsize);}
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
 }
