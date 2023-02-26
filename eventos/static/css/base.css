@@ -9,7 +9,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 :root {
 --fontsize: 35px;
---fontsize-l: 35px;
+--fontsize-l: 45px;
 --fontsize-s: 17px;
 }
 
@@ -280,6 +280,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .table input {font-size: var(--fontsize);}
     .navbar-item { font-size: var(--fontsize-l);}
     .button { font-size: var(--fontsize);}
+    .searchbar { font-size: var(--fontsize-l);}
     .navbar-brand i{font-size:var(--fontsize);}
     .modal-content {font-size:var(--fontsize);}
     .modal-content input{font-size: var(--fontsize);}
