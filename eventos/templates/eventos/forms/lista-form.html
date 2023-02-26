@@ -1,23 +1,22 @@
-
 {% for field in form %}
 <div class="field">
     <label class="label">{{field.label}}</label>
-    {% if field.id_for_label == 'id_lista' %}
-    <span class="select">
+    {% if field.id_for_label == 'id_color' %}
+        <span class="select">
     {% else %}
-    <div class="control">
+        <div class="control">
     {% endif %}
         {{field}}
-    {% if field.id_for_label != 'id_lista' %}
-    </div>
+    {% if field.id_for_label != 'id_color' %}
+        </div>
     {% else %}
-    </span>
+        </span>
     {% endif %}
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 {% endfor %}
 <div class="field">
     <p class="control">
-<input type="submit" class="button is-info" value="Asignar Entradas">
+        <input type="submit" class="button is-info" value="Crear Lista">
     </p>
 </div>

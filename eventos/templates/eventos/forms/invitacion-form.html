@@ -1,5 +1,5 @@
 
-{% for field in form %}
+{% for field in persona_form %}
 <div class="field">
     <label class="label">{{field.label}}</label>
     {% if field.id_for_label == 'id_lista' %}
@@ -16,8 +16,4 @@
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 {% endfor %}
-<div class="field">
-    <p class="control">
-<input type="submit" class="button is-info" value="Asignar Entradas">
-    </p>
-</div>
+  <input type="submit" class="button is-info modal-button" value="Agregar">

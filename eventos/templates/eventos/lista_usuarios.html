@@ -10,10 +10,24 @@
 {% include 'eventos/tablas/tabla_usuarios.html' %}
 {% include 'eventos/setups/autocomplete_setup.html' %}
 
-<h5 class="title is-5"> Agregar Usuario: </h5>
+{% endblock %}
 
-<form class="body-form" action="" method="post">
-    {% csrf_token %}
-    {% include 'eventos/forms/new-user-form.html' %}
-</form>
+{% block dialog %}
+<div class="button-container">
+    <button id="add-form" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
+</div>
+
+<div class="modal" id="form-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='form-close' class="close">&times;</span>
+
+            <form class="modal-form" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/new-user-form.html' %}
+            </form>
+
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
+
 {% endblock %}

@@ -12,6 +12,11 @@
         <th onclick="sortTable(0);">
             Lista
         </th>
+        {% if 'entrada' in groups or 'admin' in groups %}
+        <th>
+            Check-in
+        </th>
+        {% endif %}
     </tr>
     {% for persona in personas %}
         <tr>
@@ -29,6 +34,11 @@
                     <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
                 {% endfor %}
             </td>
+            {% if 'entrada' in groups or 'admin' in groups %}
+            <td>
+                <button class="button is-info">Check-in</button>
+            </td>
+            {% endif %}
         </tr>
     {% endfor %}
 </table>

@@ -1,20 +1,12 @@
-<form class="modal-form" method="post" action="">
-  {% csrf_token %}
-    {% for field in persona_form %}
-        <p>{{field.label}}</p>
-        {% if field.id_for_label == 'id_lista' %}
-        <div class="select">
-        {% else %}
-        <p>
-        {% endif %}
-            {{field}}
-        {% if field.id_for_label != 'id_lista' %}
-        </p>
-        {% else %}
-        </div>
-        {% endif %}
-    {% endfor %}
-    <div>
-  <input type="submit" class="button is-info modal-button" value="Agregar">
+{% for field in form %}
+<div class="field">
+    <label class="label">{{field.label}}</label>
+    <div class="control">
+        {{field}}
     </div>
-</form>
+    <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
+</div>
+{% endfor %}
+<div class="control">
+<input type="submit" class="button is-info" value="Crear Persona">
+</div>

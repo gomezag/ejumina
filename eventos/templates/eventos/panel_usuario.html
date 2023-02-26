@@ -6,7 +6,7 @@
    {{id_usuario.first_name}}
 </h1>
 <h2 class="title is-2">
-{% for group in persona.groups.all%} {{group}} {% endfor %}
+{% for group in id_usuario.groups.all%} {{group}} {% endfor %}
 </h2>
 
 <table class="table">
@@ -38,7 +38,7 @@
 
 <form class="body-form" action="" method="post">
     {% csrf_token %}
-    {% include 'eventos/forms/evento-form.html' %}
+    {% include 'eventos/forms/free-assign-form.html' %}
 </form>
 
 {% endblock %}

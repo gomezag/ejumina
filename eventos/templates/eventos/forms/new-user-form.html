@@ -1,16 +1,12 @@
 {% for field in form %}
-    <p>{{field.label}}</p>
-    <p class="errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
-    {% if field.id_for_label == 'id_groups' %}
-    <span>
-    {% else %}
-    <p>
-    {% endif %}
+<div class="field">
+    <label class="label">{{field.label}}</label>
+    <div class="control">
         {{field}}
-    {% if field.id_for_label != 'id_groups' %}
-    </p>
-    {% else %}
-    </span>
-    {% endif %}
+    </div>
+    <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
+</div>
 {% endfor %}
+<div class="control">
 <input type="submit" class="button is-info" value="Crear Usuario">
+</div>

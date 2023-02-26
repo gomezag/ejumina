@@ -2,7 +2,7 @@
 {% for field in form %}
     <p class="title is-4">{{field.label}}</p>
     {% if field.errors %}
-    <p>{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
+    <p class="errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
     {% endif %}
     {% if field.id_for_label == 'id_evento' %}
     <div class="select">

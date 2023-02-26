@@ -10,12 +10,25 @@
 
 <h1 class="title is-1"> Listas </h1>
 {% include 'eventos/tablas/tabla_listas.html' %}
-<p class="title is-4">Crear Lista: </p>
 
-<form class="body-form" action="" method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" class="button is-info" value="Crear Lista">
-</form>
+
+{% endblock %}
+{% block dialog %}
+<div class="button-container">
+    <button id="add-form" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
+</div>
+
+<div class="modal" id="form-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='form-close' class="close">&times;</span>
+
+            <form class="modal-form" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/lista-form.html' %}
+            </form>
+
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
 
 {% endblock %}
