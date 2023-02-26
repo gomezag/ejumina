@@ -17,6 +17,7 @@ class BasicView(UserPassesTestMixin, View):
     def get_context_data(self, user, *args, **kwargs):
         c = dict()
         c['usuario'] = user
+        c['groups'] = [g.name for g in user.groups.all()]
         c['eventos'] = Evento.objects.all()
         c['back'] = '/'
 

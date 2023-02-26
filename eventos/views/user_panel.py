@@ -29,6 +29,7 @@ class PanelEvento(BasicView):
             c['evento'] = Evento.objects.get(slug=evento)
         else:
             c['evento'] = Evento.objects.all()[0]
+
         c['personas'] = []
         for persona in Persona.objects.all():
             try:
@@ -44,12 +45,15 @@ class PanelEvento(BasicView):
                                   'invitaciones': invitaciones.count(),
                                   'frees': frees.count(),
                                   'listas': list(listas)})
-        c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
-                                                            evento=c['evento'].pk).exclude(cliente=None).count()
-        c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                       evento=c['evento'].pk).exclude(cliente=None).count()
-        c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                       evento=c['evento'].pk).count()
+
+        if any([r in c['groups'] for r in ('rrpp', 'admin')]):
+            c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
+                                                                evento=c['evento'].pk).exclude(cliente=None).count()
+            c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario'],
+                                                           evento=c['evento'].pk).exclude(cliente=None).count()
+            c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
+                                                           evento=c['evento'].pk).count()
+
         return c
 
     def get(self, request, evento, *args, **kwargs):
@@ -57,8 +61,8 @@ class PanelEvento(BasicView):
         # Check query
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
-        c['persona_form'] = InvitacionAssignForm(request.user)
-        c['invi_totales'] = len(c['evento'].invitacion_set.all())
+        if any([r in c['groups'] for r in ('rrpp', 'admin')]):
+            c['persona_form'] = InvitacionAssignForm(request.user)
 
         return super().get(request, c)
 
@@ -66,13 +70,16 @@ class PanelEvento(BasicView):
 
         evento = Evento.objects.get(slug=evento)
         user = request.user
-        form = InvitacionAssignForm(request.user, data=request.POST)
-
-        if form.is_valid():
-            form.save(request.user, evento)
-
         c = self.get_context_data(user, evento, None)
-        c['persona_form'] = form
+
+        if any([r in c['groups'] for r in ('rrpp', 'admin')]):
+            form = InvitacionAssignForm(request.user, data=request.POST)
+
+            if form.is_valid():
+                form.save(request.user, evento)
+            c['persona_form'] = form
+
+        c.update(self.get_context_data(user, evento=evento))
         return render(request, self.template_name, context=c)
 
 
