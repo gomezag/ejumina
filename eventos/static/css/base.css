@@ -277,13 +277,14 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     .body-form input { font-size: var(--fontsize-l);}
     .body-form select { font-size:var(--fontsize);}
     .table { font-size: var(--fontsize);}
-    .table input {font-size: var(--fontsize-l);}
+    .table input {font-size: var(--fontsize);}
     .navbar-item { font-size: var(--fontsize-l);}
     .button { font-size: var(--fontsize);}
     .searchbar { font-size: var(--fontsize-l);}
     .navbar-brand i{font-size:var(--fontsize);}
     .modal-content {font-size:var(--fontsize);}
     .modal-content input{font-size: var(--fontsize-l);}
+    .modal-content .select {font-size: var(--fontsize-l);}
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
 }
