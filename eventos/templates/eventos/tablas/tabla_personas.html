@@ -36,14 +36,10 @@
             </td>
             {% if 'entrada' in groups or 'admin' in groups %}
             <td>
-                <form action="" method="post" onsubmit='return confirm("Hacer check-in a {{persona.nombre}}?");'>
-                    {% csrf_token %}
-                    <input type="hidden" value="{{persona.invis_disponibles}}" name="n_invis">
-                    <input type="hidden" value="{{persona.frees_disponibles}}" name="n_frees">
-                    <input type="hidden" value="{{persona.pk}}" name="persona">
-                    <input type="hidden" value="True" name="checkin">
-                <input type="submit" class="button is-info" value="Check-in">
-                </form>
+                <button class="button is-info" onclick="openCheckInModal({{persona.pk}},
+                {{persona.frees}}, {{persona.frees_usadas}}, {{persona.invis}}, {{persona.invis_usadas}});">
+                    Check-In
+                </button>
             </td>
             {% endif %}
         </tr>

@@ -78,7 +78,7 @@ class PanelEvento(BasicView):
                                                            evento=c['evento'].pk).exclude(cliente=None).count()
             c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
                                                            evento=c['evento'].pk).count()
-
+        c['checkin_form'] = CheckInForm()
         return c
 
     def get(self, request, evento, *args, **kwargs):
@@ -87,41 +87,31 @@ class PanelEvento(BasicView):
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
-            c['persona_form'] = InvitacionAssignForm(request.user)
+            c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
 
         return super().get(request, c)
 
     def post(self, request, evento, *args, **kwargs):
-
         evento = Evento.objects.get(slug=evento)
         user = request.user
         c = self.get_context_data(user, evento, None)
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
         if validate_in_group(c['groups'], ('rrpp', 'admin')) and invitar:
-            form = InvitacionAssignForm(request.user, data=request.POST)
+            form = InvitacionAssignForm(request.user, data=request.POST, auto_id='invi_%s')
             if form.is_valid():
                 form.save(request.user, evento)
             c['persona_form'] = form
 
         elif validate_in_group(c['groups'], ('entrada', 'admin')) and checkin:
-            id_persona = request.POST.get('persona', None)
-            persona = Persona.objects.get(pk=id_persona)
-            n_invis = request.POST.get('n_invis', None)
-            n_frees = request.POST.get('n_frees', None)
-
-            checkin_form = CheckInForm({
-                'evento': evento,
-                'persona': persona,
-                'check_invis': n_invis,
-                'check_frees': n_frees
-            })
-            if checkin_form.is_valid():
+            checkin_form = CheckInForm(request.POST)
+            print(request.POST['persona'])
+            if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
             else:
                 c['checkin_errors'] = checkin_form.errors
                 print(c['checkin_errors'])
-            c['persona_form'] = InvitacionAssignForm(request.user)
+            c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
         c.update(self.get_context_data(user, evento=evento))
         return render(request, self.template_name, context=c)
 

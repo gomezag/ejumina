@@ -46,10 +46,33 @@
           <span id='lista-close' class="close">&times;</span>
           <form class="modal-form" method="post" action="">
             {% csrf_token %}
-            {% include 'eventos/forms/invitacion-form.html' %}
+            {% include 'eventos/forms/invitacion-form.html' with form=persona_form %}
           </form>
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
+
+<div class="modal" id="checkin-dialog">
+      <div class="modal-content">
+          <span id='checkin-close' class="close">&times;</span>
+          <form class="modal-form" method="post" action="">
+            {% csrf_token %}
+            {% include 'eventos/forms/checkin-form.html' with form=checkin_form %}
+          </form>
+      </div>
+</div>
+
+<script nonce="{{request.csp_nonce}}">
+    function openCheckInModal(id, f_max, f_min, i_max, i_min){
+        checkinModal = document.getElementById("checkin-dialog");
+        checkinModal.classList.add("is-active");
+        document.getElementById("{{checkin_form.persona.id_for_label}}").value=id;
+        document.getElementById("{{checkin_form.check_frees.id_for_label}}").max=f_max-f_min;
+        document.getElementById("{{checkin_form.check_frees.id_for_label}}").min=-f_min;
+        document.getElementById("{{checkin_form.check_invis.id_for_label}}").max=i_max-i_min;
+        document.getElementById("{{checkin_form.check_invis.id_for_label}}").min=-i_min;
+    };
+</script>
+{% include 'eventos/setups/modal_setup.html' with ModalName='checkin' noBtn=1%}
 
 {% endblock %}
