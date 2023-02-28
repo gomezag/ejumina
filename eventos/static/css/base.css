@@ -16,8 +16,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 .autocomplete-items {
     background-color: white;
-    width: 250px;
-    max-height: 250px;
+    width: 100% ;
 }
 
 .body {
