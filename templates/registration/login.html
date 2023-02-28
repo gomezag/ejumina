@@ -6,7 +6,12 @@
 <h2 class="title is-2">Log In</h2>
 <form class="body-form" id="login-form" method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+  {% for field in form %}
+  <div class="field">
+    <label class="label">{{field.label}}</label>
+    <div class="control">{{field}}</div>
+  </div>
+  {% endfor %}
   <button class="button" type="submit">Log In</button>
   <a href="{% url 'password_reset' %}">Olvidaste la contraseña?</a>
 </form>
