@@ -143,7 +143,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .close {
   color: #aaa;
   float: right;
-  font-size: var(--fontsize-s);
+  font-size: var(--fontsize-xl);
   font-weight: bold;
 }
 .close:hover,
@@ -239,7 +239,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .button-container {
     position: fixed;
     bottom: 30px;
-    right: 10px;
+    right: 15px;
     z-index: 2;
 }
 
@@ -259,9 +259,6 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     width: 6vh;
     height: 6vh;
     border-radius: 3vh;
-    bottom: 10px;
-    right: 10px;
-
 }
     .plus-button.green {
         background-color: green;
@@ -273,6 +270,22 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
         color: white;
     }
 
+.modal-form .plus-button {
+    width: 70px;
+    height: 100px;
+    font-size: 5rem;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
 /* Smartphones in landscape */
 @media only screen
   and (min-device-width: 100px)
