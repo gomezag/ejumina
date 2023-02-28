@@ -12,7 +12,6 @@ function autocomplete(inp, arr) {
    /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function(e) {
       var a, b, i, val = this.value;
-      console.log(val);
       /*close any already open lists of autocompleted values*/
       closeAllLists();
       if (!val) { return false;}
@@ -28,18 +27,17 @@ function autocomplete(inp, arr) {
       /*for each item in the array...*/
       for (i = 0; i < arr[0].length; i++) {
         /*check if the item starts with the same letters as the text field value:*/
-        console.log(arr[0][i][0]);
-        if (arr[0][i][0].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        if (arr[0][i][0].toUpperCase().replace(/\./g, '').includes(val.replace(/\./g, '').toUpperCase())) {
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
           if(inp.id == 'id_persona') {
               b.innerHTML = "<p>"+arr[0][i][0]+"</p>";
-              console.log(b.innerHTML);
+              //console.log(b.innerHTML);
           }
           else{
               b.innerHTML = "<a href='/e/"+arr[1]+"/p/"+arr[0][i][1]+"/'> "+arr[0][i][0]+"</a>";
-              console.log(b.innerHTML);
+              //console.log(b.innerHTML);
           }
           b.classList.add('opciones');
           b.classList.add('li');
@@ -47,12 +45,12 @@ function autocomplete(inp, arr) {
          // b.innerHTML += "</a>"
           b.innerHTML += "<input type='hidden' value='" + arr[0][i][0] + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
-              /*close the list of autocompleted values,
-              (or any other open lists of autocompleted values:*/
-              closeAllLists();
+          b.addEventListener("click", function(e) {
+          /*insert the value for the autocomplete text field:*/
+          inp.value = this.getElementsByTagName("input")[0].value;
+          /*close the list of autocompleted values,
+          (or any other open lists of autocompleted values:*/
+          closeAllLists();
           });
           a.appendChild(b);
         }
