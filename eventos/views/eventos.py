@@ -57,15 +57,13 @@ class PanelEvento(BasicView):
 
         c['personas'] = []
         for persona in Persona.objects.all():
-            try:
-                invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
-                frees = Free.objects.filter(evento=c['evento'], cliente=persona)
-                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=c['evento'].pk) |
+            invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
+            frees = Free.objects.filter(evento=c['evento'], cliente=persona)
+            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=c['evento'].pk) |
                                                        Q(personas_free=persona, free__evento=c['evento'].pk)).distinct()
-            except ObjectDoesNotExist:
-                invitaciones = listas = []
 
             c['personas'].append({'nombre': persona.nombre,
+                                  'cedula': persona.cedula if persona.cedula else '',
                                   'pk': persona.pk,
                                   'invis': invitaciones.count(),
                                   'invis_usadas': invitaciones.filter(estado='USA').count(),

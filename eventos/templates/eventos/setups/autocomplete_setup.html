@@ -4,7 +4,7 @@
 var availableTags = [[
     {% for cliente in personas %}
     [
-      "{{cliente.nombre}}",
+      "{{cliente.nombre}} - {{cliente.cedula}}",
       "{{cliente.pk}}",
     ],
     {% endfor %}

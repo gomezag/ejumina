@@ -21,6 +21,7 @@ ESTADOS_CLIENTES = [
 class Persona(Model):
     nombre = CharField(max_length=100, blank=False, null=False)
     estado = CharField(max_length=3, blank=False, null=False, choices=ESTADOS_CLIENTES, default='ACT')
+    cedula = CharField(max_length=11, blank=False, null=True)
 
     def __str__(self):
         return " - ".join([str(self.nombre), str(self.estado)])
