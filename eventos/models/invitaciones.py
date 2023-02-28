@@ -46,7 +46,8 @@ class Invitacion(models.Model):
     lista = ForeignKey(ListaInvitados, null=False, on_delete=models.CASCADE, blank=False)
 
     def __str__(self):
-        return f"Invitacion a {self.evento.name} - {self.get_estado_display()} - {self.vendedor.first_name} a {self.cliente.nombre}"
+        return f"Invitacion a {self.evento.name} - {self.get_estado_display()} - {self.vendedor.first_name} a" \
+               f" {self.cliente.nombre}"
 
 
 class Free(models.Model):
@@ -58,4 +59,5 @@ class Free(models.Model):
     lista = ForeignKey(ListaInvitados, null=True, on_delete=models.CASCADE, blank=True)
 
     def __str__(self):
-        return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} a {self.cliente}"
+        return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \
+               f"a {self.cliente}"

@@ -104,7 +104,6 @@ class FreeAssignToUserForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def save(self, user, vendedor):
-
         for n in range(self.cleaned_data['free']):
             free = Free()
             free.evento = self.cleaned_data['evento']
