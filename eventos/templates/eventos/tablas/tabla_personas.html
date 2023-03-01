@@ -1,3 +1,4 @@
+{% load auth_extras %}
 <table class="tabla-personas table" id="tabla_personas">
     <tr>
         <th onclick="sortTable(0)">
@@ -15,7 +16,7 @@
         <th onclick="sortTable(4);">
             Lista
         </th>
-        {% if 'entrada' in groups or 'admin' in groups %}
+        {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
         <th>
             Check-in
         </th>
@@ -40,7 +41,7 @@
                     <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
                 {% endfor %}
             </td>
-            {% if 'entrada' in groups or 'admin' in groups %}
+            {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
                 <button class="button is-info" onclick="openCheckInModal({{persona.pk}},
                 {{persona.frees}}, {{persona.frees_usadas}}, {{persona.invis}}, {{persona.invis_usadas}});">

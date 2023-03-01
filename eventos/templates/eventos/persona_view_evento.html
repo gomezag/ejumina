@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load auth_extras %}
 {% block go_back %} / {% endblock %}
 {% block content %}
 <h1 class="title is-1">
@@ -24,6 +25,7 @@
 {% endblock %}
 
 {% block dialog %}
+{% if request.user|has_group:"admin" or request.user|has_group:"rrpp" %}
 <div class="button-container">
     <button id="add-form" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
@@ -37,4 +39,5 @@
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
+{% endif %}
 {% endblock %}

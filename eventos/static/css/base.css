@@ -296,7 +296,7 @@ table .plus-button{
 .table-btn-container {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: last baseline;
 }
 
 .modal-form .plus-button {

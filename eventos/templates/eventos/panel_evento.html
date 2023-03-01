@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load auth_extras %}
 {% load static %}
 {% block breadcrumbs %}
     <li class=""><a href="#">Eventos</a></li>
@@ -37,6 +38,7 @@
 {% endblock %}
 
 {% block dialog %}
+{% if request.user|has_group:"admin" or request.user|has_group:"rrpp" %}
 <div class="button-container">
     <button id="add-lista" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
@@ -51,7 +53,8 @@
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
-
+{% endif %}
+{% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
 <div class="modal" id="checkin-dialog">
       <div class="modal-content">
           <span id='checkin-close' class="close">&times;</span>
@@ -74,5 +77,5 @@
     };
 </script>
 {% include 'eventos/setups/modal_setup.html' with ModalName='checkin' noBtn=1%}
-
+{% endif %}
 {% endblock %}
