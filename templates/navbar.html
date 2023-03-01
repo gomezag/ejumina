@@ -35,9 +35,11 @@
       <a class="navbar-item" href="/personas">
         Personas
       </a>
+      {% if request.user|has_group:"rrpp" or request.user|has_group:"admin" %}
       <a class="navbar-item" href="/importar">
         Importar Excel
       </a>
+      {% endif %}
       {% if request.user|has_group:"admin" %}
       <a class="navbar-item" href="/usuarios">
         Usuarios
