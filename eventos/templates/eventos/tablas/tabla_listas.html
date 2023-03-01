@@ -10,7 +10,7 @@
     {% for lista in listas %}
         <tr>
             <td>
-                {{lista.nombre}}
+                <a href="/l/{{lista.slug}}">{{lista.nombre}}</a>
             </td>
             <td>
                 {% for user in lista.administradores.all %}

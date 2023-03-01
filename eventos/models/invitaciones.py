@@ -7,9 +7,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 import django.db.models as models
 from django.db.models import ForeignKey, ManyToManyField
-from django.db.models.fields import CharField
+from django.db.models.fields import CharField, SlugField
 from . import Evento, Usuario, Persona
 
+from eventos.utils import unique_slugify
 
 COLORES = [
     ('#008744', 'Green'),
@@ -33,9 +34,15 @@ class ListaInvitados(models.Model):
     personas_free = ManyToManyField(Persona, blank=True, through='Free', related_name='invitados_free')
     administradores = ManyToManyField(Usuario, blank=True)
     nombre = CharField(max_length=25, null=False, blank=False, unique=True)
+    slug = SlugField(blank=True)
 
     def __str__(self):
         return self.nombre
+
+    def save(self, **kwargs):
+        slug_str = "%s" % (self.nombre)
+        unique_slugify(self, slug_str)
+        super().save(**kwargs)
 
 
 class Invitacion(models.Model):

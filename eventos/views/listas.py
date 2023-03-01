@@ -33,3 +33,18 @@ class ListaListasInvitados(AdminView):
         c['form'] = form
         return render(request, self.template_name, context=c)
 
+
+class PanelListasInvitados(AdminView):
+    template_name = 'eventos/panel-listas-invitados.html'
+
+    def get_context_data(self, user, lista, *args, **kwargs):
+        c = super().get_context_data(user, *args, **kwargs)
+        c['lista'] = lista
+        c['back'] = '/listas'
+        return c
+
+    def get(self, request, lista):
+        lista = ListaInvitados.objects.get(slug=lista)
+        c = self.get_context_data(request.user, lista)
+
+        return render(request, self.template_name, context=c)
