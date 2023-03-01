@@ -31,7 +31,11 @@
     <div class="control">{{form.persona}}</div>
     <p class="help errors">{% for error in form.persona.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
-
+<div class="field">
+    <label class="label">{{form.cedula.label}}</label>
+    <div class="control">{{form.cedula}}</div>
+    <p class="help errors">{% for error in form.cedula.errors %} <li>{{error}}</li>{% endfor %}</p>
+</div>
  {% for field in form.hidden_fields %}
      <div style="display:none;">{{ field }}</div>
  {% endfor %}

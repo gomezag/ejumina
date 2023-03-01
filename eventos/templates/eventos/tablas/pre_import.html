@@ -1,26 +1,37 @@
-<table class="tabla-personas table">
+<table class="tabla-personas table" id="tabla_personas">
     <tr>
-    <th>
-
+    <th onclick="sortTable(0)">
         Nombre
     </th>
-    <th>
+    <th onclick="sortTable(1)">
+        Cedula
+    </th>
+    <th onclick="sortTable(2)">
        Invitaciones
     </th>
-    <th>
+    <th onclick="sortTable(3)">
         Frees
     </th>
-    <th>
+    <th onclick="sortTable(4)">
         Lista
     </th>
-    <th>
+    <th onclick="sortTable(5)">
         Aviso
     </th>
     </tr>
     {% for invitacion in invitaciones %}
-    <tr>
+    <tr
+            {% if invitacion.errors.0.0 == 'error' %}
+                class="red"
+            {% elif invitacion.errors.0.0 == 'warning' %}
+                class="yellow"
+            {% endif %}
+    >
     <td>
         {{invitacion.persona.nombre}}
+    </td>
+    <td>
+        {{invitacion.persona.cedula}}
     </td>
     <td>
         {{invitacion.invis}}

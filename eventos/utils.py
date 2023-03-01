@@ -20,17 +20,22 @@ def parse_excel_import(f):
     rows = ws.rows
     header = next(rows)
     try:
-        assert header[0].value.lower() == 'nombre', "Primera columna tiene que llamarse nombre"
-        assert header[1].value.lower() == 'frees', "Segunda columna tiene que llamarse frees"
-        assert header[2].value.lower() == 'invis', "Tercera columna tiene que llamarse invis"
-        assert header[3].value.lower() == 'lista', "Cuarta columna tiene que llamarse Lista"
+        assert header[0].value.lower() == 'nombre', "Primera columna tiene que llamarse Nombre"
+        assert header[1].value.lower() == 'cedula', "Segunda columna tiene que llamarse Cedula"
+        assert header[2].value.lower() == 'frees', "Tercera columna tiene que llamarse Frees"
+        assert header[3].value.lower() == 'invitaciones', "Cuarta columna tiene que llamarse Invitaciones"
+        assert header[4].value.lower() == 'lista', "Quinta columna tiene que llamarse Lista"
     except Exception as e:
         raise ValueError(str(e))
     frees = 0
     for row in rows:
         if all([r.value is not None for r in row]):
-            results.append({'nombre': row[0].value, 'invis': row[2].value, 'frees': row[1].value, 'lista': row[3].value})
-            frees += row[1].value
+            results.append({'nombre': row[0].value,
+                            'invis': row[3].value,
+                            'frees': row[2].value,
+                            'lista': row[4].value,
+                            'cedula': str(row[1].value)})
+            frees += row[2].value
 
     return frees, results
 

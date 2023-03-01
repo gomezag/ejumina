@@ -78,16 +78,19 @@ class MultiInviAssignToPersona(forms.Form):
 
 
 class InvitacionAssignForm(MultiInviAssignToPersona):
-    persona = forms.CharField()
+    persona = forms.CharField(required=True)
+    cedula = forms.CharField(required=True)
     invitar = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
     def __init__(self, user, *args, **kwargs):
         super(InvitacionAssignForm, self).__init__(user, None, *args, **kwargs)
         self.fields['persona'].widget.attrs['class'] = 'input persona'
+        self.fields['cedula'].widget.attrs['class'] = 'input cedula'
 
     def save(self, user, evento):
         nombre = self.cleaned_data['persona']
-        persona, created = Persona.objects.get_or_create(nombre=nombre)
+        cedula = self.cleaned_data['cedula']
+        persona, created = Persona.objects.get_or_create(nombre=nombre, cedula=cedula)
         if created:
             persona.save()
         super().save(user, persona, evento)

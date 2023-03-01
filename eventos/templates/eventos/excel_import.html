@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
     {% if form %}
     <form class="body-form" action="" method="post" enctype="multipart/form-data">
@@ -18,6 +18,7 @@
     {% endif %}
 
     {% if invitaciones %}
+        <script src="{% static 'js/sort.js' %}" nonce="{{request.csp_nonce}}"></script>
         <h4 class="title is-4"> Verifica los datos del excel: </h4>
         <h5 class="title is-5"> Evento: {{evento.name}} </h5>
         {% include 'eventos/tablas/pre_import.html' %}

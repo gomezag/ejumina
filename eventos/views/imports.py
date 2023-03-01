@@ -50,6 +50,7 @@ class ImportView(BasicView):
                 frees, res = parse_excel_import(request.FILES['file'])
             except ValueError as e:
                 form.errors['file'] = [str(e)]
+                frees = 0
                 res = False
             evento = form.cleaned_data['evento']
             total_frees = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True).count()
@@ -66,20 +67,26 @@ class ImportView(BasicView):
                         lista = ListaInvitados.objects.get(nombre=entry['lista'], administradores__in=[request.user])
                         lista = {'nombre': lista.nombre, 'pk': lista.pk}
                     except ObjectDoesNotExist:
-                        errors.append(('lista', 'Lista no existe. Se ignora esta entrada.'))
+                        errors.append(('error', 'Lista no existe (o no tenés acceso). Se ignora esta entrada.'))
                         lista = {'nombre': entry['lista']}
                     try:
-                        persona = Persona.objects.get(nombre=entry['nombre'])
-                        persona = {'nombre': persona.nombre, 'pk': persona.pk}
+                        persona = Persona.objects.get(cedula=entry['cedula'].replace('.', ''))
+                        serialized_persona = {'nombre': persona.nombre,
+                                   'pk': persona.pk,
+                                   'cedula': entry['cedula']}
+
+                        if persona.nombre != entry['nombre']:
+                            errors.append(('error', 'Esta cedula ya existe. Se ignora esta entrada.'))
+                            serialized_persona['nombre'] = entry['nombre']
                     except ObjectDoesNotExist:
-                        errors.append(('persona', 'Persona no existe. Se creara nueva'))
-                        persona = {'nombre': entry['nombre']}
+                        errors.append(('warning', 'Persona no existe. Se creara nueva'))
+                        serialized_persona = {'nombre': entry['nombre'], 'cedula': entry['cedula']}
                     frees = int(entry['frees'])
                     invis = int(entry['invis'])
                     if integer_validator(frees) and integer_validator(invis):
-                        errors.append(('lista', "Error leyendo frees o invis. Se ignora esta entrada."))
+                        errors.append(('error', "Error leyendo frees o invis. Se ignora esta entrada."))
                     parsed.append({
-                        'persona': persona,
+                        'persona': serialized_persona,
                         'lista': lista,
                         'frees': frees,
                         'invis': invis,
@@ -109,12 +116,14 @@ class ImportExcelToEvento(BasicView):
         errors = []
         if parsed_data and evento:
             for row in parsed_data:
-                if 'lista' not in [r[0] for r in row['errors']]:
+                if 'error' not in [r[0] for r in row['errors']]:
                     form = InvitacionAssignForm(request.user, data={
                         'persona': row['persona']['nombre'],
                         'lista': row['lista']['pk'],
                         'frees': row['frees'],
-                        'invitaciones': row['invis']
+                        'cedula': row['persona']['cedula'].replace('.', ''),
+                        'invitaciones': row['invis'],
+                        'invitar': True
                     })
                     if form.is_valid():
                         form.save(request.user, evento)

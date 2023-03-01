@@ -5,19 +5,36 @@
 <h1 class="title is-1">
    {{evento.name}}
 </h1>
-<h2 class="title is-2">
+<div class="field is-centered">
+    <h2 class="title is-2">
      {{persona.nombre}}
+    </h2>
+    <h3 class="title is-3">
+        C.I.: {{persona.cedula}}
+    </h3>
+</div>
+<h3 class="title is-3">
+
+</h3>
+<h2 class="title">
+   Invitaciones:
 </h2>
-<h4>
-    C.I.: {{persona.cedula}}
-</h4>
+{% include 'eventos/tablas/tabla-invitaciones.html' %}
 
-{% include 'eventos/tablas/tabla_invitaciones.html' %}
+{% endblock %}
 
-<h5 class="title is-5"> Asignar Entradas: </h5>
-
-<form class="body-form" action="" method="post">
-    {% csrf_token %}
-    {% include 'eventos/forms/multiassign-form.html' %}
-</form>
+{% block dialog %}
+<div class="button-container">
+    <button id="add-form" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
+</div>
+<div class="modal" id="form-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='form-close' class="close">&times;</span>
+            <form class="modal-form" action="" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/multiassign-form.html' %}
+            </form>
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
 {% endblock %}

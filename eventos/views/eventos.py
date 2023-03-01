@@ -129,18 +129,18 @@ class PanelEventoPersona(BasicView):
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = []
         invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).
-                     values('vendedor__first_name', 'lista__pk', 'lista__nombre').annotate(
+                     values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
                      invis=Count('lista'),
                      used_invis=Count('lista', filter=Q(estado='USA'))))
         frees = list(Free.objects.filter(evento=evento, cliente=persona).
-                     values('vendedor__first_name', 'lista__pk', 'lista__nombre').annotate(
+                     values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
                      frees=Count('lista'),
                      used_frees=Count('lista', filter=Q(estado='USA'))))
-        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor__first_name'], x['lista__pk']))
-        for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor__first_name'], x['lista__pk'])):
+        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor__pk'], x['lista__pk']))
+        for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor__pk'], x['lista__pk'])):
             lista = ListaInvitados.objects.get(pk=common[1])
             r = {
-                'rrpp': common[0],
+                'rrpp': Usuario.objects.get(pk=common[0]),
                 'lista_id': lista.pk,
                 'invis': 0,
                 'frees': 0,
