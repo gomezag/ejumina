@@ -2,6 +2,8 @@
     <div class="field int-input">
         <label class="label">{{form.invitaciones.label}}</label>
         <div class="control">{{form.invitaciones}}</div>
+        <p class="help errors">{% for error in form.invitaciones.errors %} <li>{{error}}</li>{% endfor %}</p>
+
     </div>
     <div class="field">
         <div class="plus-button"><i class="fa fa-plus-circle" onclick="document.getElementById('{{form.invitaciones.id_for_label}}').stepUp();"></i></div>
@@ -10,6 +12,7 @@
     <div class="field int-input">
         <label class="label">{{form.frees.label}}</label>
         <div class="control">{{form.frees}}</div>
+        <p class="help errors">{% for error in form.frees.errors %} <li>{{error}}</li>{% endfor %}</p>
     </div>
     <div class="field">
         <div class="plus-button"><i class="fa fa-plus-circle" onclick="document.getElementById('{{form.frees.id_for_label}}').stepUp();"></i></div>
@@ -21,10 +24,12 @@
     <span class="select">
         {{form.lista}}
     </span>
+    <p class="help errors">{% for error in form.lista.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 <div class="field">
     <label class="label">{{form.persona.label}}</label>
     <div class="control">{{form.persona}}</div>
+    <p class="help errors">{% for error in form.persona.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 
  {% for field in form.hidden_fields %}

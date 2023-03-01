@@ -2,6 +2,8 @@
     <div class="field int-input">
         <label class="label">{{form.check_invis.label}}</label>
         <div class="control">{{form.check_invis}}</div>
+        <p class="help errors">{% for error in form.check_invis.errors %} <li>{{error}}</li>{% endfor %}</p>
+
     </div>
     <div class="field">
         <div class="plus-button"><i class="fa fa-plus-circle" onclick="document.getElementById('{{form.check_invis.id_for_label}}').stepUp();"></i></div>
@@ -10,6 +12,8 @@
     <div class="field int-input">
         <label class="label">{{form.check_frees.label}}</label>
         <div class="control">{{form.check_frees}}</div>
+        <p class="help errors">{% for error in form.check_frees.errors %} <li>{{error}}</li>{% endfor %}</p>
+
     </div>
     <div class="field">
         <div class="plus-button"><i class="fa fa-plus-circle" onclick="document.getElementById('{{form.check_frees.id_for_label}}').stepUp();"></i></div>

@@ -12,7 +12,9 @@
     <div class="control">{{field}}</div>
   </div>
   {% endfor %}
+  <div class="field">
   <button class="button" type="submit">Log In</button>
+  </div>
   <a href="{% url 'password_reset' %}">Olvidaste la contraseña?</a>
 </form>
 {% include 'google_captcha_setup.html' %}
