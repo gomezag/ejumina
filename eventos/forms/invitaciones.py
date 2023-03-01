@@ -89,7 +89,7 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
 
     def save(self, user, evento):
         nombre = self.cleaned_data['persona']
-        cedula = self.cleaned_data['cedula']
+        cedula = self.cleaned_data['cedula'].replace('.', '')
         persona, created = Persona.objects.get_or_create(nombre=nombre, cedula=cedula)
         if created:
             persona.save()

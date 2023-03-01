@@ -1,16 +1,14 @@
+{% load auth_extras %}
 <table class="tabla-personas table" id="tabla_personas">
     <tr>
         <th onclick="sortTable(0)">
             Nombre
         </th>
-        <th onclick="sortTable(0)">
+        <th onclick="sortTable(1)">
             Cédula
         </th>
-        <th onclick="sortTable(1);">
-            ..
-        </th>
         <th onclick="sortTable(2);">
-            Delete
+            Acciones
         </th>
     </tr>
     {% for persona in personas %}
@@ -22,14 +20,17 @@
                 {{persona.cedula}}
             </td>
             <td>
-
-            </td>
-            <td>
-                <form method="POST" action="">
+            <div class="table-btn-container">
+                {% if request.user|has_group:'admin' %}
+                <button class="plus-button in-table blue" onclick="openEditModal('{{persona.pk}}', '{{persona.nombre}}', '{{persona.cedula}}');"><i class="fa fa-pencil"></i></button>
+                <form method="POST" action=""
+                onsubmit="return confirm('Seguro que queres borrar esta persona y todas sus entradas asociadas?');">
                        {% csrf_token %}
                         <input type="hidden" name="delete" value="{{persona.pk}}">
-                        <input class="button is-danger" type="submit" value="DELETE">
+                        <button class="plus-button in-table red" type="submit" value="DELETE"><i class="fa fa-trash"></i></button>
                 </form>
+                {% endif %}
+            </div>
             </td>
         </tr>
     {% endfor %}

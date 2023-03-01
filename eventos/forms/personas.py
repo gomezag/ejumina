@@ -19,6 +19,12 @@ class PersonaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(PersonaForm, self).__init__(*args, **kwargs)
+        self.fields['nombre'].required = True
+        self.fields['cedula'].required = True
+
+    def clean(self):
+        super().clean()
+        self.cleaned_data['cedula'] = self.cleaned_data['cedula'].replace('.', '').lstrip(' ').rstrip(' ')
 
 
 class EventoForm(forms.ModelForm):

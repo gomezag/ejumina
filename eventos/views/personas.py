@@ -21,10 +21,8 @@ class ListaPersona(BasicView):
     def get_context_data(self, user, persona=None, *args, **kwargs):
         c = super(ListaPersona, self).get_context_data(user, *args, **kwargs)
         c['personas'] = Persona.objects.all()
-        if persona is None:
-            c['form'] = PersonaForm()
-        else:
-            c['form'] = PersonaForm(initial=persona)
+        c['form'] = PersonaForm()
+        c['edit_form'] = PersonaForm(auto_id='edit')
         return c
 
     def get(self, request, *args, **kwargs):
@@ -40,6 +38,15 @@ class ListaPersona(BasicView):
                 persona = Persona.objects.get(pk=request.POST['delete'])
                 persona.delete()
             except Exception as e:
+                pass
+        elif request.POST.get('edit', None) is not None:
+            try:
+                persona = Persona.objects.get(pk=request.POST['edit'])
+                form = PersonaForm(request.POST, instance=persona)
+                if form.is_valid():
+                    form.save()
+            except Exception as e:
+                print(repr(e))
                 pass
         else:
             form = PersonaForm(data=request.POST)
