@@ -67,20 +67,29 @@ class ImportView(BasicView):
                         lista = ListaInvitados.objects.get(nombre=entry['lista'], administradores__in=[request.user])
                         lista = {'nombre': lista.nombre, 'pk': lista.pk}
                     except ObjectDoesNotExist:
-                        errors.append(('error', 'Lista no existe (o no tenés acceso). Se ignora esta entrada.'))
+                        errors.append(('error', 'Lista no existe (o no tenés acceso).'))
                         lista = {'nombre': entry['lista']}
                     try:
-                        persona = Persona.objects.get(cedula=entry['cedula'].replace('.', ''))
+                        if entry['cedula']:
+                            cedula = str(entry['cedula']).replace('.', '')
+                        else:
+                            cedula = ''
+                            raise AttributeError
+                        persona = Persona.objects.get(cedula=cedula)
                         serialized_persona = {'nombre': persona.nombre,
                                    'pk': persona.pk,
                                    'cedula': entry['cedula']}
 
                         if persona.nombre != entry['nombre']:
-                            errors.append(('error', 'Esta cedula ya existe. Se ignora esta entrada.'))
+                            errors.append(('error', 'Esta cedula ya existe o no se puede leer. '
+                                                    'Probá quitar caracteres especiales.'))
                             serialized_persona['nombre'] = entry['nombre']
                     except ObjectDoesNotExist:
-                        errors.append(('warning', 'Persona no existe. Se creara nueva'))
+                        errors.append(('warning', 'Persona no existe. Se creara nueva.'))
                         serialized_persona = {'nombre': entry['nombre'], 'cedula': entry['cedula']}
+                    except AttributeError:
+                        errors.append(('error', 'Cedula vacía o no se puede leer'))
+                        serialized_persona = {'nombre': entry['nombre'], 'cedula': cedula}
                     frees = int(entry['frees'])
                     invis = int(entry['invis'])
                     if integer_validator(frees) and integer_validator(invis):

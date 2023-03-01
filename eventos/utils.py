@@ -6,7 +6,6 @@ from openpyxl import load_workbook
 from django.template.defaultfilters import slugify
 
 
-
 def parse_excel_import(f):
     extension = os.path.splitext(str(f))[1]
     if extension != '.xlsx':
@@ -29,12 +28,12 @@ def parse_excel_import(f):
         raise ValueError(str(e))
     frees = 0
     for row in rows:
-        if all([r.value is not None for r in row]):
+        if any([r.value is not None for r in row]):
             results.append({'nombre': row[0].value,
                             'invis': row[3].value,
                             'frees': row[2].value,
                             'lista': row[4].value,
-                            'cedula': str(row[1].value)})
+                            'cedula': row[1].value})
             frees += row[2].value
 
     return frees, results
