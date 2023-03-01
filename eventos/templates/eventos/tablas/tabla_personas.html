@@ -10,6 +10,9 @@
             Nombre
         </th>
         <th onclick="sortTable(3);">
+            Cédula
+        </th>
+        <th onclick="sortTable(4);">
             Lista
         </th>
         {% if 'entrada' in groups or 'admin' in groups %}
@@ -28,6 +31,9 @@
             </td>
             <td>
                 <a href="/e/{{evento.slug}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
+            </td>
+            <td>
+                {{persona.cedula}}
             </td>
             <td>
                 {% for lista in persona.listas %}

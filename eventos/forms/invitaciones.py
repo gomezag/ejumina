@@ -122,6 +122,9 @@ class ExcelImportForm(forms.Form):
     file = forms.FileField(validators=[file_size])
     evento = forms.ModelChoiceField(queryset=Evento.objects.all())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file'].widget.attrs['class'] = 'file-input'
 
 class CheckInForm(forms.Form):
     persona = forms.ModelChoiceField(queryset=Persona.objects.all(), widget=forms.HiddenInput)
