@@ -8,8 +8,6 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 from django.db.models import Model
 from django.db.models.fields import CharField, DateField, SlugField
 from django.utils.timezone import now
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 from eventos.utils import unique_slugify
 
