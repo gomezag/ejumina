@@ -335,4 +335,5 @@ input[type=number] {
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
     .back-button i{font-size: var(--fontsize-xl);}
+    .table-btn-container i{font-size: var(--fontsize-s);}
 }
