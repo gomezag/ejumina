@@ -92,7 +92,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 }
 
 .tabla-personas tbody td {
-    vertical-align: middle
+    vertical-align: middle;
     word-wrap: break-word;
     max-width:30vw;
     text-align: center;
