@@ -1,4 +1,5 @@
 <table class="tabla-personas table" id="tabla_personas">
+    <thead>
     <tr>
         <th onclick="sortTable(0)">
             Nombre
@@ -6,7 +7,12 @@
         <th onclick="sortTable(0)">
             Fecha
         </th>
+        <th>
+
+        </th>
     </tr>
+    </thead>
+    <tbody>
     {% for evento in eventos %}
         <tr>
             <td>
@@ -15,5 +21,14 @@
             <td>
                 {{evento.fecha}}
             </td>
+            <td>
+                <div class="table-btn-container">
+                <div class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
+                '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
+                    <i class="fa fa-pencil"></i>
+                </div>
+                </div>
+            </td>
     {% endfor %}
+    </tbody>
 </table>

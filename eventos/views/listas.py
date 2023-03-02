@@ -46,5 +46,14 @@ class PanelListasInvitados(AdminView):
     def get(self, request, lista):
         lista = ListaInvitados.objects.get(slug=lista)
         c = self.get_context_data(request.user, lista)
+        c['form'] = ListaInvitadosForm(instance=lista)
+        return render(request, self.template_name, context=c)
 
+    def post(self, request, lista):
+        lista = ListaInvitados.objects.get(slug=lista)
+        c = self.get_context_data(request.user, lista)
+        form = ListaInvitadosForm(request.POST, instance=lista)
+        if form.is_valid():
+            form.save()
+        c['form'] = form
         return render(request, self.template_name, context=c)

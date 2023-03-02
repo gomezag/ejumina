@@ -8,11 +8,14 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
 
+import itertools
+
 from django.shortcuts import render
+from django.db.models import Count
+
 from eventos.forms import *
 from .basic_view import BasicView
-from django.db.models import Count
-import itertools
+from .eventos import PanelEventoPersona
 
 
 class ListaPersona(BasicView):
@@ -65,24 +68,7 @@ class PanelPersona(BasicView):
         c['persona'] = persona
         invitaciones = []
         for evento in Evento.objects.all():
-            event_invis = []
-            invis = Invitacion.objects.filter(cliente=persona, evento=evento).values('vendedor', 'lista').annotate(
-                invis=Count('lista'))
-            frees = Free.objects.filter(cliente=persona, evento=evento).values('vendedor', 'lista').annotate(
-                frees=Count('lista'))
-            all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor'], x['lista']))
-            for common, all_invis_group in itertools.groupby(all_invis, key=lambda x: (x['vendedor'], x['lista'])):
-                vendedor = Usuario.objects.get(pk=common[0])
-                lista = ListaInvitados.objects.get(pk=common[1])
-                r = {
-                    'rrpp': vendedor.first_name,
-                    'lista_id': lista.pk,
-                    'invis': 0,
-                    'frees': 0,
-                }
-                [r.update(i) for i in all_invis_group]
-                r.update({'lista': lista.nombre})
-                event_invis.append(r)
+            event_invis = PanelEventoPersona.parse_invitaciones(persona, evento)
             if event_invis:
                 invitaciones.append({'name': evento.name, 'invis': event_invis})
         c['eventos_info'] = invitaciones

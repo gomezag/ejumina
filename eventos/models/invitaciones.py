@@ -46,7 +46,7 @@ class ListaInvitados(models.Model):
 
 
 class Invitacion(models.Model):
-    estado = CharField(max_length=3, choices=ESTADOS_INVITACION)
+    estado = CharField(max_length=3, choices=ESTADOS_INVITACION, default='ACT')
     evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
     vendedor = ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=False)
     cliente = ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True)
@@ -68,3 +68,5 @@ class Free(models.Model):
     def __str__(self):
         return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \
                f"a {self.cliente}"
+
+

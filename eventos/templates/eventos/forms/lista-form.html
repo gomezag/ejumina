@@ -15,8 +15,6 @@
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 {% endfor %}
-<div class="field">
-    <p class="control">
-        <input type="submit" class="button is-info" value="Crear Lista">
-    </p>
-</div>
+{% for field in form.hidden_fields %}
+    {{field}}
+{% endfor %}

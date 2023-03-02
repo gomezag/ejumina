@@ -7,6 +7,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django import forms
 from django.forms.widgets import Widget
+from django.db.models import ObjectDoesNotExist
 
 from eventos.models import *
 from eventos.forms.validators import *
@@ -53,13 +54,15 @@ class MultiInviAssignToPersona(forms.Form):
         n_frees = self.cleaned_data.get('frees')
         n_invis = self.cleaned_data.get('invitaciones')
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
-        assert user in list(self.cleaned_data.get('lista').administradores.all())
+        if not user in list(self.cleaned_data.get('lista').administradores.all()):
+            raise ValidationError("No podes editar esta lista.")
+
         if n_frees > 0:
             for n in range(n_frees):
                 try:
                     free = free_set[n]
                 except IndexError:
-                    self.add_error('frees', 'No tenés suficientes frees!')
+                    self.add_error('frees', 'No tenés suficientes frees! Se añadieron {}'.format(str(n)))
                     break
                 free.cliente = persona
                 free.lista = self.cleaned_data.get('lista')
@@ -80,7 +83,7 @@ class MultiInviAssignToPersona(forms.Form):
 class InvitacionAssignForm(MultiInviAssignToPersona):
     persona = forms.CharField(required=True)
     cedula = forms.CharField(required=True)
-    email = forms.EmailField()
+    email = forms.EmailField(required=False)
     invitar = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
     def __init__(self, user, *args, **kwargs):
@@ -88,6 +91,25 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
         self.fields['persona'].widget.attrs['class'] = 'input persona'
         self.fields['cedula'].widget.attrs['class'] = 'input cedula'
         self.fields['email'].widget.attrs['class'] = 'input'
+
+    def clean(self):
+        form_data = super().clean()
+        print(form_data)
+        try:
+            persona = Persona.objects.get(cedula=form_data['cedula'])
+            print(persona)
+            if persona.nombre != form_data['persona']:
+                self.add_error("persona", "Nombre no coincide con una persona existente que tiene la misma C.I.")
+                raise ValidationError("Nombre no coincide con una persona existente que tiene la misma C.I.")
+            if persona.email != form_data['email']:
+                self.add_error("email", "Email no coincide con una persona existente que tiene la misma C.I.")
+                raise ValidationError("Email no coincide con una persona existente que tiene la misma C.I.")
+        except ObjectDoesNotExist:
+            pass
+
+    def clean_cedula(self):
+        data = self.cleaned_data['cedula']
+        return data.replace('.', '').lstrip(' ').rstrip(' ')
 
     def save(self, user, evento):
         nombre = self.cleaned_data['persona']

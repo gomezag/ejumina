@@ -25,6 +25,11 @@
             <form class="modal-form" method="post">
                 {% csrf_token %}
                 {% include 'eventos/forms/lista-form.html' %}
+                <div class="field">
+                    <p class="control">
+                        <input type="submit" class="button is-info" value="Crear Lista">
+                    </p>
+                </div>
             </form>
 
       </div>

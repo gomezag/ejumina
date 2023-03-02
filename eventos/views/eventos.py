@@ -32,21 +32,58 @@ class ListaEventos(BasicView):
         c = self.get_context_data(user)
         if request.user.groups.filter(name='admin').exists():
             c['form'] = EventoForm()
+            c['edit_form'] = EventoForm(auto_id='edit')
         return super().get(request, c)
 
     def post(self, request):
         if not request.user.groups.filter(name='admin').exists():
             return self.get(request)
         c = self.get_context_data(request.user)
-        form = EventoForm(request.POST)
-        if form.is_valid():
-            form.save()
+        if request.POST.get('delete', None) is not None:
+            try:
+                evento = Evento.objects.get(pk=request.POST['delete'])
+                #evento.delete()
+            except Exception as e:
+                pass
+            form = EventoForm()
+        elif request.POST.get('edit', None) is not None:
+            try:
+                evento = Evento.objects.get(pk=request.POST['edit'])
+                form = EventoForm(request.POST, instance=evento)
+                if form.is_valid():
+                    form.save()
+            except ObjectDoesNotExist:
+                form = EventoForm()
+            c['edit_form'] = form
+        else:
+            form = EventoForm(request.POST)
+            if form.is_valid():
+                form.save()
+
         c['form'] = form
         return render(request, self.template_name, context=c)
 
 
 class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
+
+    @staticmethod
+    def parse_invitaciones(persona_set, evento):
+        r = []
+        for persona in persona_set:
+            invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona)
+            frees = Free.objects.filter(evento=evento, cliente=persona)
+            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
+                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
+            r.append({'nombre': persona.nombre,
+                                  'cedula': persona.cedula if persona.cedula else '',
+                                  'pk': persona.pk,
+                                  'invis': invitaciones.count(),
+                                  'invis_usadas': invitaciones.filter(estado='USA').count(),
+                                  'frees': frees.count(),
+                                  'frees_usadas': frees.filter(estado='USA').count(),
+                                  'listas': list(listas)})
+        return r
 
     def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
@@ -55,21 +92,7 @@ class PanelEvento(BasicView):
         else:
             c['evento'] = Evento.objects.all()[0]
 
-        c['personas'] = []
-        for persona in Persona.objects.all():
-            invitaciones = Invitacion.objects.filter(evento=c['evento'], cliente=persona)
-            frees = Free.objects.filter(evento=c['evento'], cliente=persona)
-            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=c['evento'].pk) |
-                                                       Q(personas_free=persona, free__evento=c['evento'].pk)).distinct()
-
-            c['personas'].append({'nombre': persona.nombre,
-                                  'cedula': persona.cedula if persona.cedula else '',
-                                  'pk': persona.pk,
-                                  'invis': invitaciones.count(),
-                                  'invis_usadas': invitaciones.filter(estado='USA').count(),
-                                  'frees': frees.count(),
-                                  'frees_usadas': frees.filter(estado='USA').count(),
-                                  'listas': list(listas)})
+        c['personas'] = self.parse_invitaciones(Persona.objects.all(), c['evento'])
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
@@ -119,23 +142,17 @@ class PanelEvento(BasicView):
 class PanelEventoPersona(BasicView):
     template_name = 'eventos/persona_view_evento.html'
 
-    def get_context_data(self, user, persona, evento, *args, **kwargs):
-        c = super().get_context_data(user, *args, **kwargs)
-        c['back'] = '/e/{}'.format(evento.slug)
-        invitaciones = persona.invitacion_set.filter(evento=evento)
-        c['persona'] = persona
-        c['evento'] = evento
-        c['invitaciones'] = invitaciones
-        c['frees'] = persona.free_set.filter(evento=evento)
-        c['invitaciones'] = []
+    @staticmethod
+    def parse_invitaciones(persona, evento):
+        out = []
         invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).
-                     values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
-                     invis=Count('lista'),
-                     used_invis=Count('lista', filter=Q(estado='USA'))))
+            values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
+            invis=Count('lista'),
+            used_invis=Count('lista', filter=Q(estado='USA'))))
         frees = list(Free.objects.filter(evento=evento, cliente=persona).
-                     values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
-                     frees=Count('lista'),
-                     used_frees=Count('lista', filter=Q(estado='USA'))))
+            values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
+            frees=Count('lista'),
+            used_frees=Count('lista', filter=Q(estado='USA'))))
         all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor__pk'], x['lista__pk']))
         for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor__pk'], x['lista__pk'])):
             lista = ListaInvitados.objects.get(pk=common[1])
@@ -148,8 +165,18 @@ class PanelEventoPersona(BasicView):
                 'used_frees': 0
             }
             [r.update(i) for i in invis]
-            c['invitaciones'].append(r)
+            out.append(r)
+        return out
 
+    def get_context_data(self, user, persona, evento, *args, **kwargs):
+        c = super().get_context_data(user, *args, **kwargs)
+        c['back'] = '/e/{}'.format(evento.slug)
+        invitaciones = persona.invitacion_set.filter(evento=evento)
+        c['persona'] = persona
+        c['evento'] = evento
+        c['invitaciones'] = invitaciones
+        c['frees'] = persona.free_set.filter(evento=evento)
+        c['invitaciones'] = self.parse_invitaciones(persona, evento)
         c['back'] = '/e/{}'.format(evento.slug)
         return c
 
@@ -175,11 +202,15 @@ class PanelEventoPersona(BasicView):
             frees = Free.objects.filter(cliente=persona, vendedor=request.user,
                                         lista=lista)
             for free in frees:
-                free.cliente = None
-                free.save()
+                if free.estado == 'ACT':
+                    free.cliente = None
+                    free.save()
             for invi in invitaciones:
-                invi.delete()
+                if invi.estado == 'USA':
+                    invi.delete()
             form = MultiInviAssignToPersona(request.user, persona)
+        elif request.POST.get('edit', None):
+            pass
         else:
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
             if form.is_valid():

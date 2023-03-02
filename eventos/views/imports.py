@@ -81,8 +81,7 @@ class ImportView(BasicView):
                                    'cedula': entry['cedula']}
 
                         if persona.nombre != entry['nombre']:
-                            errors.append(('error', 'Esta cedula ya existe o no se puede leer. '
-                                                    'Probá quitar caracteres especiales.'))
+                            errors.append(('error', 'Esta cedula ya existe o no se puede leer.'))
                             serialized_persona['nombre'] = entry['nombre']
                     except ObjectDoesNotExist:
                         errors.append(('warning', 'Persona no existe. Se creara nueva.'))

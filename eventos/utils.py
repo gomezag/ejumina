@@ -29,11 +29,11 @@ def parse_excel_import(f):
     frees = 0
     for row in rows:
         if any([r.value is not None for r in row]):
-            results.append({'nombre': row[0].value.rstrip(' ').lstrip(' '),
+            results.append({'nombre': str(row[0].value).rstrip(' ').lstrip(' '),
                             'invis': row[3].value,
                             'frees': row[2].value,
-                            'lista': row[4].value.rstrip(' ').lstrip(' '),
-                            'cedula': row[1].value.rstrip(' ').lstrip(' ')
+                            'lista': str(row[4].value).rstrip(' ').lstrip(' '),
+                            'cedula': str(row[1].value).rstrip(' ').lstrip(' ')
                             })
             frees += row[2].value
 

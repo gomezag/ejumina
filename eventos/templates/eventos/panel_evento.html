@@ -45,7 +45,7 @@
     <button id="add-lista" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
 
-<div class="modal" id="lista-dialog">
+<div class="modal{% if persona_form.errors %} is-active {% endif %}" id="lista-dialog">
       <div class="modal-content">
           <span id='lista-close' class="close">&times;</span>
           <form class="modal-form" method="post" action="">

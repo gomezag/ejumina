@@ -13,11 +13,4 @@
     {% endwith %}
 {% endfor %}
 
-<h5 class="title is-5"> Asignar Entradas: </h5>
-<div class="content">
-<form class="body-form" action="" method="post">
-    {% csrf_token %}
-    {% include 'eventos/forms/multiassign-form.html' %}
-</form>
-</div>
 {% endblock %}

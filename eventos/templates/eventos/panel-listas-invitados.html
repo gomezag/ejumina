@@ -5,5 +5,20 @@
 <h2 class="title is-2">
      {{lista.nombre}}
 </h2>
+<div class="card">
+     <div class="card-body">
+          <div class="container">
+          <form class="modal-form" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/lista-form.html' %}
+               <div class="field">
+                   <p class="control">
+                       <input type="submit" class="button is-info" value="Editar Lista">
+                   </p>
+               </div>
+          </form>
+          </div>
+     </div>
+</div>
 
 {% endblock %}

@@ -9,10 +9,8 @@
 {% block content %}
 
 <script src="{% static 'js/sort.js' %}"></script>
-
 <h1 class="title is-1"> Eventos </h1>
 {% include 'eventos/tablas/tabla_eventos.html' %}
-{% include 'eventos/setups/autocomplete_setup.html' %}
 
 {% if form %}
 
@@ -30,9 +28,35 @@
             <form class="modal-form" action="" method="post">
                 {% csrf_token %}
                 {% include 'eventos/forms/evento-form.html' %}
+                <div class="control">
+                <input type="submit" class="button is-info" value="Crear Evento">
+                </div>
             </form>
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
+<div class="modal" id="edit-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='edit-close' class="close">&times;</span>
+            <form class="modal-form" action="" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/evento-form.html' with form=edit_form %}
+                <div class="control">
+                <input type="submit" class="button is-info" value="Editar Evento">
+                </div>
+                <input type="hidden" name="edit" id="id_evento" value="">
+            </form>
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='edit' noBtn=1%}
+<script nonce="{{request.csp_nonce}}">
+    function openEditModal(id, name, fecha){
+        checkinModal = document.getElementById("edit-dialog");
+        checkinModal.classList.add("is-active");
+        document.getElementById("{{edit_form.name.id_for_label}}").value=name;
+        document.getElementById("{{edit_form.fecha.id_for_label}}").value=fecha;
+        document.getElementById("id_evento").value=id;
+    };
+</script>
 {% endif %}
 {% endblock %}
