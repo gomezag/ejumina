@@ -1,5 +1,6 @@
 {% load auth_extras %}
 <table class="tabla-personas table" id="tabla_personas">
+    <thead>
     <tr>
         <th onclick="sortTable(0)">
             Inv.
@@ -22,6 +23,8 @@
         </th>
         {% endif %}
     </tr>
+    </thead>
+    <tbody>
     {% for persona in personas %}
         <tr>
             <td>
@@ -51,4 +54,5 @@
             {% endif %}
         </tr>
     {% endfor %}
+    </tbody>
 </table>

@@ -76,23 +76,29 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     font-size: var(--fontsize-s);
 }
 
-.tabla_personas>tbody>tr {
+.tabla-personas>tbody>tr {
     width: 100%;
-    border: 4px solid;
 }
 
-.tabla_personas>tbody>tr>td {
-    border: 1pt solid;
+.tabla-personas>tbody>tr>td {
+    vertical-align: middle
 }
 
-.tabla_invitacion>tbody>tr>td {
+.tabla-invitacion>tbody>tr>td {
     padding:0 25px 0 10px;
-        border: 1pt solid;
 }
 
 .tabla_personas>tbody>tr>th {
     padding:0 25px 0 10px;
     border: 1pt solid;
+}
+
+.persona-card {
+    width: 90%;
+}
+
+.persona-card .title{
+    color: unset;
 }
 
 .title {
@@ -335,5 +341,8 @@ input[type=number] {
     .navbar-burger {height:100px;width:100px;}
     .body-content {font-size: var(--fontsize);}
     .back-button i{font-size: var(--fontsize-xl);}
-    .table-btn-container i{font-size: var(--fontsize-s);}
+    .table-btn-container i{font-size: var(--fontsize-xl);}
+    .table-btn-container .plus-button{width:var(--fontsize-xl);height:var(--fontsize-xl);border-radius:var(--fontsize-xl);}
+    .table-btn-container .plus-button i{font-size: var(--fontsize-l)}
+    .table-btn-container {flex-direction: column; align-items: center;}
 }

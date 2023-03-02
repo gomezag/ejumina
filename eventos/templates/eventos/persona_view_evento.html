@@ -4,21 +4,34 @@
 {% block go_back %} / {% endblock %}
 {% block content %}
 <h1 class="title is-1">
-   {{evento.name}}
+    {{evento.name}}
 </h1>
-<div class="field is-centered">
-    <h2 class="title is-2">
-     {{persona.nombre}}
-    </h2>
-    <h3 class="title is-3">
-        C.I.: {{persona.cedula}}
-    </h3>
+<div class="card persona-card">
+    <header class="card-header">
+        <h2 class="title is-2">
+            {{persona.nombre}}
+        </h2>
+    </header>
+    <div class="card-content">
+        <div class="media">
+<!--            <div class="media-left">-->
+<!--                <figure class="image is-150x150">-->
+<!--                    <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">-->
+<!--                </figure>-->
+<!--            </div>-->
+            <div class="media-content">
+                <h3 class="subtitle is-3">
+                    C.I.: {{persona.cedula}}
+                </h3>
+                <h3 class="subtitle is-3">
+                    Email: {{persona.email}}
+                </h3>
+            </div>
+        </div>
+    </div>
 </div>
-<h3 class="title is-3">
-
-</h3>
 <h2 class="title">
-   Invitaciones:
+    Invitaciones:
 </h2>
 {% include 'eventos/tablas/tabla-invitaciones.html' %}
 
@@ -30,13 +43,13 @@
     <button id="add-form" class="plus-button green"><i class="fa fa-plus-circle"></i></button>
 </div>
 <div class="modal" id="form-dialog">
-      <div class="modal-content is-fullheight">
-          <span id='form-close' class="close">&times;</span>
-            <form class="modal-form" action="" method="post">
-                {% csrf_token %}
-                {% include 'eventos/forms/multiassign-form.html' %}
-            </form>
-      </div>
+    <div class="modal-content is-fullheight">
+        <span id='form-close' class="close">&times;</span>
+        <form class="modal-form" action="" method="post">
+            {% csrf_token %}
+            {% include 'eventos/forms/multiassign-form.html' %}
+        </form>
+    </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
 {% endif %}
