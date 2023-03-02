@@ -1,25 +1,20 @@
+<div class="field is-grouped">
+    <div class="field int-input">
+        <label class="label">{{form.free.label}}</label>
+        <div class="control">{{form.free}}</div>
+        <p class="help errors">{% for error in form.free.errors %} <li>{{error}}</li>{% endfor %}</p>
 
-{% for field in form %}
+    </div>
+    <div class="field">
+        <div class="plus-button"><i class="fa fa-plus-circle" onclick="document.getElementById('{{form.free.id_for_label}}').stepUp();"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle" onclick="document.getElementById('{{form.free.id_for_label}}').stepDown();"></i></div>
+    </div>
+</div>
 <div class="field">
-    <label class="label">{{field.label}}</label>
-    {% if field.id_for_label == 'id_evento' %}
-    <span class="select">
-    {% elif field.id_for_label == 'id_free' %}
-    <div class="control int-input">
-    {% else %}
-    <div class="control">
-    {% endif %}
-        {{field}}
-    {% if field.id_for_label == 'id_free' %}
-    </div>
-    {% elif field.id_for_label != 'id_evento' %}
-    </div>
-    {% else %}
-    </span>
-    {% endif %}
+    <label class="label">{{form.evento.label}}</label>
+    <div class="select">{{form.evento}}</div>
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
-{% endfor %}
 <div class="field">
   <input type="submit" class="button is-info modal-button" value="Asignar Frees">
 </div>

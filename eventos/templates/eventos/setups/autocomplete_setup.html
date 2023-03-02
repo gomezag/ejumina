@@ -9,13 +9,13 @@ var availableTags = [[
     ],
     {% endfor %}
     ],
-    "{{evento.pk}}"
+    "{{evento.slug}}"
 ];
 autocomplete(document.getElementById("searchbar"), availableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
 window.addEventListener("load",function() {
-    autocomplete(document.getElementById("id_persona"), availableTags);
-    document.getElementById("id_persona").value = "{{keyword}}";
+    autocomplete(document.getElementById("invi_persona"), availableTags);
+    document.getElementById("invi_persona").value = "{{keyword}}";
 });
 // Get the input field
 var input = document.getElementById("searchbar");

@@ -15,7 +15,7 @@ class PersonaForm(forms.ModelForm):
 
     class Meta:
         model = Persona
-        fields = ['nombre', 'cedula']
+        fields = ['nombre', 'cedula', 'email']
 
     def __init__(self, *args, **kwargs):
         super(PersonaForm, self).__init__(*args, **kwargs)

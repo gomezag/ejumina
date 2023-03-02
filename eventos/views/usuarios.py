@@ -28,6 +28,10 @@ class PanelUsuario(AdminView):
                                     'frees': evento.free_set.filter(vendedor=c['id_usuario'],
                                                                     cliente__isnull=False).count(),
                                     'invis': evento.invitacion_set.filter(vendedor=c['id_usuario']).count(),
+                                    'checked': evento.invitacion_set.filter(vendedor=c['id_usuario'],
+                                                                            estado='USA').count() +
+                                               evento.free_set.filter(vendedor=c['id_usuario'],
+                                                                      estado='USA').count(),
                                     'nombre': evento.name,
                                     'slug': evento.slug})
 

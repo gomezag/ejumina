@@ -7,7 +7,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, CASCADE, SET_NULL
-from django.db.models.fields import IntegerField, CharField
+from django.db.models.fields import IntegerField, CharField, EmailField
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -22,6 +22,7 @@ class Persona(Model):
     nombre = CharField(max_length=100, blank=False, null=False)
     estado = CharField(max_length=3, blank=False, null=False, choices=ESTADOS_CLIENTES, default='ACT')
     cedula = CharField(max_length=11, blank=False, null=True, unique=True)
+    email = EmailField(blank=True, null=True, unique=False)
 
     def __str__(self):
         return " - ".join([str(self.nombre), str(self.estado)])

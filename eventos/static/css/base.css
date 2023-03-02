@@ -17,6 +17,8 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .autocomplete-items {
     background-color: white;
     width: 100% ;
+    overflow-y: scroll;
+    max-height: 30vh;
 }
 
 .body {
@@ -65,23 +67,34 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     color: white;
 }
 
+.table-container {
+    width: 90vw;
+    max-width: 90vw;
+}
 
 .tabla-personas {
-    width: 90vw;
     border: 4px solid;
     font-size: var(--fontsize-s);
+
 }
 
 .tabla-personas input {
     font-size: var(--fontsize-s);
 }
 
-.tabla-personas>tbody>tr {
-    width: 100%;
+.tabla-personas tr {
 }
 
-.tabla-personas>tbody>tr>td {
+.tabla-personas th {
+    width: 100%;
+    word-wrap: break-word;
+}
+
+.tabla-personas td {
     vertical-align: middle
+    width: 100%;
+    word-wrap: break-word;
+    max-width:30vw;
 }
 
 .tabla-invitacion>tbody>tr>td {
@@ -92,6 +105,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     padding:0 25px 0 10px;
     border: 1pt solid;
 }
+
 
 .persona-card {
     width: 90%;
@@ -119,6 +133,16 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .back-button {
     font-size: var(--fontsize);
     margin: 15px;
+}
+
+.body-form .plus-button {
+    margin: 10px;
+    width:var(--fontsize-xl);
+    height:var(--fontsize-xl);
+    border-radius:var(--fontsize-xl);
+}
+.body-form .plus-button i{
+    font-size: var(--fontsize-l);
 }
 
  /* The Modal (background) */

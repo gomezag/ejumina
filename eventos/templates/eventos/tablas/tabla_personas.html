@@ -1,5 +1,5 @@
 {% load auth_extras %}
-<table class="tabla-personas table" id="tabla_personas">
+<table class="tabla-personas table is-bordered is-fullwidth is-hoverable" id="tabla_personas">
     <thead>
     <tr>
         <th onclick="sortTable(0)">
@@ -28,10 +28,13 @@
     {% for persona in personas %}
         <tr>
             <td>
-                {{persona.invis}} ({{persona.invis_usadas}})
+                <p>{{persona.invis}}</p>
+                <p>({{persona.invis_usadas}})</p>
             </td>
             <td>
-                {{persona.frees}} ({{persona.frees_usadas}})
+                <p>{{persona.frees}}</p>
+                <p>({{persona.frees_usadas}})</p>
+
             </td>
             <td>
                 <a href="/e/{{evento.slug}}/p/{{persona.pk}}/"> {{persona.nombre}} </a>
@@ -46,10 +49,12 @@
             </td>
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
-                <button class="button is-info" onclick="openCheckInModal({{persona.pk}},
+                <div class="table-btn-container">
+                <div class="plus-button green" onclick="openCheckInModal({{persona.pk}},
                 {{persona.frees}}, {{persona.frees_usadas}}, {{persona.invis}}, {{persona.invis_usadas}});">
-                    Check-In
-                </button>
+                    <i class="fa fa-check"></i>
+                </div>
+                </div>
             </td>
             {% endif %}
         </tr>

@@ -9,7 +9,8 @@
 {% for group in id_usuario.groups.all%} {{group}} {% endfor %}
 </h2>
 
-<table class="table">
+<table class="table tabla-personas">
+    <tr>
     <th>
         Evento
     </th>
@@ -19,6 +20,10 @@
     <th>
         Inv.
     </th>
+    <th>
+        Checked
+    </th>
+    </tr>
     {% for evento in id_eventos %}
     <tr>
         <td>
@@ -30,11 +35,14 @@
         <td>
             {{evento.invis}}
         </td>
+        <td>
+            {{evento.checked}}
+        </td>
     </tr>
     {% endfor %}
 </table>
 
-<h5 class="title is-5"> Asignar Frees: </h5>
+<h2 class="title is-2"> Asignar Frees: </h2>
 
 <form class="body-form" action="" method="post">
     {% csrf_token %}
