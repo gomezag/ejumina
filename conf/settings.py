@@ -115,7 +115,8 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_NAME = '__Secure-sessionid'
 CSRF_COOKIE_NAME = '__Secure-csrftoken'
 ROOT_URLCONF = 'conf.urls'
-
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Strict'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -169,6 +170,15 @@ if os.getenv('DEBUG'):
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
     SECURE_SSL_REDIRECT = False
+else:
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    ## Strict-Transport-Security
+    SECURE_HSTS_SECONDS = 15768000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+
+
 
 CSP_REPORT_URI = '<add your reporting uri>'
 
