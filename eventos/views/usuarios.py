@@ -8,9 +8,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
 from django.contrib.auth.forms import PasswordResetForm
+from django.shortcuts import render
 
-from eventos.forms import *
-from eventos.views.basic_view import *
+from eventos.forms import NewUserForm, FreeAssignToUserForm, EditUserForm
+from eventos.models import Usuario, Evento
+from .basic_view import AdminView
 
 
 class PanelUsuario(AdminView):
@@ -66,8 +68,8 @@ class ListaUsuarios(AdminView):
 
     def get(self, request, *args, **kwargs):
         c = self.get_context_data(request.user)
-        form = NewUserForm()
-        c['form'] = form
+        c['form'] = NewUserForm()
+        c['edit_form'] = EditUserForm(auto_id='edit')
         return super().get(request, c)
 
     def post(self, request, *args, **kwargs):

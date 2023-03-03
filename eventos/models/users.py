@@ -8,7 +8,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 from django.contrib.auth.models import AbstractUser, Group
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 ESTADOS_CLIENTES = [
@@ -34,20 +34,22 @@ class Usuario(AbstractUser):
         (2, 'R.R.P.P.'),
         (3, 'Guest')
     ]
-    rol = IntegerField(choices=ROLES_USUARIO)
+    rol = IntegerField(choices=ROLES_USUARIO, null=True, blank=True)
     first_name = CharField(max_length=20, unique=True)
 
     def __str__(self):
         return f"{self.username} - {self.get_rol_display()}"
 
 
-@receiver(pre_save, sender=Usuario, dispatch_uid="asignar_roles")
+@receiver(post_save, sender=Usuario, dispatch_uid="asignar_roles")
 def asignar_roles(sender, instance, **kwargs):
-    if Group.objects.get_or_create(name='admin')[0] in instance.groups.all():
-        instance.rol = 0
-    elif Group.objects.get_or_create(name='rrpp')[0] in instance.groups.all():
-        instance.rol = 2
-    elif Group.objects.get_or_create(name='entrada')[0] in instance.groups.all():
-        instance.rol = 1
-    else:
-        instance.rol = 3
+    if not instance.rol:
+        if Group.objects.get_or_create(name='admin')[0] in instance.groups.all():
+            instance.rol = 0
+        elif Group.objects.get_or_create(name='rrpp')[0] in instance.groups.all():
+            instance.rol = 2
+        elif Group.objects.get_or_create(name='entrada')[0] in instance.groups.all():
+            instance.rol = 1
+        else:
+            instance.rol = 3
+        instance.save()

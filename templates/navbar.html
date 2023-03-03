@@ -47,6 +47,8 @@
       <a class="navbar-item" href="/listas">
         Listas
       </a>
+      {% endif %}
+      {% if request.user.is_superuser %}
       <a class="navbar-item" href="/admin">
         Admin Panel
       </a>

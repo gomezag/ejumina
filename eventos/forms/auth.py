@@ -29,3 +29,14 @@ class NewUserForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['groups'].queryset = Group.objects.exclude(name='superuser')
         self.fields['groups'].required = True
+
+
+class EditUserForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['groups', 'first_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['groups'].queryset = Group.objects.exclude(name='superuser')
+        self.fields['groups'].required = True
