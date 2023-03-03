@@ -61,7 +61,7 @@ class ListaUsuarios(AdminView):
 
     def get_context_data(self, user, *args, **kwargs):
         c = super().get_context_data(user)
-        c['usuarios'] = Usuario.objects.all().order_by('-is_active')
+        c['usuarios'] = Usuario.objects.filter(is_superuser=False).order_by('-is_active')
         return c
 
     def get(self, request, *args, **kwargs):

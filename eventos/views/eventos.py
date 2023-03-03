@@ -7,17 +7,17 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
+from django.core.validators import integer_validator
+from django.db.models.base import ObjectDoesNotExist
+from django.db.models import Count, Q
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 import itertools
 
-from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count
-from django.db.models import Q
-from django.core.validators import integer_validator
-
-from eventos.forms import *
-from eventos.views.basic_view import *
+from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona
+from eventos.views.basic_view import BasicView
 from eventos.utils import validate_in_group
-from eventos.models import Invitacion, Evento
+from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
 
 
 class ListaEventos(BasicView):

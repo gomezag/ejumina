@@ -11,7 +11,8 @@ from django.db.models.fields import CharField, SlugField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from . import Evento, Usuario, Persona
+from .eventos import Evento
+from .users import Usuario, Persona
 from eventos.utils import unique_slugify
 
 COLORES = [

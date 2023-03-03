@@ -10,6 +10,7 @@ from django.apps import apps
 from django.contrib.admin.sites import AlreadyRegistered
 from django.contrib.auth.admin import UserAdmin
 from eventos.models import Usuario
+
 # Register your models here.
 
 app_models = apps.get_app_config('eventos').get_models()

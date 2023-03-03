@@ -7,8 +7,11 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
-from eventos.forms import *
-from eventos.views.basic_view import *
+from django.shortcuts import render
+
+from eventos.forms import ListaInvitadosForm
+from eventos.models import ListaInvitados
+from eventos.views.basic_view import AdminView
 
 
 class ListaListasInvitados(AdminView):

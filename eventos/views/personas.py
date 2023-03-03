@@ -8,13 +8,11 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
 
-import itertools
-
 from django.shortcuts import render
-from django.db.models import Count
 
-from eventos.forms import *
-from .basic_view import BasicView
+from eventos.forms import PersonaForm
+from eventos.models import Persona, Evento
+from eventos.views import BasicView
 from .eventos import PanelEventoPersona
 
 

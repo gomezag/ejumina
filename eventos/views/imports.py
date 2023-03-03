@@ -9,9 +9,12 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.db.models.base import ObjectDoesNotExist
 from django.core.validators import integer_validator
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
-from eventos.forms import *
-from eventos.views.basic_view import *
+from eventos.forms import ExcelImportForm, InvitacionAssignForm
+from eventos.models import Evento, Free, Persona, ListaInvitados
+from eventos.views.basic_view import BasicView
 from eventos.utils import parse_excel_import
 
 
