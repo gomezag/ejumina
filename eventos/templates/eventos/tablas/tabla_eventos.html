@@ -1,3 +1,4 @@
+{% load auth_extras %}
 <table class="tabla-personas table" id="tabla_personas">
     <thead>
     <tr>
@@ -22,12 +23,14 @@
                 {{evento.fecha}}
             </td>
             <td>
+                {% if request.user|has_group:'admin' %}
                 <div class="table-btn-container">
                 <div class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
                 '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
                     <i class="fa fa-pencil"></i>
                 </div>
                 </div>
+                {% endif %}
             </td>
     {% endfor %}
     </tbody>

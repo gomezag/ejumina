@@ -116,6 +116,10 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     color: unset;
 }
 
+.user-card.inactive {
+    background-color: gray;
+}
+
 .title {
     color: white;
 }

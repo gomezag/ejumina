@@ -5,7 +5,7 @@ Contacto: agustin.gomez.mansilla@gmail.com
 Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.db.models import Model, CASCADE, SET_NULL
 from django.db.models.fields import IntegerField, CharField, EmailField
 from django.db.models.signals import pre_save
@@ -22,7 +22,6 @@ class Persona(Model):
     nombre = CharField(max_length=100, blank=False, null=False)
     estado = CharField(max_length=3, blank=False, null=False, choices=ESTADOS_CLIENTES, default='ACT')
     cedula = CharField(max_length=11, blank=False, null=True, unique=True)
-    email = EmailField(blank=True, null=True, unique=False)
 
     def __str__(self):
         return " - ".join([str(self.nombre), str(self.estado)])
@@ -43,5 +42,11 @@ class Usuario(AbstractUser):
 
 @receiver(pre_save, sender=Usuario, dispatch_uid="user_count")
 def crear_usuario(sender, instance, **kwargs):
-    if not instance.rol:
+    if Group.objects.get_or_create(name='admin')[0] in instance.groups.all():
+        instance.rol = 0
+    elif Group.objects.get_or_create(name='rrpp')[0] in instance.groups.all():
+        instance.rol = 2
+    elif Group.objects.get_or_create(name='entrada')[0] in instance.groups.all():
+        instance.rol = 1
+    else:
         instance.rol = 3

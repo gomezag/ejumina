@@ -17,6 +17,7 @@ from django.core.validators import integer_validator
 from eventos.forms import *
 from eventos.views.basic_view import *
 from eventos.utils import validate_in_group
+from eventos.models import Invitacion, Evento
 
 
 class ListaEventos(BasicView):
@@ -101,7 +102,8 @@ class PanelEvento(BasicView):
                                                            evento=c['evento'].pk).exclude(cliente=None).count()
             c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
                                                            evento=c['evento'].pk).count()
-        c['checkin_form'] = CheckInForm()
+        if validate_in_group([g.name for g in user.groups.all()], ('admin', 'entrada')):
+            c['checkin_form'] = CheckInForm()
         return c
 
     def get(self, request, evento, *args, **kwargs):
@@ -185,12 +187,17 @@ class PanelEventoPersona(BasicView):
         evento = Evento.objects.get(slug=evento)
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
-        c['form'] = MultiInviAssignToPersona(usuario, persona)
+        if validate_in_group([g.name for g in usuario.groups.all()], ('admin', 'rrpp')):
+            c['form'] = MultiInviAssignToPersona(usuario, persona)
+        if validate_in_group([g.name for g in usuario.groups.all()], ('admin', 'entrada')):
+            c['checkin_form'] = CheckInForm()
         return super().get(request, c)
 
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
+        checkin = request.POST.get('checkin', None)
+        c = {}
         if request.POST.get('delete', None):
             try:
                 integer_validator(request.POST['lista'])
@@ -209,13 +216,21 @@ class PanelEventoPersona(BasicView):
                 if invi.estado == 'USA':
                     invi.delete()
             form = MultiInviAssignToPersona(request.user, persona)
-        elif request.POST.get('edit', None):
-            pass
+        elif validate_in_group([g.name for g in request.user.groups.all()], ('entrada', 'admin')) and checkin:
+            id_lista = request.POST.get('lista')
+            checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
+            if checkin_form.is_valid(evento=evento):
+                checkin_form.save()
+            else:
+                c['checkin_errors'] = checkin_form.errors
+            form = MultiInviAssignToPersona(request.user, persona)
+            c['checkin_form'] = checkin_form
         else:
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
             if form.is_valid():
                 form.save(request.user, persona, evento)
-        c = self.get_context_data(request.user, persona, evento)
+
+        c.update(self.get_context_data(request.user, persona, evento))
         c['form'] = form
         return super().get(request, c)
 

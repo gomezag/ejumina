@@ -50,7 +50,7 @@ class MultiInviAssignToPersona(forms.Form):
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'input'
 
-    def save(self, user, persona, evento):
+    def save(self, user, persona, evento, **kwargs):
         n_frees = self.cleaned_data.get('frees')
         n_invis = self.cleaned_data.get('invitaciones')
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
@@ -83,27 +83,21 @@ class MultiInviAssignToPersona(forms.Form):
 class InvitacionAssignForm(MultiInviAssignToPersona):
     persona = forms.CharField(required=True)
     cedula = forms.CharField(required=True)
-    email = forms.EmailField(required=False)
     invitar = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
     def __init__(self, user, *args, **kwargs):
         super(InvitacionAssignForm, self).__init__(user, None, *args, **kwargs)
         self.fields['persona'].widget.attrs['class'] = 'input persona'
         self.fields['cedula'].widget.attrs['class'] = 'input cedula'
-        self.fields['email'].widget.attrs['class'] = 'input'
 
     def clean(self):
         form_data = super().clean()
         print(form_data)
         try:
             persona = Persona.objects.get(cedula=form_data['cedula'])
-            print(persona)
             if persona.nombre != form_data['persona']:
                 self.add_error("persona", "Nombre no coincide con una persona existente que tiene la misma C.I.")
                 raise ValidationError("Nombre no coincide con una persona existente que tiene la misma C.I.")
-            if persona.email != form_data['email']:
-                self.add_error("email", "Email no coincide con una persona existente que tiene la misma C.I.")
-                raise ValidationError("Email no coincide con una persona existente que tiene la misma C.I.")
         except ObjectDoesNotExist:
             pass
 
@@ -111,13 +105,13 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
         data = self.cleaned_data['cedula']
         return data.replace('.', '').lstrip(' ').rstrip(' ')
 
-    def save(self, user, evento):
+    def save(self, user, evento, **kwargs):
         nombre = self.cleaned_data['persona']
         cedula = self.cleaned_data['cedula'].replace('.', '')
-        persona, created = Persona.objects.get_or_create(nombre=nombre, cedula=cedula, email=self.cleaned_data['email'])
+        persona, created = Persona.objects.get_or_create(nombre=nombre, cedula=cedula)
         if created:
             persona.save()
-        super().save(user, persona, evento)
+        super().save(user, persona, evento, **kwargs)
 
 
 InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0, exclude=['id'])
@@ -150,14 +144,33 @@ class ExcelImportForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['file'].widget.attrs['class'] = 'file-input'
 
+
 class CheckInForm(forms.Form):
     persona = forms.ModelChoiceField(queryset=Persona.objects.all(), widget=forms.HiddenInput)
     check_invis = forms.IntegerField(initial=0)
     check_frees = forms.IntegerField(initial=0)
     evento = None
 
+    def __init__(self, *args, **kwargs):
+        vendedor = kwargs.pop('vendedor', None)
+        lista = kwargs.pop('lista', None)
+        super().__init__(*args, **kwargs)
+        if vendedor:
+            self._vendedor = vendedor
+        else:
+            self._vendedor = None
+        if lista:
+            self._lista = lista
+        else:
+            self._lista = None
+
     def is_valid(self, **kwargs):
         evento = kwargs.pop('evento', None)
+        extra = {}
+        if self._vendedor:
+            extra.update({'vendedor': self._vendedor})
+        if self._lista:
+            extra.update({'lista': self._lista})
         if not evento or not isinstance(evento, Evento):
             return False
         self.evento = evento
@@ -166,16 +179,16 @@ class CheckInForm(forms.Form):
             persona = self.cleaned_data['persona']
             n_invis = self.cleaned_data['check_invis']
             n_frees = self.cleaned_data['check_frees']
-            if n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT').count() and n_invis > 0:
+            if n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra).count() and n_invis > 0:
                 self.errors.append('Demasiados check-ins para esta persona y evento.')
                 return False
-            elif -n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='USA').count() and n_invis < 0:
+            elif -n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='USA', **extra).count() and n_invis < 0:
                 self.errors.append('Demasiados check-ins para esta persona y evento.')
                 return False
-            if n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='ACT').count():
+            if n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra).count():
                 self.errors.append('Demasiados check-ins para esta persona y evento.')
                 return False
-            elif -n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='USA').count() and n_frees < 0:
+            elif -n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='USA', **extra).count() and n_frees < 0:
                 self.errors.append('Demasiados check-ins para esta persona y evento.')
                 return False
         return r
@@ -185,23 +198,28 @@ class CheckInForm(forms.Form):
         evento = self.evento
         n_invis = self.cleaned_data['check_invis']
         n_frees = self.cleaned_data['check_frees']
+        extra = {}
+        if self._vendedor:
+            extra.update({'vendedor': self._vendedor})
+        if self._lista:
+            extra.update({'lista': self._lista})
         if n_invis>0:
-            invis = list(Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT'))
+            invis = list(Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra))
             for n in range(n_invis):
                 invis[n].estado = 'USA'
                 invis[n].save()
         elif n_invis < 0:
-            invis = list(Invitacion.objects.filter(cliente=persona, evento=evento, estado='USA'))
+            invis = list(Invitacion.objects.filter(cliente=persona, evento=evento, estado='USA', **extra))
             for n in range(-n_invis):
                 invis[n].estado = 'ACT'
                 invis[n].save()
         if n_frees>0:
-            frees = list(Free.objects.filter(cliente=persona, evento=evento, estado='ACT'))
+            frees = list(Free.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra))
             for n in range(n_frees):
                 frees[n].estado = 'USA'
                 frees[n].save()
         elif n_frees < 0:
-            frees = list(Free.objects.filter(cliente=persona, evento=evento, estado='USA'))
+            frees = list(Free.objects.filter(cliente=persona, evento=evento, estado='USA', **extra))
             for n in range(-n_frees):
                 frees[n].estado = 'ACT'
                 frees[n].save()

@@ -61,7 +61,7 @@ class ListaUsuarios(AdminView):
 
     def get_context_data(self, user, *args, **kwargs):
         c = super().get_context_data(user)
-        c['usuarios'] = Usuario.objects.all()
+        c['usuarios'] = Usuario.objects.all().order_by('-is_active')
         return c
 
     def get(self, request, *args, **kwargs):
@@ -72,9 +72,18 @@ class ListaUsuarios(AdminView):
 
     def post(self, request, *args, **kwargs):
         delete = request.POST.get('delete', None)
+        reactivate = request.POST.get('reactivate', None)
         reset = request.POST.get('reset', None)
+
         if delete:
-            print('deleting: {}'.format(delete))
+            user = Usuario.objects.get(pk=delete)
+            user.is_active = False
+            user.save()
+            form = NewUserForm()
+        elif reactivate:
+            user = Usuario.objects.get(pk=reactivate)
+            user.is_active = True
+            user.save()
             form = NewUserForm()
         elif reset:
             target = Usuario.objects.get(pk=reset)
