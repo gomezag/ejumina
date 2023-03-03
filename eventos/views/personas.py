@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from eventos.forms import PersonaForm
 from eventos.models import Persona, Evento
-from eventos.views import BasicView
+from .basic_view import BasicView
 from .eventos import PanelEventoPersona
 
 
