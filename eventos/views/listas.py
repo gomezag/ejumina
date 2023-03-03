@@ -26,15 +26,10 @@ class ListaListasInvitados(AdminView):
         return super().get(request, c)
 
     def post(self, request):
-        delete = request.POST.get('delete', None)
         c = self.get_context_data(request.user)
-        if delete:
-            lista = ListaInvitados.objects.get(pk=delete)
-
-        else:
-            form = ListaInvitadosForm(request.POST)
-            if form.is_valid():
-                form.save()
+        form = ListaInvitadosForm(request.POST)
+        if form.is_valid():
+            form.save()
         c['form'] = form
         return render(request, self.template_name, context=c)
 
