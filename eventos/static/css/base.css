@@ -352,6 +352,20 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
+
+.signature {
+    background-color: none;
+    position: absolute;
+    bottom: 5px;
+    left: 15px;
+}
+
+.signature a{
+    color: gray;
+
+    font-size: var(--fontsize-l);
+}
+
 /* Smartphones in landscape */
 @media only screen
   and (min-device-width: 100px)
