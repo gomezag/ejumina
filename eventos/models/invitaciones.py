@@ -51,9 +51,9 @@ class ListaInvitados(models.Model):
 class Invitacion(models.Model):
     estado = CharField(max_length=3, choices=ESTADOS_INVITACION, default='ACT')
     evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
-    vendedor = ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=False)
-    cliente = ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True)
-    lista = ForeignKey(ListaInvitados, null=False, on_delete=models.CASCADE, blank=False)
+    vendedor = ForeignKey(Usuario, on_delete=models.PROTECT, null=True, blank=False)
+    cliente = ForeignKey(Persona, on_delete=models.PROTECT, null=True, blank=True)
+    lista = ForeignKey(ListaInvitados, null=False, on_delete=models.PROTECT, blank=False)
 
     def __str__(self):
         return f"Invitacion a {self.evento.name} - {self.get_estado_display()} - {self.vendedor.first_name} a" \
@@ -64,9 +64,9 @@ class Free(models.Model):
     administrador = ManyToManyField(Usuario, blank=False, related_name='frees')
     estado = CharField(max_length=3, choices=ESTADOS_INVITACION, null=False)
     evento = ForeignKey(Evento, on_delete=models.CASCADE, null=False)
-    vendedor = ForeignKey(Usuario, on_delete=models.CASCADE, null=False, blank=False)
-    cliente = ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True)
-    lista = ForeignKey(ListaInvitados, null=True, on_delete=models.CASCADE, blank=True)
+    vendedor = ForeignKey(Usuario, on_delete=models.PROTECT, null=False, blank=False)
+    cliente = ForeignKey(Persona, on_delete=models.PROTECT, null=True, blank=True)
+    lista = ForeignKey(ListaInvitados, null=True, on_delete=models.PROTECT, blank=True)
 
     def __str__(self):
         return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \
