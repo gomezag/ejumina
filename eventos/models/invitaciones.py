@@ -6,10 +6,12 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 import django.db.models as models
-from django.db.models import ForeignKey, ManyToManyField
+from django.db.models import ForeignKey, ManyToManyField, ObjectDoesNotExist
 from django.db.models.fields import CharField, SlugField
-from . import Evento, Usuario, Persona
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
+from . import Evento, Usuario, Persona
 from eventos.utils import unique_slugify
 
 COLORES = [
@@ -69,4 +71,16 @@ class Free(models.Model):
         return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \
                f"a {self.cliente}"
 
+
+@receiver(post_save, sender=Usuario, dispatch_uid="crear_lista")
+def asignar_roles(sender, instance, **kwargs):
+    try:
+        ListaInvitados.objects.get(nombre=instance.first_name)
+
+    except ObjectDoesNotExist:
+        lista = ListaInvitados()
+        lista.nombre = instance.first_name
+        lista.color = '#008744'
+        lista.save()
+        lista.administradores.add(instance)
 

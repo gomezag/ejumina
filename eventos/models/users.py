@@ -7,7 +7,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.contrib.auth.models import AbstractUser, Group
 from django.db.models import Model, CASCADE, SET_NULL
-from django.db.models.fields import IntegerField, CharField, EmailField
+from django.db.models.fields import IntegerField, CharField
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -35,13 +35,14 @@ class Usuario(AbstractUser):
         (3, 'Guest')
     ]
     rol = IntegerField(choices=ROLES_USUARIO)
+    first_name = CharField(max_length=20, unique=True)
 
     def __str__(self):
         return f"{self.username} - {self.get_rol_display()}"
 
 
-@receiver(pre_save, sender=Usuario, dispatch_uid="user_count")
-def crear_usuario(sender, instance, **kwargs):
+@receiver(pre_save, sender=Usuario, dispatch_uid="asignar_roles")
+def asignar_roles(sender, instance, **kwargs):
     if Group.objects.get_or_create(name='admin')[0] in instance.groups.all():
         instance.rol = 0
     elif Group.objects.get_or_create(name='rrpp')[0] in instance.groups.all():
