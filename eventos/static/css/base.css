@@ -232,7 +232,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 .card-content {
 
 }
-
+.card-header {display:flex; align-items: center;}
 .card {
     font-size: var(--fontsize);
 }
@@ -376,4 +376,5 @@ input[type=number] {
     .table-btn-container .plus-button{width:var(--fontsize-xl);height:var(--fontsize-xl);border-radius:var(--fontsize-xl);}
     .table-btn-container .plus-button i{font-size: var(--fontsize-l)}
     .table-btn-container {flex-direction: column; align-items: center;}
+
 }

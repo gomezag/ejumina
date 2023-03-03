@@ -6,8 +6,14 @@
                 <header class="card-header">
                 <p class="card-header-title">
                   <a href="/u/{{user.pk}}">{{user.first_name}} </a>
+                    <div class="table-btn-container">
                     <button class="plus-button blue" onclick="openEditModal('{{user.pk}}',
-                    '{{user.first_name}}', '{{user.email}}', [{% for group in user.groups.all %} '{{group.pk}}' {% if not forloop.last %},{% endif %} {% endfor %} ]);"><i class="fa fa-pencil"></i></button>
+                    '{{user.first_name}}', '{{user.email}}',
+                    [{% for group in user.groups.all %}
+                        '{{group.pk}}'
+                        {% if not forloop.last %},{% endif %}
+                    {% endfor %} ]);"><i class="fa fa-pencil"></i></button>
+                    </div>
                     {% if not user.is_active %} <p>(Desactivado)</p> {% endif %}
                 </p>
                 </header>
