@@ -7,7 +7,7 @@
 </h2>
 
 {% for evento in eventos_info %}
-    {{ evento.name }}
+    <h2 class="title is-2">{{ evento.name }}</h2>
     {% with evento.invis as invitaciones %}
         {% include 'eventos/tablas/tabla-invitaciones.html' %}
     {% endwith %}

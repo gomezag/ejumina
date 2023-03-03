@@ -22,13 +22,22 @@
             <td>
             <div class="table-btn-container">
                 {% if request.user|has_group:'admin' %}
+                {% if persona.estado == 'ACT' %}
                 <button class="plus-button in-table blue" onclick="openEditModal('{{persona.pk}}', '{{persona.nombre}}', '{{persona.cedula}}');"><i class="fa fa-pencil"></i></button>
                 <form method="POST" action=""
-                onsubmit="return confirm('Seguro que queres borrar esta persona y todas sus entradas asociadas?');">
+                onsubmit="return confirm('Seguro que queres desactivar a esta persona?');">
                        {% csrf_token %}
                         <input type="hidden" name="delete" value="{{persona.pk}}">
                         <button class="plus-button in-table red" type="submit" value="DELETE"><i class="fa fa-trash"></i></button>
                 </form>
+                {% else %}
+                <form method="POST" action=""
+                onsubmit="return confirm('Queres volver a activar esta persona?');">
+                       {% csrf_token %}
+                        <input type="hidden" name="reactivate" value="{{persona.pk}}">
+                        <button class="plus-button in-table green" type="submit" value="reactivate"><i class="fa fa-share-square-o"></i></button>
+                </form>
+                {% endif %}
                 {% endif %}
             </div>
             </td>

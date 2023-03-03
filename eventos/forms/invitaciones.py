@@ -56,7 +56,8 @@ class MultiInviAssignToPersona(forms.Form):
         free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
         if not user in list(self.cleaned_data.get('lista').administradores.all()):
             raise ValidationError("No podes editar esta lista.")
-
+        if persona.estado == 'INA':
+            raise ValidationError("La persona esta inactiva.")
         if n_frees > 0:
             for n in range(n_frees):
                 try:

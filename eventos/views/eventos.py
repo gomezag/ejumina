@@ -93,7 +93,8 @@ class PanelEvento(BasicView):
         else:
             c['evento'] = Evento.objects.all()[0]
 
-        c['personas'] = self.parse_invitaciones(Persona.objects.all(), c['evento'])
+        #TODO: En vez de ocultar, marcarlas en gris y sin link
+        c['personas'] = self.parse_invitaciones(Persona.objects.filter(estado='ACT'), c['evento'])
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
