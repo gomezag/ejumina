@@ -76,16 +76,24 @@ class ListaUsuarios(AdminView):
         delete = request.POST.get('delete', None)
         reactivate = request.POST.get('reactivate', None)
         reset = request.POST.get('reset', None)
-
+        edit = request.POST.get('edit', None)
         if delete:
             user = Usuario.objects.get(pk=delete)
             user.is_active = False
             user.save()
             form = NewUserForm()
+            edit_form = EditUserForm()
         elif reactivate:
             user = Usuario.objects.get(pk=reactivate)
             user.is_active = True
             user.save()
+            form = NewUserForm()
+            edit_form = EditUserForm()
+        elif edit:
+            user = Usuario.objects.get(pk=edit)
+            edit_form = EditUserForm(request.POST, instance=user)
+            if edit_form.is_valid():
+                edit_form.save()
             form = NewUserForm()
         elif reset:
             target = Usuario.objects.get(pk=reset)
@@ -100,11 +108,13 @@ class ListaUsuarios(AdminView):
                     email_template_name='registration/password_reset_email.html'
                 )
             form = NewUserForm()
+            edit_form = EditUserForm()
         else:
             form = NewUserForm(request.POST)
             if form.is_valid():
                 form.save()
-
+            edit_form = EditUserForm()
         c = self.get_context_data(request.user)
         c['form'] = form
+        c['edit_form'] = edit_form
         return render(request, self.template_name, context=c)
