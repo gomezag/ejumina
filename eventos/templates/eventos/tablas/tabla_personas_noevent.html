@@ -12,7 +12,7 @@
         </th>
     </tr>
     {% for persona in personas %}
-        <tr>
+        <tr {% if persona.estado == 'INA' %} class="deactivated" {% endif %}>
             <td>
                 <a href="/p/{{persona.pk}}/">{{persona.nombre}}</a>
             </td>
@@ -23,7 +23,10 @@
             <div class="table-btn-container">
                 {% if request.user|has_group:'admin' %}
                 {% if persona.estado == 'ACT' %}
-                <button class="plus-button in-table blue" onclick="openEditModal('{{persona.pk}}', '{{persona.nombre}}', '{{persona.cedula}}');"><i class="fa fa-pencil"></i></button>
+                <button class="plus-button in-table blue" onclick="openEditModal('{{persona.pk}}',
+                                                                  '{{persona.nombre}}', '{{persona.cedula}}');">
+                    <i class="fa fa-pencil"></i>
+                </button>
                 <form method="POST" action=""
                 onsubmit="return confirm('Seguro que queres desactivar a esta persona?');">
                        {% csrf_token %}

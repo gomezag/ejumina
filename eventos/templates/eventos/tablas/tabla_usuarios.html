@@ -5,7 +5,8 @@
             <div class="card user-card {% if not user.is_active %} inactive {% endif %}">
                 <header class="card-header">
                 <p class="card-header-title">
-                  <a href="/u/{{user.pk}}">{{user.first_name}} </a>
+                  <a href="/u/{{user.pk}}">{{user.first_name}} - {% for group in user.groups.all %} {{group.label}}
+                  {% if not forloop.last %},{% endif %} {% endfor %}</a>
                     <div class="table-btn-container">
                     <button class="plus-button blue" onclick="openEditModal('{{user.pk}}',
                     '{{user.first_name}}', '{{user.email}}',

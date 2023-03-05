@@ -20,16 +20,33 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     overflow-y: scroll;
     max-height: 30vh;
 }
-
+html {
+    position: relative;
+    min-height: 100%;
+}
 .body {
     background-color: black;
-    position: absolute;
     height: 100%;
     width: 100%;
     overflow-y: scroll;
+    min-height: 100vh;
 }
 
 .body input {
+    font-size: var(--fontsize-l);
+}
+
+.signature {
+    background-color: none;
+    bottom: 20px;
+    left: 15px;
+    z-index: 6;
+    position:absolute;
+    display: block;
+}
+
+.signature a{
+    color: gray;
     font-size: var(--fontsize-l);
 }
 
@@ -45,10 +62,15 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
     align-items: center;
     max-width: 80%;
     row-gap: 15px;
+    margin-bottom: var(--fontsize-xl);
 }
 
 .navbar {
     background-color: black;
+}
+
+.deactivated {
+    background-color: gray;
 }
 
 .navbar-item {
@@ -351,19 +373,6 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance:textfield; /* Firefox */
-}
-
-.signature {
-    background-color: none;
-    position: absolute;
-    bottom: 5px;
-    left: 15px;
-}
-
-.signature a{
-    color: gray;
-
-    font-size: var(--fontsize-l);
 }
 
 /* Smartphones in landscape */
