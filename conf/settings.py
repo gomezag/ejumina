@@ -79,7 +79,7 @@ EMAIL_HOST_USER = os.environ.get('MAIL_USR', '')
 EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PWD', '')
 EMAIL_PORT = os.environ.get('MAIL_PRT', '')
 
-DEFAULT_FROM_EMAIL = 'Ejumina <ejuchupe-noreply@therealagustin.com>'
+DEFAULT_FROM_EMAIL = 'Ejumina <ejumina-noreply@therealagustin.com>'
 
 WSGI_APPLICATION = 'conf.wsgi.application'
 
@@ -116,7 +116,7 @@ SESSION_COOKIE_NAME = '__Secure-sessionid'
 CSRF_COOKIE_NAME = '__Secure-csrftoken'
 ROOT_URLCONF = 'conf.urls'
 CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
