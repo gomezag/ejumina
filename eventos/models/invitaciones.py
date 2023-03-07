@@ -77,11 +77,11 @@ class Free(models.Model):
 def asignar_roles(sender, instance, **kwargs):
     if not instance.is_superuser:
         try:
-            ListaInvitados.objects.get(nombre=instance.first_name)
+            ListaInvitados.objects.get(nombre=instance.username)
 
         except ObjectDoesNotExist:
             lista = ListaInvitados()
-            lista.nombre = instance.first_name
+            lista.nombre = instance.username
             lista.color = '#008744'
             lista.save()
             lista.administradores.add(instance)
