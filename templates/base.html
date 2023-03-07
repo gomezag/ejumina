@@ -24,6 +24,17 @@
 </div>
 {% block dialog %}
 {% endblock %}
+<div class="modal {% if alert_msg %} is-active {% endif %}" id="alert-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='alert-close' class="close">&times;</span>
+          <div class="content">
+              {% for alert in alert_msg %}
+                <p>{{alert}}</p>
+              {% endfor %}
+          </div>
+      </div>
+</div>
+{% include 'eventos/setups/modal_setup.html' with ModalName='alert' noBtn=1%}
 <footer>
 <div class="signature">
     <a href="mailto:webmaster@therealagustin.com"><u><i class="fa fa-copyright"></i>Ejumina</u></a>

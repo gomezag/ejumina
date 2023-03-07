@@ -9,6 +9,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.contrib.auth.forms import PasswordResetForm
 from django.shortcuts import render
+from smtplib import SMTPRecipientsRefused
 
 from eventos.forms import NewUserForm, FreeAssignToUserForm, EditUserForm
 from eventos.models import Usuario, Evento
@@ -77,6 +78,7 @@ class ListaUsuarios(AdminView):
         reactivate = request.POST.get('reactivate', None)
         reset = request.POST.get('reset', None)
         edit = request.POST.get('edit', None)
+        msg = []
         if delete:
             user = Usuario.objects.get(pk=delete)
             user.is_active = False
@@ -101,12 +103,16 @@ class ListaUsuarios(AdminView):
                 'email': target.email
             })
             if pwd_form.is_valid():
-                print('password reset sent!')
-                pwd_form.save(
-                    request=request,
-                    use_https=True,
-                    email_template_name='registration/password_reset_email.html'
-                )
+                try:
+                    pwd_form.save(
+                        request=request,
+                        use_https=True,
+                        email_template_name='registration/password_reset_email.html'
+                    )
+                    msg = 'Mail enviado!'
+                except SMTPRecipientsRefused:
+                    msg.append('La dirección de email fue rechazada por el servidor.')
+                    msg.append('Verificá la dirección de correo e intentá de vuelta.')
             form = NewUserForm()
             edit_form = EditUserForm()
         else:
@@ -117,4 +123,5 @@ class ListaUsuarios(AdminView):
         c = self.get_context_data(request.user)
         c['form'] = form
         c['edit_form'] = edit_form
+        c['alert_msg'] = msg
         return render(request, self.template_name, context=c)
