@@ -13,7 +13,7 @@ from django.dispatch import receiver
 
 from .eventos import Evento
 from .users import Usuario, Persona
-from eventos.utils import unique_slugify
+from eventos.utils import unique_slugify, validate_in_group
 
 COLORES = [
     ('#008744', 'Green'),
@@ -75,7 +75,7 @@ class Free(models.Model):
 
 @receiver(post_save, sender=Usuario, dispatch_uid="crear_lista")
 def asignar_roles(sender, instance, **kwargs):
-    if not instance.is_superuser:
+    if not instance.is_superuser and validate_in_group(instance, ('admin', 'rrpp')):
         try:
             ListaInvitados.objects.get(nombre=instance.username)
 
