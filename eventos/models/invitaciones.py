@@ -75,13 +75,14 @@ class Free(models.Model):
 
 @receiver(post_save, sender=Usuario, dispatch_uid="crear_lista")
 def asignar_roles(sender, instance, **kwargs):
-    try:
-        ListaInvitados.objects.get(nombre=instance.first_name)
+    if not instance.is_superuser:
+        try:
+            ListaInvitados.objects.get(nombre=instance.first_name)
 
-    except ObjectDoesNotExist:
-        lista = ListaInvitados()
-        lista.nombre = instance.first_name
-        lista.color = '#008744'
-        lista.save()
-        lista.administradores.add(instance)
+        except ObjectDoesNotExist:
+            lista = ListaInvitados()
+            lista.nombre = instance.first_name
+            lista.color = '#008744'
+            lista.save()
+            lista.administradores.add(instance)
 
