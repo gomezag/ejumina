@@ -11,6 +11,7 @@ from django.db.models import ObjectDoesNotExist
 
 from eventos.models import *
 from eventos.forms.validators import *
+from eventos.utils import validate_in_group
 
 
 class DisplayOnlyField(Widget):
@@ -53,24 +54,35 @@ class MultiInviAssignToPersona(forms.Form):
     def save(self, user, persona, evento, **kwargs):
         n_frees = self.cleaned_data.get('frees')
         n_invis = self.cleaned_data.get('invitaciones')
-        free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
         if not user in list(self.cleaned_data.get('lista').administradores.all()):
             raise ValidationError("No podes editar esta lista.")
         if persona.estado == 'INA':
             raise ValidationError("La persona esta inactiva.")
-        if n_frees > 0:
+        if validate_in_group(user, ('admin',)):
             for n in range(n_frees):
-                try:
-                    free = free_set[n]
-                except IndexError:
-                    self.add_error('frees', 'No tenés suficientes frees! Se añadieron {}'.format(str(n)))
-                    break
+                free = Free()
+                free.evento = self.cleaned_data['evento']
+                free.vendedor = user
                 free.cliente = persona
-                free.lista = self.cleaned_data.get('lista')
                 free.estado = 'ACT'
                 free.save()
+                free.administrador.set([user])
+                free.save()
+        else:
+            free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
+            if n_frees > 0:
+                for n in range(n_frees):
+                    try:
+                        free = free_set[n]
+                    except IndexError:
+                        self.add_error('frees', 'No tenés suficientes frees! Se añadieron {}'.format(str(n)))
+                        break
+                    free.cliente = persona
+                    free.lista = self.cleaned_data.get('lista')
+                    free.estado = 'ACT'
+                    free.save()
 
-        if n_invis>0:
+        if n_invis > 0:
             for n in range(n_invis):
                 invi = Invitacion()
                 invi.cliente = persona

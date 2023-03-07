@@ -110,6 +110,7 @@ def _slug_strip(value, separator='-'):
     return value
 
 
-def validate_in_group(groups, valids):
+def validate_in_group(user, valids):
+    groups = [g.name for g in user.groups.all()]
     return any([g in groups for g in valids])
 
