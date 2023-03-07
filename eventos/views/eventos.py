@@ -103,7 +103,7 @@ class PanelEvento(BasicView):
                                                            evento=c['evento'].pk).exclude(cliente=None).count()
             c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
                                                            evento=c['evento'].pk).count()
-        if validate_in_group([g.name for g in user.groups.all()], ('admin', 'entrada')):
+        if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return c
 
@@ -123,13 +123,13 @@ class PanelEvento(BasicView):
         c = self.get_context_data(user, evento, None)
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
-        if validate_in_group(c['groups'], ('rrpp', 'admin')) and invitar:
+        if validate_in_group(user, ('rrpp', 'admin')) and invitar:
             form = InvitacionAssignForm(request.user, data=request.POST, auto_id='invi_%s')
             if form.is_valid():
                 form.save(request.user, evento)
             c['persona_form'] = form
 
-        elif validate_in_group(c['groups'], ('entrada', 'admin')) and checkin:
+        elif validate_in_group(user, ('entrada', 'admin')) and checkin:
             checkin_form = CheckInForm(request.POST)
             print(request.POST['persona'])
             if checkin_form.is_valid(evento=evento):
@@ -188,9 +188,9 @@ class PanelEventoPersona(BasicView):
         evento = Evento.objects.get(slug=evento)
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
-        if validate_in_group([g.name for g in usuario.groups.all()], ('admin', 'rrpp')):
+        if validate_in_group(usuario, ('admin', 'rrpp')):
             c['form'] = MultiInviAssignToPersona(usuario, persona)
-        if validate_in_group([g.name for g in usuario.groups.all()], ('admin', 'entrada')):
+        if validate_in_group(usuario, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return super().get(request, c)
 
@@ -217,7 +217,7 @@ class PanelEventoPersona(BasicView):
                 if invi.estado == 'USA':
                     invi.delete()
             form = MultiInviAssignToPersona(request.user, persona)
-        elif validate_in_group([g.name for g in request.user.groups.all()], ('entrada', 'admin')) and checkin:
+        elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
             if checkin_form.is_valid(evento=evento):
