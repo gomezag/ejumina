@@ -202,20 +202,25 @@ class PanelEventoPersona(BasicView):
         if request.POST.get('delete', None):
             try:
                 integer_validator(request.POST['lista'])
+                integer_validator(request.POST['rrpp'])
                 lista = ListaInvitados.objects.get(pk=request.POST['lista'])
+                rrpp = Usuario.objects.get(pk=request.POST['rrpp'])
             except Exception as e:
                 return HttpResponseRedirect('/')
-            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=request.user,
+            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
                                                      lista=lista)
             frees = Free.objects.filter(cliente=persona, vendedor=request.user,
                                         lista=lista)
+
             for free in frees:
                 if free.estado == 'ACT':
                     free.cliente = None
                     free.save()
             for invi in invitaciones:
-                if invi.estado == 'USA':
+                if invi.estado == 'ACT':
                     invi.delete()
+                else:
+                    c['alert_msg'] = ['No se puede borrar una entrada usada!']
             form = MultiInviAssignToPersona(request.user, persona)
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('lista')

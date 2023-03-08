@@ -40,5 +40,16 @@
     <a href="mailto:webmaster@therealagustin.com"><u><i class="fa fa-copyright"></i>Ejumina</u></a>
 </div>
 </footer>
+<script nonce="{{request.csp_nonce}}">
+    function stepOnUp(inp){
+        inp.stepUp();
+        inp.dispatchEvent(new Event('input'));
+    }
+    function stepOnDown(inp){
+        inp.stepDown();
+        inp.dispatchEvent(new Event('input'));
+    }
+
+</script>
 </body>
 </html>
