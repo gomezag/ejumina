@@ -43,6 +43,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="delete" value="1">
                         <input type="hidden" name="lista" value="{{invitacion.lista_id}}">
+                        <input type="hidden" name="rrpp" value="{{invitacion.rrpp.pk}}">
                         <button type="submit" class="plus-button in-table red"> <i class="fa fa-trash"></i> </button>
                     </form>
                     </div>

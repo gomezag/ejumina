@@ -26,6 +26,7 @@
     </thead>
     <tbody>
     {% for persona in personas %}
+    {% if persona.invis > 0 or persona.frees > 0 %}
         <tr>
             <td>
                 <p>{{persona.invis}}</p>
@@ -58,6 +59,7 @@
             </td>
             {% endif %}
         </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
 </table>

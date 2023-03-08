@@ -42,7 +42,7 @@
                 {% csrf_token %}
                 {% include 'eventos/forms/evento-form.html' with form=edit_form %}
                 <div class="control">
-                <input type="submit" class="button is-info" value="Editar Evento">
+                    <input type="submit" class="button is-info" value="Editar Evento">
                 </div>
                 <input type="hidden" name="edit" id="id_evento" value="">
             </form>

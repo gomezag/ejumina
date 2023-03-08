@@ -42,13 +42,35 @@
 <div class="modal" id="form-dialog">
     <div class="modal-content is-fullheight">
         <span id='form-close' class="close">&times;</span>
-        <form class="modal-form" action="" method="post">
+        <form class="modal-form" id="invi-form" action="" method="post">
             {% csrf_token %}
             {% include 'eventos/forms/multiassign-form.html' %}
         </form>
     </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='form'%}
+<script nonce="{{request.csp_nonce}}">
+    form = document.getElementById('invi-form');
+    inputs = form.querySelectorAll('input');
+    inputs.forEach((input) => {
+        input.addEventListener('input', () => {
+            console.log('hey');
+            checkForm();
+        })
+    });
+    function checkForm() {
+        let form = document.getElementById('invi-form');
+        let buttonSend = form.getElementsByClassName('is-info')[0]
+        let frees = Number(document.getElementById('id_frees').value);
+        let invis = Number(document.getElementById('id_invitaciones').value);
+        console.log(invis);
+        if (frees+invis>0) {
+          buttonSend.disabled = false;
+        } else {
+          buttonSend.disabled = true;
+        }
+    }
+</script>
 {% endif %}
 {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
 <div class="modal" id="checkin-dialog">
@@ -77,6 +99,7 @@
         document.getElementById("id_checkin").value=id;
         document.getElementById("id_lista").value=lista;
     };
+
 </script>
 {% include 'eventos/setups/modal_setup.html' with ModalName='checkin' noBtn=1%}
 {% endif %}

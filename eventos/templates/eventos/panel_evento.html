@@ -48,13 +48,53 @@
 <div class="modal{% if persona_form.errors %} is-active {% endif %}" id="lista-dialog">
       <div class="modal-content">
           <span id='lista-close' class="close">&times;</span>
-          <form class="modal-form" method="post" action="">
+          <form class="modal-form" id='invi-form' method="post" action="">
             {% csrf_token %}
             {% include 'eventos/forms/invitacion-form.html' with form=persona_form %}
           </form>
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
+<script nonce="{{request.csp_nonce}}">
+    var inputValidator = {
+      "persona": false,
+      "cedula": false,
+    }
+
+    form = document.getElementById('invi-form');
+    inputs = form.querySelectorAll('input');
+    buttonSend = form.getElementsByClassName('is-info')[0]
+    inputs.forEach((input) => {
+        input.addEventListener('input', () => {
+            checkForm(event.target);
+        })
+    })
+    function checkForm(t) {
+            let form = document.getElementById('invi-form');
+            let inputs = form.querySelectorAll('input');
+            for(i=0;i<inputs.length;i++){
+                name = inputs[i].getAttribute('name');
+                if(Object.keys(inputValidator).includes(name)){
+                    console.log(name);
+                    if (inputs[i].value.length > 0) {
+                      inputValidator[name] = true;
+                    } else {
+                      inputValidator[name] = false;
+                    };
+                }
+            }
+            let allTrue = Object.keys(inputValidator).every((item) => {
+              return inputValidator[item] === true
+            });
+            let frees = Number(document.getElementById('invi_frees').value);
+            let invis = Number(document.getElementById('invi_invitaciones').value);
+            if (allTrue && frees+invis>0) {
+              buttonSend.disabled = false;
+            } else {
+              buttonSend.disabled = true;
+            }
+    }
+</script>
 {% endif %}
 {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
 <div class="modal" id="checkin-dialog">
