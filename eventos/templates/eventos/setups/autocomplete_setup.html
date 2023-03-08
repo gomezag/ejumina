@@ -11,7 +11,19 @@ var availableTags = [[
     ],
     "{{evento.slug}}"
 ];
-autocomplete(document.getElementById("searchbar"), availableTags);
+var reducedAvailableTags = [[
+    {% for cliente in personas %}
+    {% if cliente.invis > 0 or cliente.frees > 0 %}
+    [
+      "{{cliente.nombre}} - {{cliente.cedula}}",
+      "{{cliente.pk}}",
+    ],
+    {% endif %}
+    {% endfor %}
+    ],
+    "{{evento.slug}}"
+];
+autocomplete(document.getElementById("searchbar"), reducedAvailableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
 window.addEventListener("load",function() {
     autocomplete(document.getElementById("invi_persona"), availableTags);
