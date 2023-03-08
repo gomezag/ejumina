@@ -43,7 +43,10 @@ class MultiInviAssignToPersona(forms.Form):
     def __init__(self, usuario, persona, *args, **kwargs):
         super(MultiInviAssignToPersona, self).__init__(*args, **kwargs)
         self.fields['lista'].queryset = ListaInvitados.objects.filter(administradores__in=[usuario])
-
+        try:
+            self.fields['lista'].initial = ListaInvitados.objects.get(nombre=usuario.username)
+        except ObjectDoesNotExist:
+            pass
         max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
 
         self.fields['frees'].widget.attrs['max'] = max_frees
