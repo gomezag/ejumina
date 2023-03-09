@@ -76,7 +76,7 @@
 <div class="modal" id="checkin-dialog">
       <div class="modal-content">
           <span id='checkin-close' class="close">&times;</span>
-          <form class="modal-form" method="post" action="">
+          <form class="modal-form" id="checkin-form" method="post" action="">
             {% csrf_token %}
             {% include 'eventos/forms/checkin-form.html' with form=checkin_form %}
               <input id="id_checkin" name="checkin" value="" type="hidden">
@@ -84,7 +84,28 @@
           </form>
       </div>
 </div>
+<script nonce="{{request.csp_nonce}}">
 
+    var form = document.getElementById('checkin-form');
+    var inputs = form.querySelectorAll('input');
+    inputs.forEach((input) => {
+        input.addEventListener('input', (event) => {
+            checkCheckInForm(event.target);
+        })
+    });
+    function checkCheckInForm(t) {
+            let form = document.getElementById('checkin-form');
+            let inputs = form.querySelectorAll('input');
+            let buttonSend = form.getElementsByClassName('is-info')[0];
+            let frees = Number(document.getElementById('id_check_frees').value);
+            let invis = Number(document.getElementById('id_check_invis').value);
+            if (frees!=0 || invis !=0) {
+              buttonSend.disabled = false;
+            } else {
+              buttonSend.disabled = true;
+            }
+    };
+</script>
 <script nonce="{{request.csp_nonce}}">
     function openCheckInModal(id, f_max, f_min, i_max, i_min, lista){
         checkinModal = document.getElementById("checkin-dialog");
