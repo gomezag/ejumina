@@ -103,6 +103,8 @@ class PanelEvento(BasicView):
                                                            evento=c['evento'].pk).exclude(cliente=None).count()
             c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
                                                            evento=c['evento'].pk).count()
+            c['checked_in'] = user.invitacion_set.filter(evento=c['evento'], estado='USA', cliente__isnull=False).count()
+            c['checked_in'] += user.free_set.filter(evento=c['evento'], estado='USA', cliente__isnull=False).count()
         if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return c

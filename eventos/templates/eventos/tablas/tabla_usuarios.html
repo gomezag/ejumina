@@ -1,3 +1,4 @@
+{% load auth_extras %}
 <div class="tile is-ancestor">
     <div class="tile is-vertical">
     {% for user in usuarios %}
@@ -7,6 +8,7 @@
                 <p class="card-header-title">
                   <a href="/u/{{user.pk}}">{{user.first_name}} - {% for group in user.groups.all %} {{group.label}}
                   {% if not forloop.last %},{% endif %} {% endfor %}</a>
+                    {% if request.user|has_group:"admin" %}
                     <div class="table-btn-container">
                     <button class="plus-button blue" onclick="openEditModal('{{user.pk}}',
                     '{{user.first_name}}', '{{user.email}}',
@@ -15,6 +17,7 @@
                         {% if not forloop.last %},{% endif %}
                     {% endfor %} ]);"><i class="fa fa-pencil"></i></button>
                     </div>
+                    {% endif %}
                     {% if not user.is_active %} <p>(Desactivado)</p> {% endif %}
                 </p>
                 </header>
@@ -24,7 +27,8 @@
                         <p class="subtitle is-6">{{user.email}}</p>
                     </div>
                     <div class="field is-grouped">
-                        {% if user.is_active %}
+                        {% if request.user|has_group:"admin" %}
+                        {% if user.is_active%}
                         <form method="POST" action="" class="table-form"
                                 onsubmit="return confirm('Enviar correo a este usuario?');">
                                {% csrf_token %}
@@ -46,6 +50,7 @@
                                 <input type="hidden" name="reactivate" value="{{user.pk}}">
                                 <input class="button is-warning" type="submit" value="Reactivar">
                         </form>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>
