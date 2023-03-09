@@ -134,6 +134,9 @@ class PanelEvento(BasicView):
             print(request.POST['persona'])
             if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
+                invis = checkin_form.cleaned_data['check_invis']
+                frees = checkin_form.cleaned_data['check_frees']
+                c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
                 c['checkin_errors'] = checkin_form.errors
                 print(c['checkin_errors'])
@@ -227,6 +230,9 @@ class PanelEventoPersona(BasicView):
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
             if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
+                invis = checkin_form.cleaned_data['check_invis']
+                frees = checkin_form.cleaned_data['check_frees']
+                c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
                 c['checkin_errors'] = checkin_form.errors
             form = MultiInviAssignToPersona(request.user, persona)

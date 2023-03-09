@@ -61,21 +61,20 @@
       "cedula": false,
     }
 
-    form = document.getElementById('invi-form');
-    inputs = form.querySelectorAll('input');
-    buttonSend = form.getElementsByClassName('is-info')[0]
+    var form = document.getElementById('invi-form');
+    var inputs = form.querySelectorAll('input');
     inputs.forEach((input) => {
         input.addEventListener('input', () => {
             checkForm(event.target);
         })
-    })
+    });
     function checkForm(t) {
             let form = document.getElementById('invi-form');
             let inputs = form.querySelectorAll('input');
+            let buttonSend = form.getElementsByClassName('is-info')[0];
             for(i=0;i<inputs.length;i++){
                 name = inputs[i].getAttribute('name');
                 if(Object.keys(inputValidator).includes(name)){
-                    console.log(name);
                     if (inputs[i].value.length > 0) {
                       inputValidator[name] = true;
                     } else {
@@ -93,20 +92,41 @@
             } else {
               buttonSend.disabled = true;
             }
-    }
+    };
 </script>
 {% endif %}
 {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
 <div class="modal" id="checkin-dialog">
       <div class="modal-content">
           <span id='checkin-close' class="close">&times;</span>
-          <form class="modal-form" method="post" action="">
+          <form class="modal-form" id="checkin-form" method="post" action="">
             {% csrf_token %}
             {% include 'eventos/forms/checkin-form.html' with form=checkin_form %}
           </form>
       </div>
 </div>
+<script nonce="{{request.csp_nonce}}">
 
+    var form = document.getElementById('checkin-form');
+    var inputs = form.querySelectorAll('input');
+    inputs.forEach((input) => {
+        input.addEventListener('input', (event) => {
+            checkCheckInForm(event.target);
+        })
+    });
+    function checkCheckInForm(t) {
+            let form = document.getElementById('checkin-form');
+            let inputs = form.querySelectorAll('input');
+            let buttonSend = form.getElementsByClassName('is-info')[0];
+            let frees = Number(document.getElementById('id_check_frees').value);
+            let invis = Number(document.getElementById('id_check_invis').value);
+            if (frees!=0 || invis !=0) {
+              buttonSend.disabled = false;
+            } else {
+              buttonSend.disabled = true;
+            }
+    };
+</script>
 <script nonce="{{request.csp_nonce}}">
     function openCheckInModal(id, f_max, f_min, i_max, i_min){
         checkinModal = document.getElementById("checkin-dialog");
