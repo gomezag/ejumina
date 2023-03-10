@@ -3,6 +3,8 @@
     <div class="select">
         {{form.evento}}
     </div>
+
+    <p class="help errors">{% for error in form.evento.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 <div class="field">
 <div class="file">
@@ -18,5 +20,6 @@
     </span>
   </label>
 </div>
+  <p class="help errors">{% for error in form.file.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
 <input type="submit" class="button is-info" value="Validar">
