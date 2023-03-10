@@ -105,8 +105,6 @@ class ImportView(BasicView):
                     })
                 request.session.update({'parsed_data': parsed, 'evento_pk': evento.pk})
 
-                return self.get(request)
-
         c = self.get_context_data(user)
         c['invitaciones'] = parsed
         c['form'] = form
