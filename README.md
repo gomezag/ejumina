@@ -16,6 +16,7 @@ completar el resto de variables `DB_*`
 
 Una vez hecho eso, 
 
+    python manage.py makemigrations admin
     python manage.py migrate
     python manage.py createsuperuser
     python manage.py runserver
