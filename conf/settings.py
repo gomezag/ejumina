@@ -78,7 +78,7 @@ EMAIL_HOST_USER = os.environ.get('MAIL_USR', '')
 EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PWD', '')
 EMAIL_PORT = os.environ.get('MAIL_PRT', '')
 
-DEFAULT_FROM_EMAIL = 'Ejumina <ejumina-noreply@therealagustin.com>'
+DEFAULT_FROM_EMAIL = 'Ejumina <{}>'.format(os.environ.get('MAIL_USR', ''))
 
 WSGI_APPLICATION = 'conf.wsgi.application'
 
