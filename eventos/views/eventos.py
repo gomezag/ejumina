@@ -133,7 +133,6 @@ class PanelEvento(BasicView):
 
         elif validate_in_group(user, ('entrada', 'admin')) and checkin:
             checkin_form = CheckInForm(request.POST)
-            print(request.POST['persona'])
             if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
                 invis = checkin_form.cleaned_data['check_invis']

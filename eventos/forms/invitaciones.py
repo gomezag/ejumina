@@ -108,7 +108,6 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
 
     def clean(self):
         form_data = super().clean()
-        print(form_data)
         try:
             persona = Persona.objects.get(cedula=form_data['cedula'])
             if persona.nombre != form_data['persona']:
