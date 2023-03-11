@@ -6,12 +6,12 @@ from .permissions import UsuarioEsRRPP, UsuarioEsAdmin, UsuarioEsBouncer, Usuari
 from django.contrib.auth.models import User
 from django.db.models import ObjectDoesNotExist
 from eventos.models import *
-from .serializers import LoginUserSerializer, UserSerializer, CreateUserSerializer
+from .serializers import *
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status, generics, permissions
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
@@ -24,19 +24,58 @@ class LoginAPI(generics.GenericAPIView):
         return Response()
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         serializer = self.get_serializer(data={
             'username': request.data.get('CI', None),
             'password': request.data.get('password', None)
         })
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+        token = RefreshToken.for_user(user)
+
         return Response({
             "_id": user.pk,
             "rol": user.groups.first().label,
             "CI": "0000000",
-            "authToken": Token.objects.get_or_create(user=user)[0].key
+            "access": str(token.access_token),
+            "refresh": str(token)
         }, status=status.HTTP_200_OK)
 
+
+class Eventos(APIView):
+    authentication_classes = (JWTAuthentication, )
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        """
+        Lista de Eventos
+        :param request:
+        :param format:
+        :return:
+        """
+        eventos = UpcomingEventosSerializer(data=
+            Evento.objects.all(), many=True)
+        eventos.is_valid()
+        return Response({
+            'eventos': eventos.data
+        })
+
+
+    def post(self, request, format=None):
+        """
+        Crea un Evento
+        :param request:
+        :param format:
+        :return:
+        """
+
+    def put(self, request, format=None):
+        """
+        Edita
+        :param request:
+        :param format:
+        :return:
+        """
 
 class EventoRRPPView(APIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -84,36 +123,6 @@ class RRPPView(APIView):
     def get(self, request, format=None):
         """
         Vista basica de los invitados de un RRPP
-        :param request:
-        :param format:
-        :return:
-        """
-
-
-class Eventos(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated, UsuarioEsAdmin]
-
-    def get(self, request, format=None):
-        """
-        Lista de Eventos
-        :param request:
-        :param format:
-        :return:
-        """
-
-
-    def post(self, request, format=None):
-        """
-        Crea un Evento
-        :param request:
-        :param format:
-        :return:
-        """
-
-    def put(self, request, format=None):
-        """
-        Edita
         :param request:
         :param format:
         :return:

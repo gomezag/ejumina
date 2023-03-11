@@ -31,3 +31,9 @@ class LoginUserSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Unable to log in with provided credentials.")
+
+
+class UpcomingEventosSerializer(serializers.Serializer):
+    nombre = serializers.CharField(source='name')
+    _id = serializers.CharField(source='pk')
+
