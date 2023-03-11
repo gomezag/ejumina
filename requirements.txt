@@ -4,3 +4,4 @@ gunicorn
 mysqlclient
 openpyxl
 django-rest-framework
+djangorestframework-simplejwt

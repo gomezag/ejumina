@@ -6,7 +6,28 @@ from .permissions import UsuarioEsRRPP, UsuarioEsAdmin, UsuarioEsBouncer, Usuari
 from django.contrib.auth.models import User
 from django.db.models import ObjectDoesNotExist
 from eventos.models import *
+from .serializers import LoginUserSerializer, UserSerializer, CreateUserSerializer
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
+from rest_framework import status, generics, permissions
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
+
+class LoginAPI(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny, ]
+    serializer_class = LoginUserSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": Token.objects.get_or_create(user=user)[0].key
+        })
 
 class EventoRRPPView(APIView):
     authentication_classes = [authentication.TokenAuthentication]
