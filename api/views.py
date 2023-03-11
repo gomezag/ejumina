@@ -20,6 +20,9 @@ class LoginAPI(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny, ]
     serializer_class = LoginUserSerializer
 
+    def get(self):
+        return Response()
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -27,7 +30,7 @@ class LoginAPI(generics.GenericAPIView):
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": Token.objects.get_or_create(user=user)[0].key
-        })
+        }, status=status.HTTP_200_OK)
 
 class EventoRRPPView(APIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -83,7 +86,7 @@ class RRPPView(APIView):
 
 class Eventos(APIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, UsuarioEsAdmin]
 
     def get(self, request, format=None):
         """
@@ -93,7 +96,7 @@ class Eventos(APIView):
         :return:
         """
 
-    @permission_classes([UsuarioEsAdmin])
+
     def post(self, request, format=None):
         """
         Crea un Evento
@@ -102,7 +105,6 @@ class Eventos(APIView):
         :return:
         """
 
-    @permission_classes([UsuarioEsAdmin])
     def put(self, request, format=None):
         """
         Edita
@@ -114,7 +116,7 @@ class Eventos(APIView):
 
 class Personas(APIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, UsuarioEsAdminOrRRPP]
 
     def get(self, request, format=None):
         """
@@ -124,20 +126,3 @@ class Personas(APIView):
         :return:
         """
 
-    @permission_classes([UsuarioEsAdminOrRRPP])
-    def post(self, request, format=None):
-        """
-        Crea un Evento
-        :param request:
-        :param format:
-        :return:
-        """
-
-    @permission_classes([UsuarioEsAdmin])
-    def put(self, request, format=None):
-        """
-        Edita
-        :param request:
-        :param format:
-        :return:
-        """

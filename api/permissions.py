@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from ..eventos.models import Usuario
+from eventos.models import Usuario
 from django.db.models import ObjectDoesNotExist
 
 
