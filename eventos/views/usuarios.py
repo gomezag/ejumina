@@ -121,7 +121,7 @@ class ListaUsuarios(BasicView):
                             use_https=True,
                             email_template_name='registration/password_reset_email.html'
                         )
-                        msg = 'Mail enviado!'
+                        msg = ['Mail enviado!']
                     except SMTPRecipientsRefused as e:
                         print(str(e))
                         msg.append('La dirección de email fue rechazada por el servidor.')
