@@ -24,13 +24,19 @@ class LoginAPI(generics.GenericAPIView):
         return Response()
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data={
+            'username': request.data.get('CI', None),
+            'password': request.data.get('password', None)
+        })
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": Token.objects.get_or_create(user=user)[0].key
+            "_id": user.pk,
+            "rol": user.groups.first().label,
+            "CI": "0000000",
+            "authToken": Token.objects.get_or_create(user=user)[0].key
         }, status=status.HTTP_200_OK)
+
 
 class EventoRRPPView(APIView):
     authentication_classes = [authentication.TokenAuthentication]

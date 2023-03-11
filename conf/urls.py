@@ -15,19 +15,19 @@ from eventos.views import LoginView
 from eventos.forms import UserLoginForm
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
-    path(
-        'accounts/login/',
-        LoginView.as_view(
-            template_name="registration/login.html",
-            form_class=UserLoginForm
-            ),
-        name='login'
-    ),
-    path("accounts/", include("django.contrib.auth.urls")),
-    path('', include('eventos.urls')),
+    # path(
+    #     'accounts/login/',
+    #     LoginView.as_view(
+    #         template_name="registration/login.html",
+    #         form_class=UserLoginForm
+    #         ),
+    #     name='login'
+    # ),
+    # path("accounts/", include("django.contrib.auth.urls")),
+    # path('', include('eventos.urls')),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
 
