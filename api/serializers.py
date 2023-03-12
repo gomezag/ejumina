@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from eventos.models import Usuario
 
+
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
