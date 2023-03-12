@@ -11,23 +11,10 @@ from django.urls import path, include, reverse
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sitemaps.views import sitemap
 from django.views.generic import TemplateView
-from eventos.views import LoginView
-from eventos.forms import UserLoginForm
 
 urlpatterns = [
-    # path('api-auth/', include('rest_framework.urls')),
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
-    # path(
-    #     'accounts/login/',
-    #     LoginView.as_view(
-    #         template_name="registration/login.html",
-    #         form_class=UserLoginForm
-    #         ),
-    #     name='login'
-    # ),
-    # path("accounts/", include("django.contrib.auth.urls")),
-    # path('', include('eventos.urls')),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
 
