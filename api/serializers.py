@@ -37,3 +37,9 @@ class EventoSerializer(serializers.Serializer):
     nombre = serializers.CharField(source='name')
     _id = serializers.CharField(source='pk')
 
+
+class PersonaSerializer(serializers.Serializer):
+    nombre = serializers.CharField()
+    apellido = serializers.CharField(source='nombre')
+    CI = serializers.CharField(source='cedula')
+

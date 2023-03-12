@@ -1,12 +1,13 @@
-from rest_framework.viewsets import ModelViewSet
-from eventos.models import *
-from .serializers import *
 from rest_framework import status, generics, permissions
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
+from eventos.forms import *
+
+from .serializers import *
 
 class Login(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny, ]
@@ -62,3 +63,30 @@ class Eventos(ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class Personas(ModelViewSet):
+    authentication_classes = (JWTAuthentication, )
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PersonaSerializer
+
+    def all(self, request):
+        queryset = Persona.objects.all()
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        form = PersonaForm(request.POST)
+        if form.is_valid():
+            persona = form.save()
+            serializer = self.get_serializer(persona)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': form.errors})
+
+    def find(self, request, ci):
+        try:
+            persona = Persona.objects.get(cedula=ci)
+            serializer = self.get_serializer(persona)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'errors': ['Invitado no encontrado.']})

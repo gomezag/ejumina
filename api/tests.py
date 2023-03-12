@@ -1,5 +1,5 @@
 from django.test import TestCase
-from eventos.models import Usuario, Evento
+from eventos.models import *
 from django.contrib.auth.models import Group
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -28,10 +28,16 @@ class AuthTestCase(TestCase):
         evento2 = Evento(name='Test2', fecha=date.today())
         evento2.save()
 
+        persona1 = Persona(nombre='Raul', cedula='0000')
+        persona1.save()
+
     def login(self, client):
         response = client.post('/api/user/login', data={'CI': 'admin',
                                                         'password': 'admin'})
         data = response.json()
+
+        access_token = data['access']
+        client.credentials(HTTP_AUTHORIZATION=f'JWT {access_token}')
         return data
 
     def test_login_responds_with_token(self):
@@ -50,9 +56,14 @@ class AuthTestCase(TestCase):
     def test_login_and_get_all_eventos(self):
         client = APIClient()
         data = self.login(client)
-        access_token = data['access']
-        client.credentials(HTTP_AUTHORIZATION=f'JWT {access_token}')
         res = client.get('/api/evento/all')
 
         assert res.status_code == 200
         assert len(res.data) == 2
+
+    def test_login_and_find_persona(self):
+        client = APIClient()
+        self.login(client)
+        res = client.get('/api/invitado/ci/0000')
+        assert res.data.get('nombre') == 'Raul'
+
