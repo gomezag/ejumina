@@ -57,14 +57,19 @@ class Logout(generics.GenericAPIView):
 class Eventos(ModelViewSet):
     authentication_classes = (JWTAuthentication, )
     permission_classes = (IsAuthenticated,)
+    serializer_class = EventoSerializer
 
     def all(self, request):
         queryset = Evento.objects.all()
-        serialized_data = self.get_serializer(queryset, many=True)
-        if serialized_data.is_valid():
-            return Response(serialized_data.validated_data, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def ongoing(self, request):
+        queryset = Evento.objects.all()
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class EventoRRPPView(APIView):

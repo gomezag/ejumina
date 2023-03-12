@@ -1,8 +1,10 @@
 from django.test import TestCase
-from eventos.models import Usuario
+from eventos.models import Usuario, Evento
 from django.contrib.auth.models import Group
 from rest_framework.test import APIClient
 from rest_framework import status
+from datetime import date
+
 
 class AuthTestCase(TestCase):
 
@@ -20,11 +22,21 @@ class AuthTestCase(TestCase):
         suser.groups.add(gadmin)
         suser.save()
 
-    def test_login_responds_with_token(self):
-        client = APIClient()
+        evento1 = Evento(name='Test1', fecha=date.today())
+        evento1.save()
+
+        evento2 = Evento(name='Test2', fecha=date.today())
+        evento2.save()
+
+    def login(self, client):
         response = client.post('/api/user/login', data={'CI': 'admin',
                                                         'password': 'admin'})
         data = response.json()
+        return data
+
+    def test_login_responds_with_token(self):
+        client = APIClient()
+        data = self.login(client)
         assert data['_id'] == 1
         assert data['rol'] == 'Admin'
         assert data['access'] != ''
@@ -34,3 +46,13 @@ class AuthTestCase(TestCase):
         response = client.post('/api/user/login', data={'CI': 'admino',
                                                         'password': 'admin'})
         assert response.status_code == 400
+
+    def test_login_and_get_all_eventos(self):
+        client = APIClient()
+        data = self.login(client)
+        access_token = data['access']
+        client.credentials(HTTP_AUTHORIZATION=f'JWT {access_token}')
+        res = client.get('/api/evento/all')
+
+        assert res.status_code == 200
+        assert len(res.data) == 2
