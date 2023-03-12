@@ -19,7 +19,6 @@ for model in app_models:
         if model != Usuario:
             admin.site.register(model)
         else:
-            print(model)
             admin.site.register(model, UserAdmin)
     except AlreadyRegistered:
         pass
