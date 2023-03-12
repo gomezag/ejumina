@@ -15,21 +15,21 @@ class AuthTestCase(TestCase):
         gbouncer = Group(name='entrada', label='Bouncer')
         gbouncer.save()
         suser = Usuario.objects.create_superuser(username='admin',
-                                                password='admin',
-                                                first_name='Admin',
-                                                email='testadmin@admin.co')
+                                                 password='admin',
+                                                 first_name='Admin',
+                                                 email='testadmin@admin.co')
         suser.groups.add(gadmin)
         suser.save()
         self.client = APIClient()
 
     def test_login_responds_with_token(self):
         response = self.client.post('/api/user/login', data={'CI': 'admin',
-                                                        'password': 'admin'})
+                                                             'password': 'admin'})
         data = response.json()
 
         self.assertEqual(data['_id'], 1, 'ID not what is expected.')
-        self.assertEqual(data['rol'],'Admin', 'rol not what is expected.')
-        self.assertNotEqual(data['access'],'', 'token is empty.')
+        self.assertEqual(data['rol'], 'Admin', 'rol not what is expected.')
+        self.assertNotEqual(data['access'], '', 'token is empty.')
 
     def test_login_with_invalid_returns_400(self):
         client = APIClient()
