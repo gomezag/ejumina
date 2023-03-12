@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from .permissions import UsuarioEsRRPP, UsuarioEsAdmin, UsuarioEsBouncer, UsuarioEsAdminOrRRPP
@@ -16,15 +17,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 
-class LoginAPI(generics.GenericAPIView):
+class Login(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny, ]
     serializer_class = LoginUserSerializer
 
-    def get(self):
-        return Response()
-
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.get_serializer(data={
             'username': request.data.get('CI', None),
             'password': request.data.get('password', None)
@@ -42,40 +39,33 @@ class LoginAPI(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
 
 
-class Eventos(APIView):
+class Logout(generics.GenericAPIView):
     authentication_classes = (JWTAuthentication, )
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, format=None):
-        """
-        Lista de Eventos
-        :param request:
-        :param format:
-        :return:
-        """
-        eventos = UpcomingEventosSerializer(data=
-            Evento.objects.all(), many=True)
-        eventos.is_valid()
-        return Response({
-            'eventos': eventos.data
-        })
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-    def post(self, request, format=None):
-        """
-        Crea un Evento
-        :param request:
-        :param format:
-        :return:
-        """
+class Eventos(ModelViewSet):
+    authentication_classes = (JWTAuthentication, )
+    permission_classes = (IsAuthenticated,)
 
-    def put(self, request, format=None):
-        """
-        Edita
-        :param request:
-        :param format:
-        :return:
-        """
+    def all(self, request):
+        queryset = Evento.objects.all()
+        serialized_data = self.get_serializer(queryset, many=True)
+        if serialized_data.is_valid():
+            return Response(serialized_data.validated_data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class EventoRRPPView(APIView):
     authentication_classes = [authentication.TokenAuthentication]

@@ -33,7 +33,7 @@ class LoginUserSerializer(serializers.Serializer):
         raise serializers.ValidationError("Unable to log in with provided credentials.")
 
 
-class UpcomingEventosSerializer(serializers.Serializer):
+class EventoSerializer(serializers.Serializer):
     nombre = serializers.CharField(source='name')
     _id = serializers.CharField(source='pk')
 
