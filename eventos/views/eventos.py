@@ -108,13 +108,23 @@ class PanelEvento(BasicView):
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
-                                                                evento=c['evento'].pk).exclude(cliente=None).count()
+                                                                evento=c['evento'],
+                                                                cliente__estado='ACT',
+                                                                cliente__isnull=False).count()
             c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                           evento=c['evento'].pk).exclude(cliente=None).count()
+                                                           evento=c['evento'],
+                                                           cliente__estado='ACT',
+                                                           cliente__isnull=False).count()
             c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                           evento=c['evento'].pk).count()
-            c['checked_in'] = user.invitacion_set.filter(evento=c['evento'], estado='USA', cliente__isnull=False).count()
-            c['checked_in'] += user.free_set.filter(evento=c['evento'], estado='USA', cliente__isnull=False).count()
+                                                           evento=c['evento']).count()
+            c['checked_in'] = user.invitacion_set.filter(evento=c['evento'],
+                                                         estado='USA',
+                                                         cliente__estado='ACT',
+                                                         cliente__isnull=False).count()
+            c['checked_in'] += user.free_set.filter(evento=c['evento'],
+                                                    estado='USA',
+                                                    cliente__estado='ACT',
+                                                    cliente__isnull=False).count()
         if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return c
