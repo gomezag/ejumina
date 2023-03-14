@@ -8,11 +8,14 @@
     </form>
     <div class="body-content">
     <p>
+        <ol>
         <li><a href="{% static 'templates/template.xlsx' %}">Descargá la plantilla de invitados</a></li>
-        <li>Reemplaza los valores por defecto. </li>
-        <li>Acordate de que en la lista tenés que poner tu nombre de usuario. </li>
-        <li>Podés ver tu usuario en la barra de navegación, a la izquierda. </li>
-
+        <li>Rellená los datos. No cambies las cabeceras.</li>
+        <li>En el campo de lista, poné tu nombre de usuario. (Podés ver tu usuario en la barra de navegación, a la izquierda.)</li>
+        <li>Cargá el archivo y presiona "Validar".</li>
+        <li>Revisá el resultado por si tengas que corregir algún error.</li>
+        <li>Presioná "Importar" si está todo bien, o "Cancelar" si querés cargar una planilla nueva.</li>
+        </ol>
     </p>
     </div>
     {% endif %}
@@ -36,5 +39,6 @@
             <input type="submit" class="button is-info" value="Importar">
         </form>
         <a class="button is-danger" href="importar/confirmar">Cancelar</a>
+        <p>Presioná "Importar" si está todo bien,</p><p> o "Cancelar" si querés cargar una planilla nueva.</p>
     {% endif %}
 {% endblock %}
