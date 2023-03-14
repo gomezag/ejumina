@@ -51,10 +51,10 @@
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
                 <div class="table-btn-container">
-                <div class="plus-button green" onclick="openCheckInModal({{persona.pk}},
+                <button class="plus-button green" onclick="openCheckInModal({{persona.pk}},
                 {{persona.frees}}, {{persona.frees_usadas}}, {{persona.invis}}, {{persona.invis_usadas}});">
                     <i class="fa fa-check"></i>
-                </div>
+                </button>
                 </div>
             </td>
             {% endif %}

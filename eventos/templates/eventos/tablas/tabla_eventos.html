@@ -40,10 +40,10 @@
                                 <button class="plus-button in-table green" type="submit" value="DELETE"><i class="fa fa-repeat"></i></button>
                         </form>
                     {% endif %}
-                <div class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
+                <button class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
                 '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
                     <i class="fa fa-pencil"></i>
-                </div>
+                </button>
                 </div>
                 {% endif %}
             </td>
