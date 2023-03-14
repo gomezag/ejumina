@@ -25,12 +25,18 @@ class ListaEventos(BasicView):
 
     def get_context_data(self, user, *args, **kwargs):
         c = super().get_context_data(user)
-        c['eventos'] = Evento.objects.all()
+        if validate_in_group(user, ('admin', )):
+            c['eventos'] = Evento.objects.all()
+        else:
+            c['eventos'] = Evento.objects.filter(estado='ACT')
         return c
 
-    def get(self, request):
+    def get(self, request, **kwargs):
         user = request.user
+        extras = kwargs.pop('extras', None)
         c = self.get_context_data(user)
+        if extras:
+            c.update(extras)
         if request.user.groups.filter(name='admin').exists():
             c['form'] = EventoForm()
             c['edit_form'] = EventoForm(auto_id='edit')
@@ -38,12 +44,16 @@ class ListaEventos(BasicView):
 
     def post(self, request):
         if not request.user.groups.filter(name='admin').exists():
-            return self.get(request)
+            return self.get(request, extras={'alert_msg': ['No autorizado']})
         c = self.get_context_data(request.user)
         if request.POST.get('delete', None) is not None:
             try:
                 evento = Evento.objects.get(pk=request.POST['delete'])
-                #evento.delete()
+                if evento.estado == 'ACT':
+                    evento.estado = 'INA'
+                elif evento.estado == 'INA':
+                    evento.estado = 'ACT'
+                evento.save()
             except Exception as e:
                 pass
             form = EventoForm()

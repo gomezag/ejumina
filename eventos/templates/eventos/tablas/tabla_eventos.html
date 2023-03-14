@@ -15,7 +15,7 @@
     </thead>
     <tbody>
     {% for evento in eventos %}
-        <tr>
+        <tr class="{% if evento.estado == 'INA' %}inactivo {% endif %}">
             <td>
                 <a href="/e/{{evento.slug}}">{{evento.name}}</a>
             </td>
@@ -25,6 +25,21 @@
             <td>
                 {% if request.user|has_group:'admin' %}
                 <div class="table-btn-container">
+                    {% if evento.estado == 'ACT' %}
+                        <form method="POST" action=""
+                        onsubmit="return confirm('Seguro que queres desactivar este evento?');">
+                               {% csrf_token %}
+                                <input type="hidden" name="delete" value="{{evento.pk}}">
+                                <button class="plus-button in-table red" type="submit" value="DELETE"><i class="fa fa-ban"></i></button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action=""
+                        onsubmit="return confirm('Seguro que queres reactivar este evento?');">
+                               {% csrf_token %}
+                                <input type="hidden" name="delete" value="{{evento.pk}}">
+                                <button class="plus-button in-table green" type="submit" value="DELETE"><i class="fa fa-repeat"></i></button>
+                        </form>
+                    {% endif %}
                 <div class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
                 '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
                     <i class="fa fa-pencil"></i>

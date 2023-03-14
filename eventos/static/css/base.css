@@ -106,6 +106,16 @@ html {
 
 .tabla-personas tr {
 }
+.tabla-personas .inactivo {
+    background-color: gray;
+
+}
+.inactivo>td>a{
+        color: white;
+    }
+.inactivo>td {
+        color: white;
+    }
 
 .tabla-personas thead th{
     word-wrap: break-word;
