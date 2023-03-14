@@ -59,6 +59,8 @@ class MultiInviAssignToPersona(forms.Form):
         n_invis = self.cleaned_data.get('invitaciones')
         if not user in list(self.cleaned_data.get('lista').administradores.all()):
             raise ValidationError("No podes editar esta lista.")
+        if evento.estado == 'INA':
+            raise ValidationError("El evento esta inactivo!")
         if persona.estado == 'INA':
             raise ValidationError("La persona esta inactiva.")
         if validate_in_group(user, ('admin',)):
@@ -121,6 +123,8 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
         return data.replace('.', '').lstrip(' ').rstrip(' ')
 
     def save(self, user, evento, **kwargs):
+        if evento.estado == 'INA':
+            raise ValidationError("El evento está inactivo!")
         nombre = self.cleaned_data['persona']
         cedula = self.cleaned_data['cedula'].replace('.', '')
         persona, created = Persona.objects.get_or_create(nombre=nombre, cedula=cedula)
@@ -134,12 +138,15 @@ InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=Invitacion
 
 class FreeAssignToUserForm(forms.Form):
     free = forms.IntegerField(min_value=0)
-    evento = forms.ModelChoiceField(queryset=Evento.objects.all())
+    evento = forms.ModelChoiceField(queryset=Evento.objects.filter(estado='ACT'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def save(self, user, vendedor):
+        evento = self.cleaned_data['evento']
+        if evento.estado == 'INA':
+            raise ValidationError("El evento está inactivo!")
         for n in range(self.cleaned_data['free']):
             free = Free()
             free.evento = self.cleaned_data['evento']
@@ -153,7 +160,7 @@ class FreeAssignToUserForm(forms.Form):
 
 class ExcelImportForm(forms.Form):
     file = forms.FileField(validators=[file_size])
-    evento = forms.ModelChoiceField(queryset=Evento.objects.all())
+    evento = forms.ModelChoiceField(queryset=Evento.objects.filter(estado='ACT'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

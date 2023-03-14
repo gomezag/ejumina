@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from eventos.forms import PersonaForm
 from eventos.models import Persona, Evento
-from .basic_view import BasicView
+from .basic_view import BasicView, AdminView
 from .eventos import PanelEventoPersona
 
 
@@ -65,7 +65,7 @@ class ListaPersona(BasicView):
         return render(request, template_name=self.template_name, context=c)
 
 
-class PanelPersona(BasicView):
+class PanelPersona(AdminView):
     template_name = 'eventos/panel-persona.html'
 
     def get_context_data(self, user, persona, *args, **kwargs):
