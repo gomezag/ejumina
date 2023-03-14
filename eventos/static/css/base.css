@@ -205,7 +205,9 @@ html {
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
+.modal-card-head{
 
+}
 /* The Close Button */
 .close {
   color: #aaa;
@@ -246,6 +248,9 @@ html {
     width: 100%;
 }
 
+.modal-card-title{
+    font-size: var(--fontsize-xl);
+}
 
 .modal-content {
 

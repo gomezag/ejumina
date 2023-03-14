@@ -122,10 +122,11 @@ class ListaUsuarios(BasicView):
                             email_template_name='registration/password_reset_email.html'
                         )
                         msg = ['Mail enviado!']
-                    except SMTPRecipientsRefused as e:
+                    except Exception as e:
                         print(str(e))
                         msg.append('La dirección de email fue rechazada por el servidor.')
                         msg.append('Verificá la dirección de correo e intentá de vuelta.')
+                        msg.append('Si el problema persiste, contactá con el administrador.')
                 form = NewUserForm()
                 edit_form = EditUserForm()
             else:

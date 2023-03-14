@@ -26,12 +26,17 @@
 {% block dialog %}
 {% endblock %}
 <div class="modal {% if alert_msg %} is-active {% endif %}" id="alert-dialog">
-      <div class="modal-content is-fullheight">
-          <span id='alert-close' class="close">&times;</span>
-          <div class="content">
+    <div class="modal-background"></div>
+          <div class="modal-card modal-content">
+              <header class="modal-card-head">
+                  <p class="modal-card-title">Aviso</p>
+                  <span id='alert-close' class="close">&times;</span>
+              </header>
+              <div class="modal-card-body">
               {% for alert in alert_msg %}
                 <p>{{alert}}</p>
               {% endfor %}
+              </div>
           </div>
       </div>
 </div>
