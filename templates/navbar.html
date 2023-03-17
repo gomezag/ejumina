@@ -60,12 +60,12 @@
       <div class="navbar-item">
         <div class="buttons">
           {% if not request.user.id %}
-          <a class="button is-light" href="/accounts/login">
-            Log in
+          <a class="button is-info" href="/accounts/login">
+            Iniciar sesión
           </a>
           {% else %}
-          <a class="button is-light" href="/accounts/logout">
-            Log out
+          <a class="button is-info" href="/accounts/logout">
+            Cerrar sesión
           </a>
           {% endif %}
         </div>
