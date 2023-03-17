@@ -32,6 +32,7 @@ class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
         fields = ['name', 'fecha']
+        labels = {'name': 'Nombre'}
 
     def save(self, *args, **kwargs):
         self.instance.estado = 'ACT'

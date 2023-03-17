@@ -99,8 +99,8 @@ class MultiInviAssignToPersona(forms.Form):
 
 
 class InvitacionAssignForm(MultiInviAssignToPersona):
-    persona = forms.CharField(required=True)
-    cedula = forms.CharField(required=True)
+    persona = forms.CharField(required=True, label="Nombre")
+    cedula = forms.CharField(required=True, label="C.I.")
     invitar = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
     def __init__(self, user, *args, **kwargs):
@@ -159,7 +159,7 @@ class FreeAssignToUserForm(forms.Form):
 
 
 class ExcelImportForm(forms.Form):
-    file = forms.FileField(validators=[file_size])
+    file = forms.FileField(validators=[file_size], label="Archivo")
     evento = forms.ModelChoiceField(queryset=Evento.objects.filter(estado='ACT'))
 
     def __init__(self, *args, **kwargs):
