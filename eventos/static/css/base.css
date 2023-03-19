@@ -255,6 +255,12 @@ html {
 .modal-content {
 
 }
+
+.modal-content .button{
+    margin-top: 20px;
+    left: 50%;
+    transform: translate(-55%, 0%);
+}
 /* End Modal */
 
 .table-form{

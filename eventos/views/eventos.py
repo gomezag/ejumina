@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
 
-from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona
+from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm
 from eventos.views.basic_view import BasicView
 from eventos.utils import validate_in_group
 from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
@@ -29,6 +29,10 @@ class ListaEventos(BasicView):
             c['eventos'] = Evento.objects.all()
         else:
             c['eventos'] = Evento.objects.filter(estado='ACT')
+        if user.groups.filter(name='admin').exists():
+            c['form'] = EventoForm()
+            c['edit_form'] = EventoForm(auto_id='edit')
+            c['delete_form'] = EventoDeleteForm(auto_id='delete')
         return c
 
     def get(self, request, **kwargs):
@@ -37,9 +41,6 @@ class ListaEventos(BasicView):
         c = self.get_context_data(user)
         if extras:
             c.update(extras)
-        if request.user.groups.filter(name='admin').exists():
-            c['form'] = EventoForm()
-            c['edit_form'] = EventoForm(auto_id='edit')
         return super().get(request, c)
 
     def post(self, request):
@@ -56,22 +57,35 @@ class ListaEventos(BasicView):
                 evento.save()
             except Exception as e:
                 pass
-            form = EventoForm()
+        elif request.POST.get('delete_evento', None) is not None:
+            try:
+                evento_id = request.POST.get('delete_evento', None)
+                if evento_id:
+                    dform = EventoDeleteForm(request.POST)
+                    if dform.is_valid(evento_id):
+                        Evento.objects.get(pk=evento_id).delete()
+                    else:
+                        c['alert_msg'] = ['El nombre escrito no coincide con el nombre del evento!']
+            except ObjectDoesNotExist:
+                c['alert_msg'] = ['El evento no existe!']
         elif request.POST.get('edit', None) is not None:
             try:
                 evento = Evento.objects.get(pk=request.POST['edit'])
-                form = EventoForm(request.POST, instance=evento)
+                form = EventoForm(request.POST, instance=evento, auto_id='edit')
                 if form.is_valid():
                     form.save()
+                else:
+                    c['alert_msg'] = ['El formulario tuvo errores']
+                c['edit_form'] = form
             except ObjectDoesNotExist:
-                form = EventoForm()
-            c['edit_form'] = form
+                pass
         else:
             form = EventoForm(request.POST)
             if form.is_valid():
                 form.save()
-
-        c['form'] = form
+            else:
+                c['alert_msg'] = ['El formulario tuvo errores.']
+            c['form'] = form
         return render(request, self.template_name, context=c)
 
 

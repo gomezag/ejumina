@@ -37,3 +37,18 @@ class EventoForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         self.instance.estado = 'ACT'
         super().save(*args, **kwargs)
+
+
+class EventoDeleteForm(forms.Form):
+    nombre = forms.CharField()
+
+    def is_valid(self, evento_id):
+        evento = Evento.objects.get(id=evento_id)
+        r = super().is_valid()
+        try:
+            if evento.name != self.cleaned_data['nombre']:
+                self.add_error('nombre', 'Nombre no coincide.')
+                return False
+        except AttributeError or KeyError:
+            return False
+        return r

@@ -38,7 +38,7 @@
 <div class="modal" id="edit-dialog">
       <div class="modal-content is-fullheight">
           <span id='edit-close' class="close">&times;</span>
-            <form class="modal-form" action="" method="post">
+            <form class="modal-form" id="edit-form" action="" method="post">
                 {% csrf_token %}
                 {% include 'eventos/forms/evento-form.html' with form=edit_form %}
                 <div class="control">
@@ -46,6 +46,10 @@
                 </div>
                 <input type="hidden" name="edit" id="id_evento" value="">
             </form>
+                <button class="button is-danger" id="delete_evento_btn">
+                    Borrar Evento
+                </button>
+
       </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='edit' noBtn=1%}
@@ -56,7 +60,40 @@
         document.getElementById("{{edit_form.name.id_for_label}}").value=name;
         document.getElementById("{{edit_form.fecha.id_for_label}}").value=fecha;
         document.getElementById("id_evento").value=id;
+        document.getElementById("delete_evento_btn").remove();
+        btn = document.createElement("button");
+        btn.classList.add("button");
+        btn.classList.add("is-danger");
+        btn.innerHTML = "Borrar Evento";
+        btn.id = "delete_evento_btn";
+        btn.addEventListener("click", function () {
+            openDeleteModal(id, name);
+        });
+        document.getElementById("edit-form").after(btn);
     };
 </script>
+<div class="modal" id="delete-dialog">
+      <div class="modal-content is-fullheight">
+          <span id='delete-close' class="close">&times;</span>
+          <p>Escribí <span id="delete_evento_help"></span> para borrar el evento:</span>
+            <form class="modal-form" action="" method="post">
+                {% csrf_token %}
+                {% include 'eventos/forms/evento-form.html' with form=delete_form %}
+                <div class="control">
+                    <input type="submit" class="button is-info" value="Borrar Evento">
+                </div>
+                <input type="hidden" name="delete_evento" id="delete_evento" value="">
+            </form>
+      </div>
+</div>
+<script nonce="{{request.csp_nonce}}">
+    function openDeleteModal(id, name){
+        deleteModal = document.getElementById("delete-dialog");
+        deleteModal.classList.add("is-active");
+        document.getElementById("delete_evento").value=id;
+        document.getElementById("delete_evento_help").innerHTML=name;
+    };
+</script>
+{% include 'eventos/setups/modal_setup.html' with ModalName='delete' noBtn=1%}
 {% endif %}
 {% endblock %}
