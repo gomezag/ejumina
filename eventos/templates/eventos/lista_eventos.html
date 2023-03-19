@@ -76,8 +76,8 @@
       <div class="modal-content is-fullheight">
           <span id='delete-close' class="close">&times;</span>
           <p class="modal-title"><b>Atención!</b></p>
-          <p class="modal-text">Al borrar un evento se perderá <b>toda</b> la información de invitaciones y frees asociadas a este evento </p>
-          <p class="modal-text">Escribí <b>"<span id="delete_evento_help"></span>"</b> y apretá el botón si estás seguro de querer borrar el evento:</span></p>
+          <p class="modal-text">Al borrar el evento se perderá <b>toda</b> la información de invitaciones y frees asociadas. </p>
+          <p class="modal-text">Escribí <b>"<span id="delete_evento_help"></span>"</b> y apretá el botón si estás seguro de querer borrarlo:</span></p>
             <form class="modal-form" action="" method="post">
                 {% csrf_token %}
                 {% include 'eventos/forms/evento-form.html' with form=delete_form %}
