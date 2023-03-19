@@ -26,7 +26,7 @@ class ListaEventos(BasicView):
     def get_context_data(self, user, *args, **kwargs):
         c = super().get_context_data(user)
         if validate_in_group(user, ('admin', )):
-            c['eventos'] = Evento.objects.all()
+            c['eventos'] = Evento.objects.all().order_by('estado', '-fecha')
         else:
             c['eventos'] = Evento.objects.filter(estado='ACT')
         if user.groups.filter(name='admin').exists():
