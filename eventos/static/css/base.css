@@ -24,10 +24,12 @@ html {
     position: relative;
     min-height: 100%;
 }
+
 .body {
     background-color: black;
     height: 100%;
     width: 100%;
+
     overflow-y: scroll;
     min-height: 100vh;
 }
@@ -428,5 +430,18 @@ input[type=number] {
     .table-btn-container .plus-button{width:var(--fontsize-xl);height:var(--fontsize-xl);border-radius:var(--fontsize-xl);}
     .table-btn-container .plus-button i{font-size: var(--fontsize-l)}
     .table-btn-container {flex-direction: column; align-items: center;}
-
+    .navbar-dropdown .is-active {
+      display: block;
+    }
+    .navbar-dropdown:not(.is-active) {
+      display: none;
+    }
+    .navbar-link.is-arrow-up::after {
+        right: 1.5em;
+        margin: -.375em;
+        border-top: 5px solid #485fc7;
+        border-right: 5px solid #485fc7;
+        border-bottom: 2px transparent;
+        border-left: 2px transparent;
+    }
 }

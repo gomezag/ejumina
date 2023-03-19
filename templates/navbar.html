@@ -17,12 +17,12 @@
 
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link" href="/">
+      <div class="navbar-item has-dropdown">
+        <a class="navbar-link" data-target="eventos">
           Eventos
         </a>
 
-        <div class="navbar-dropdown is-active">
+        <div class="navbar-dropdown" id="eventos">
           {% for evento in eventos %}
             <a class="navbar-item" href="/e/{{evento.slug}}">
               {{evento.name}}
