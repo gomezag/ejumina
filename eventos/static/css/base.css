@@ -25,6 +25,23 @@ html {
     min-height: 100%;
 }
 
+.subtitle {
+    color: #7a7a7a;
+}
+
+.navbar-item {
+    color: #7a7a7a;
+}
+.navbar-link {
+    color: #7a7a7a;
+}
+
+.navbar-dropdown .navbar-item {
+    font-size: 2.5rem;
+    left: 3rem;
+}
+
+
 .body {
     background-color: black;
     height: 100%;
@@ -406,12 +423,33 @@ input[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
 
+.promo-header {
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 50px;
+}
+.promo-header .is-1 {
+    font-size: 6rem;
+}
+
+hr {
+    color: white;
+    background-color: white;
+    height: 0.5rem;
+    border: 2px solid white;
+    width: 100%;
+    z-index:4;
+}
+
 /* Smartphones in landscape */
 @media only screen
   and (min-device-width: 100px)
   and (max-device-width: 871px){
     .body-form { font-size: var(--fontsize);}
     .body-form input { font-size: var(--fontsize-l);}
+    .body-content {font-size: var(--fontsize);}
+    .body-content p.info {font-size: var(--fontsize-s);}
     .body-form select { font-size:var(--fontsize);}
     .table { font-size: var(--fontsize);}
     .table input {font-size: var(--fontsize);}
@@ -424,7 +462,6 @@ input[type=number] {
     .modal-form select {font-size: var(--fontsize-l);}
     .modal-form label {font-size: var(--fontsize);}
     .navbar-burger {height:100px;width:100px;}
-    .body-content {font-size: var(--fontsize);}
     .back-button i{font-size: var(--fontsize-xl);}
     .table-btn-container i{font-size: var(--fontsize-xl);}
     .table-btn-container .plus-button{width:var(--fontsize-xl);height:var(--fontsize-xl);border-radius:var(--fontsize-xl);}
@@ -443,5 +480,35 @@ input[type=number] {
         border-right: 5px solid #485fc7;
         border-bottom: 2px transparent;
         border-left: 2px transparent;
+    }
+
+    .navbar-burger {
+        font-size: 3rem;
+        margin-right: 1rem;
+        width: 4rem;
+    }
+    .navbar-burger span{
+        width: 2rem;
+        height: 2px;
+        margin-top: 1rem;
+        background-color: white;
+    }
+    .navbar-burger span:first-child{
+        top: calc(15% - 6px);
+        left: calc(10%);
+    }
+    .navbar-burger span:nth-child(2){
+        top: calc(20% - 0px);
+        left: calc(10%);
+    }
+    .navbar-burger span:nth-child(3){
+        top: calc(26% + 6px);
+        left: calc(10%);
+    }
+    .navbar-burger.is-active span:first-child {
+        transform: translateY(18px) rotate(45deg)
+    }
+    .navbar-burger.is-active span:nth-child(3) {
+    transform: translateY(-4px) rotate(-45deg)
     }
 }
