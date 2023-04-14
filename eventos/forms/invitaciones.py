@@ -47,7 +47,10 @@ class MultiInviAssignToPersona(forms.Form):
             self.fields['lista'].initial = ListaInvitados.objects.get(nombre=usuario.username)
         except ObjectDoesNotExist:
             pass
-        max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
+        if validate_in_group(usuario, ('admin', )):
+            max_frees = 1000
+        else:
+            max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
 
         self.fields['frees'].widget.attrs['max'] = max_frees
 
@@ -66,10 +69,11 @@ class MultiInviAssignToPersona(forms.Form):
         if validate_in_group(user, ('admin',)):
             for n in range(n_frees):
                 free = Free()
-                free.evento = self.cleaned_data['evento']
+                free.evento = evento
                 free.vendedor = user
                 free.cliente = persona
                 free.estado = 'ACT'
+                free.lista = self.cleaned_data['lista']
                 free.save()
                 free.administrador.set([user])
                 free.save()

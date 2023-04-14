@@ -114,6 +114,8 @@ class PanelEvento(BasicView):
         c = super().get_context_data(user, *args, **kwargs)
         if evento and not isinstance(evento, Evento):
             c['evento'] = Evento.objects.get(slug=evento)
+        elif isinstance(evento, Evento):
+            c['evento'] = evento
         else:
             c['evento'] = Evento.objects.all()[0]
 
@@ -230,14 +232,15 @@ class PanelEventoPersona(BasicView):
             c['form'] = MultiInviAssignToPersona(usuario, persona)
         if validate_in_group(usuario, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
-        return super().get(request, c)
+        return render(request, self.template_name, context=c)
 
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
         checkin = request.POST.get('checkin', None)
+        delete = request.POST.get('delete', None)
         c = {}
-        if request.POST.get('delete', None):
+        if validate_in_group(request.user, ('rrpp', 'admin')) and delete:
             try:
                 integer_validator(request.POST['lista'])
                 integer_validator(request.POST['rrpp'])
@@ -246,9 +249,9 @@ class PanelEventoPersona(BasicView):
             except Exception as e:
                 return HttpResponseRedirect('/')
             invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
-                                                     lista=lista)
+                                                     lista=lista, evento=evento)
             frees = Free.objects.filter(cliente=persona, vendedor=request.user,
-                                        lista=lista)
+                                        lista=lista, evento=evento)
 
             for free in frees:
                 if free.estado == 'ACT':
@@ -272,12 +275,12 @@ class PanelEventoPersona(BasicView):
                 c['checkin_errors'] = checkin_form.errors
             form = MultiInviAssignToPersona(request.user, persona)
             c['checkin_form'] = checkin_form
-        else:
+        elif validate_in_group(request.user, ('rrpp', 'admin')):
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
             if form.is_valid():
                 form.save(request.user, persona, evento)
 
         c.update(self.get_context_data(request.user, persona, evento))
         c['form'] = form
-        return super().get(request, c)
+        return render(request, self.template_name, context=c)
 
