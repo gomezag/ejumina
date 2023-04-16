@@ -301,11 +301,11 @@ class PanelFrees(AdminView):
     def get_context_data(self, user, evento, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
         evento = Evento.objects.get(slug=evento)
-        users = Usuario.objects.filter(groups__name='rrpp')
+        users = Usuario.objects.filter(Q(groups__name='rrpp')|Q(groups__name='admin'))
         c['users'] = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
                                     usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
                                                                            free__evento=evento)),
-                                    input_id=Concat(F('username'), Value("_frees")))
+                                    input_id=Concat(F('username'), Value("_frees"))).order_by('first_name')
         c['evento'] = evento
         return c
 
