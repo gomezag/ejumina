@@ -95,11 +95,14 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     @staticmethod
-    def parse_invitaciones(persona_set, evento):
+    def parse_invitaciones(persona_set, evento, user):
         r = []
         for persona in persona_set:
             invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona)
             frees = Free.objects.filter(evento=evento, cliente=persona)
+            if not validate_in_group(user, ('admin', )):
+                frees = frees.filter(vendedor=user)
+                invitaciones = invitaciones.filter(vendedor=user)
             listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
                                                        Q(personas_free=persona, free__evento=evento.pk)).distinct()
             r.append({'nombre': persona.nombre,
@@ -122,7 +125,7 @@ class PanelEvento(BasicView):
             c['evento'] = Evento.objects.all()[0]
 
         #TODO: En vez de ocultar, marcarlas en gris y sin link
-        c['personas'] = self.parse_invitaciones(Persona.objects.filter(estado='ACT'), c['evento'])
+        c['personas'] = self.parse_invitaciones(Persona.objects.filter(estado='ACT'), c['evento'], user)
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
