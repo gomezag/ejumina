@@ -100,7 +100,7 @@ class PanelEvento(BasicView):
         for persona in persona_set:
             invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona)
             frees = Free.objects.filter(evento=evento, cliente=persona)
-            if not validate_in_group(user, ('admin', )):
+            if not validate_in_group(user, ('admin', 'entrada')):
                 frees = frees.filter(vendedor=user)
                 invitaciones = invitaciones.filter(vendedor=user)
             listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
