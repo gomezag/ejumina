@@ -41,6 +41,7 @@ class MultiInviAssignToPersona(forms.Form):
     lista = forms.ModelChoiceField(queryset=None)
 
     def __init__(self, usuario, persona, *args, **kwargs):
+        evento = kwargs.pop('evento', None)
         super(MultiInviAssignToPersona, self).__init__(*args, **kwargs)
         self.fields['lista'].queryset = ListaInvitados.objects.filter(administradores__in=[usuario])
         try:
@@ -50,7 +51,10 @@ class MultiInviAssignToPersona(forms.Form):
         if validate_in_group(usuario, ('admin', )):
             max_frees = 1000
         else:
-            max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True).count()
+            max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True)
+            if evento:
+                max_frees = max_frees.filter(evento=evento)
+            max_frees = max_frees.count()
 
         self.fields['frees'].widget.attrs['max'] = max_frees
 
@@ -78,7 +82,7 @@ class MultiInviAssignToPersona(forms.Form):
                 free.administrador.set([user])
                 free.save()
         else:
-            free_set = Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True)
+            free_set = list(Free.objects.filter(vendedor=user, evento=evento, cliente__isnull=True))
             if n_frees > 0:
                 for n in range(n_frees):
                     try:
@@ -140,8 +144,28 @@ class InvitacionAssignForm(MultiInviAssignToPersona):
 InvitacionAssignFormset = forms.modelformset_factory(Invitacion, form=InvitacionAssignForm, extra=0, exclude=['id'])
 
 
-class FreeAssignToUserForm(forms.Form):
+
+class FreeAssign(forms.Form):
     free = forms.IntegerField(min_value=0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save(self, user, vendedor, evento):
+        if evento.estado == 'INA':
+            raise ValidationError("El evento está inactivo!")
+        for n in range(self.cleaned_data['free']):
+            free = Free()
+            free.evento = evento
+            free.vendedor = vendedor
+            free.cliente = None
+            free.estado = 'ACT'
+            free.save()
+            free.administrador.set([user])
+            free.save()
+
+
+class FreeAssignToUserForm(FreeAssign):
     evento = forms.ModelChoiceField(queryset=Evento.objects.filter(estado='ACT'))
 
     def __init__(self, *args, **kwargs):
@@ -149,17 +173,7 @@ class FreeAssignToUserForm(forms.Form):
 
     def save(self, user, vendedor):
         evento = self.cleaned_data['evento']
-        if evento.estado == 'INA':
-            raise ValidationError("El evento está inactivo!")
-        for n in range(self.cleaned_data['free']):
-            free = Free()
-            free.evento = self.cleaned_data['evento']
-            free.vendedor = vendedor
-            free.cliente = None
-            free.estado = 'ACT'
-            free.save()
-            free.administrador.set([user])
-            free.save()
+        super().save(user, vendedor, evento)
 
 
 class ExcelImportForm(forms.Form):
@@ -206,16 +220,16 @@ class CheckInForm(forms.Form):
             n_invis = self.cleaned_data['check_invis']
             n_frees = self.cleaned_data['check_frees']
             if n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra).count() and n_invis > 0:
-                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                self.add_error('check_invis','Demasiados check-ins para esta persona y evento.')
                 return False
             elif -n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='USA', **extra).count() and n_invis < 0:
-                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                self.add_error('check_invis', 'Demasiados check-ins para esta persona y evento.')
                 return False
             if n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra).count():
-                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                self.add_error('check_frees', 'Demasiados check-ins para esta persona y evento.')
                 return False
             elif -n_frees > Free.objects.filter(cliente=persona, evento=evento, estado='USA', **extra).count() and n_frees < 0:
-                self.errors.append('Demasiados check-ins para esta persona y evento.')
+                self.add_error('check_frees', 'Demasiados check-ins para esta persona y evento.')
                 return False
         return r
 

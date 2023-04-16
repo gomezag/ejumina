@@ -12,7 +12,9 @@ from .views import *
 urlpatterns = [
     path('', ListaEventos.as_view()),
     path('e/<slug:evento>', PanelEvento.as_view()),
+    path('e/<slug:evento>/frees', PanelFrees.as_view()),
     path('e/<slug:evento>/p/<int:persona>/', PanelEventoPersona.as_view()),
+    path('e/<slug:evento>/u/<int:rrpp>/', PanelEventoUsuario.as_view()),
     path('personas', ListaPersona.as_view()),
     path('p/<int:persona>/', PanelPersona.as_view()),
     path('usuarios', ListaUsuarios.as_view()),

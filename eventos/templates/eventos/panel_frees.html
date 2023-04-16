@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load auth_extras %}
+{% load static %}
+
+{% block content %}
+
+<h1 class="title is-1">
+    {{evento.name}}
+</h1>
+<div>
+    <form action="" method="post" class="table-btn-container">
+        {% csrf_token %}
+        <table class="table tabla-personas">
+            <thead>
+            <tr>
+                <th>
+                    Usuario
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th>
+                    Frees
+                </th>
+                <th>
+                    Agregar Frees
+                </th>
+                <th>
+                    Editar Frees
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    {{user.username}}
+                </td>
+                <td>
+                    {{user.first_name}}
+                </td>
+                <td>
+                    {{user.usedfree_count}}/{{user.free_count}}
+                </td>
+                {% if not user|has_group:'admin' %}
+                <td>
+                    {% with nonusedfrees=user.free_count|sub:user.usedfree_count %}
+                    {% include 'eventos/forms/free-form.html' with inputId=user.input_id frees=nonusedfrees %}
+                    {% endwith %}
+                </td>
+                <td>
+                    <a href="./u/{{user.pk}}"> Invitados </a>
+                </td>
+                {% else %}
+                <td>
+                    <p> Es admin. </p>
+                </td>
+                <td>
+                    {{user.invitados}}
+                    {% for cliente in user.invitados %}
+                        {{cliente.nombre}}
+                    {% endfor %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+</div>
+<div class="">
+    <input type="submit" class="button is-info" value="Editar Frees">
+</div>
+</form>
+{% endblock %}

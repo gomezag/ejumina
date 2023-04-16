@@ -8,14 +8,16 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
 from django.core.validators import integer_validator
+from django.contrib.auth.models import Group
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F, Value, Subquery, OuterRef, CharField
+from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
 
-from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm
-from eventos.views.basic_view import BasicView
+from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm, FreeAssign
+from eventos.views.basic_view import BasicView, AdminView
 from eventos.utils import validate_in_group
 from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
 
@@ -151,7 +153,8 @@ class PanelEvento(BasicView):
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
-            c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
+            form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=Evento.objects.get(slug=evento))
+            c['persona_form'] = form
 
         return super().get(request, c)
 
@@ -200,6 +203,7 @@ class PanelEventoPersona(BasicView):
         for common, invis in itertools.groupby(all_invis, key=lambda x: (x['vendedor__pk'], x['lista__pk'])):
             lista = ListaInvitados.objects.get(pk=common[1])
             r = {
+                'persona': persona,
                 'rrpp': Usuario.objects.get(pk=common[0]),
                 'lista_id': lista.pk,
                 'invis': 0,
@@ -228,8 +232,6 @@ class PanelEventoPersona(BasicView):
         evento = Evento.objects.get(slug=evento)
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
-        if validate_in_group(usuario, ('admin', 'rrpp')):
-            c['form'] = MultiInviAssignToPersona(usuario, persona)
         if validate_in_group(usuario, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return render(request, self.template_name, context=c)
@@ -248,21 +250,29 @@ class PanelEventoPersona(BasicView):
                 rrpp = Usuario.objects.get(pk=request.POST['rrpp'])
             except Exception as e:
                 return HttpResponseRedirect('/')
-            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
-                                                     lista=lista, evento=evento)
-            frees = Free.objects.filter(cliente=persona, vendedor=request.user,
-                                        lista=lista, evento=evento)
+            if not validate_in_group(request.user, ('admin')) and rrpp != request.user:
+                c['alert_msg'].append('No podes borrar entradas que no son tuyas!')
+            else:
+                invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
+                                                         lista=lista, evento=evento)
+                frees = Free.objects.filter(cliente=persona, vendedor=rrpp,
+                                            lista=lista, evento=evento)
 
-            for free in frees:
-                if free.estado == 'ACT':
-                    free.cliente = None
-                    free.save()
-            for invi in invitaciones:
-                if invi.estado == 'ACT':
-                    invi.delete()
-                else:
-                    c['alert_msg'] = ['No se puede borrar una entrada usada!']
-            form = MultiInviAssignToPersona(request.user, persona)
+                for free in frees:
+                    if free.estado == 'ACT':
+                        if request.user.groups.filter(name='admin').exists():
+                            free.delete()
+                        else:
+                            free.cliente = None
+                            free.save()
+                    else:
+                        c['alert_msg'] = ['No se puede borrar una entrada usada!']
+                for invi in invitaciones:
+                    if invi.estado == 'ACT':
+                        invi.delete()
+                    else:
+                        c['alert_msg'] = ['No se puede borrar una entrada usada!']
+                form = MultiInviAssignToPersona(request.user, persona)
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
@@ -282,5 +292,157 @@ class PanelEventoPersona(BasicView):
 
         c.update(self.get_context_data(request.user, persona, evento))
         c['form'] = form
+        return render(request, self.template_name, context=c)
+
+
+class PanelFrees(AdminView):
+    template_name = 'eventos/panel_frees.html'
+
+    def get_context_data(self, user, evento, *args, **kwargs):
+        c = super().get_context_data(user, *args, **kwargs)
+        evento = Evento.objects.get(slug=evento)
+        users = Usuario.objects.filter(groups__name='rrpp')
+        c['users'] = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
+                                    usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
+                                                                           free__evento=evento)),
+                                    input_id=Concat(F('username'), Value("_frees")))
+        c['evento'] = evento
+        return c
+
+    def get(self, request, evento, *args, **kwargs):
+        c = self.get_context_data(request.user, evento)
+        return render(request, self.template_name, context=c)
+
+    def post(self, request, evento, *args, **kwargs):
+        c = self.get_context_data(request.user, evento)
+        for user in c['users']:
+            try:
+                frees = int(request.POST[user.input_id])
+                rrpp = Usuario.objects.get(pk=user.id)
+                if frees > 0:
+                    form = FreeAssign(data={'free': frees})
+                    if form.is_valid():
+                        form.save(request.user, rrpp, c['evento'])
+                    else:
+                        print('FreeAssign Errors:')
+                        print(form.errors)
+                        print('End FreeAssign Errors')
+                elif frees < 0:
+                    free_list = list(Free.objects.filter(vendedor=rrpp, evento=c['evento'], cliente__isnull=True))
+                    for n in range(-frees):
+                        try:
+                            free = free_list[n]
+                            free.delete()
+                        except IndexError:
+                            print('Se intentaron borrar mas frees de los que tenia un usuario')
+                            pass
+            except KeyError:
+                pass
+            except ValueError:
+                pass
+        c.update(**self.get_context_data(request.user, evento))
+        return render(request, self.template_name, context=c)
+
+
+class PanelEventoUsuario(AdminView):
+    template_name = 'eventos/rrpp_view_evento.html'
+
+    @staticmethod
+    def parse_invitaciones(rrpp, evento):
+        out = []
+        invis = list(Invitacion.objects.filter(evento=evento, vendedor=rrpp).
+            values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
+            invis=Count('lista'),
+            used_invis=Count('lista', filter=Q(estado='USA'))))
+        frees = list(Free.objects.filter(evento=evento, vendedor=rrpp, cliente__isnull=False).
+            values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
+            frees=Count('lista'),
+            used_frees=Count('lista', filter=Q(estado='USA'))))
+        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['cliente__pk'], x['lista__pk']))
+        if len(all_invis) > 0:
+            for common, invis in itertools.groupby(all_invis, key=lambda x: (x['cliente__pk'], x['lista__pk'])):
+                lista = ListaInvitados.objects.get(pk=common[1])
+                r = {
+                    'rrpp': rrpp,
+                    'persona': Persona.objects.get(pk=common[0]),
+                    'lista_id': lista.pk,
+                    'invis': 0,
+                    'frees': 0,
+                    'used_invis': 0,
+                    'used_frees': 0
+                }
+                [r.update(i) for i in invis]
+                out.append(r)
+        else:
+          out = []
+        return out
+
+    def get_context_data(self, user, rrpp, evento, *args, **kwargs):
+        c = super().get_context_data(user, *args, **kwargs)
+        c['back'] = '/e/{}'.format(evento.slug)
+        invitaciones = rrpp.invitacion_set.filter(evento=evento)
+        c['rrpp'] = rrpp
+        c['evento'] = evento
+        c['invitaciones'] = invitaciones
+        c['frees'] = rrpp.free_set.filter(evento=evento)
+        c['invitaciones'] = self.parse_invitaciones(rrpp, evento)
+        c['back'] = '/e/{}'.format(evento.slug)
+        return c
+
+    def get(self, request, rrpp, evento, *args, **kwargs):
+        rrpp = Usuario.objects.get(pk=rrpp)
+        evento = Evento.objects.get(slug=evento)
+        c = self.get_context_data(request.user, rrpp, evento)
+        c['checkin_form'] = CheckInForm()
+        return render(request, self.template_name, context=c)
+
+    def post(self, request, rrpp, evento, *args, **kwargs):
+        rrpp = Usuario.objects.get(pk=rrpp)
+        evento = Evento.objects.get(slug=evento)
+        checkin = request.POST.get('checkin', None)
+        delete = request.POST.get('delete', None)
+        c = {'alert_msg':[]}
+        if delete:
+            try:
+                integer_validator(request.POST['lista'])
+                integer_validator(request.POST['persona'])
+                lista = ListaInvitados.objects.get(pk=request.POST['lista'])
+                persona = Persona.objects.get(pk=request.POST['persona'])
+            except Exception as e:
+                return HttpResponseRedirect('/')
+
+            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
+                                                     lista=lista, evento=evento)
+            frees = Free.objects.filter(cliente=persona, vendedor=rrpp,
+                                        lista=lista, evento=evento)
+
+            for free in frees:
+                if free.estado == 'ACT':
+                    if request.user.groups.filter(name='admin').exists():
+                        free.delete()
+                    else:
+                        free.cliente = None
+                        free.save()
+                else:
+                    c['alert_msg'] = ['No se puede borrar una entrada usada!']
+            for invi in invitaciones:
+                if invi.estado == 'ACT':
+                    invi.delete()
+                else:
+                    c['alert_msg'] = ['No se puede borrar una entrada usada!']
+        elif checkin:
+            id_lista = request.POST.get('lista')
+            checkin_form = CheckInForm(request.POST, vendedor=rrpp, lista=id_lista)
+            if checkin_form.is_valid(evento=evento):
+                checkin_form.save()
+                invis = checkin_form.cleaned_data['check_invis']
+                frees = checkin_form.cleaned_data['check_frees']
+                c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
+            else:
+                c['checkin_errors'] = checkin_form.errors
+            c['checkin_form'] = checkin_form
+        if not c.get('checkin_form', None):
+            c['checkin_form'] = CheckInForm()
+        c.update(self.get_context_data(request.user, rrpp, evento))
         return render(request, self.template_name, context=c)
 

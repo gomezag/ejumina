@@ -12,6 +12,8 @@ from django.contrib.auth.forms import authenticate, AuthenticationForm
 from django.shortcuts import render
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
+from django.conf import settings
+
 
 import urllib
 import os
@@ -34,19 +36,22 @@ class LoginView(View):
 
     def post(self, request, *args, **kwargs):
         captcha_error = False
-
-        ''' Begin reCAPTCHA validation '''
-        recaptcha_response = request.POST.get('g-recaptcha-response')
-        url = 'https://www.google.com/recaptcha/api/siteverify'
-        values = {
-            'secret': os.getenv("GOOGLE_RECAPTCHA_SECRET_KEY"),
-            'response': recaptcha_response
-        }
-        data = urllib.parse.urlencode(values).encode()
-        req = urllib.request.Request(url, data=data)
-        response = urllib.request.urlopen(req)
-        result = json.loads(response.read().decode())
-        ''' End reCAPTCHA validation '''
+        c = self.get_context()
+        if settings.DEBUG:
+            result = dict(success=True)
+        else:
+            ''' Begin reCAPTCHA validation '''
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            values = {
+                'secret': os.getenv("GOOGLE_RECAPTCHA_SECRET_KEY"),
+                'response': recaptcha_response
+            }
+            data = urllib.parse.urlencode(values).encode()
+            req = urllib.request.Request(url, data=data)
+            response = urllib.request.urlopen(req)
+            result = json.loads(response.read().decode())
+            ''' End reCAPTCHA validation '''
         if result['success']:
             username = request.POST['username']
             password = request.POST['password']
@@ -60,9 +65,10 @@ class LoginView(View):
                         return HttpResponseRedirect(request.GET['next'])
                     except:
                         return HttpResponseRedirect('/')
+                else:
+                    c['alert_msg'] = ['Usuario desactivado. Contacta con tu administrador.']
         else:
             captcha_error = True
-        c = self.get_context()
         c['recaptcha_error'] = captcha_error
         return render(request, self.template_name, c)
 
