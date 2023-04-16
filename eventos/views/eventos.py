@@ -376,7 +376,7 @@ class PanelEventoUsuario(AdminView):
 
     def get_context_data(self, user, rrpp, evento, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
-        c['back'] = '/e/{}'.format(evento.slug)
+        c['back'] = '/e/{}/frees'.format(evento.slug)
         invitaciones = rrpp.invitacion_set.filter(evento=evento)
         c['rrpp'] = rrpp
         c['evento'] = evento
@@ -408,8 +408,6 @@ class PanelEventoUsuario(AdminView):
             except Exception as e:
                 return HttpResponseRedirect('/')
 
-            invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
-                                                     lista=lista, evento=evento)
             frees = Free.objects.filter(cliente=persona, vendedor=rrpp,
                                         lista=lista, evento=evento)
 
@@ -420,11 +418,6 @@ class PanelEventoUsuario(AdminView):
                     else:
                         free.cliente = None
                         free.save()
-                else:
-                    c['alert_msg'] = ['No se puede borrar una entrada usada!']
-            for invi in invitaciones:
-                if invi.estado == 'ACT':
-                    invi.delete()
                 else:
                     c['alert_msg'] = ['No se puede borrar una entrada usada!']
         elif checkin:
