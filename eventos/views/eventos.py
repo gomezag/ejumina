@@ -302,10 +302,11 @@ class PanelFrees(AdminView):
         c = super().get_context_data(user, *args, **kwargs)
         evento = Evento.objects.get(slug=evento)
         users = Usuario.objects.filter(Q(groups__name='rrpp')|Q(groups__name='admin'))
-        c['users'] = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
+        users = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
                                     usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
                                                                            free__evento=evento)),
                                     input_id=Concat(F('username'), Value("_frees"))).order_by('first_name')
+        c['users'] = users
         c['evento'] = evento
         return c
 
@@ -332,7 +333,8 @@ class PanelFrees(AdminView):
                     for n in range(-frees):
                         try:
                             free = free_list[n]
-                            free.delete()
+                            free.cliente=None
+                            free.save()
                         except IndexError:
                             print('Se intentaron borrar mas frees de los que tenia un usuario')
                             pass
@@ -350,15 +352,11 @@ class PanelEventoUsuario(AdminView):
     @staticmethod
     def parse_invitaciones(rrpp, evento):
         out = []
-        invis = list(Invitacion.objects.filter(evento=evento, vendedor=rrpp).
-            values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
-            invis=Count('lista'),
-            used_invis=Count('lista', filter=Q(estado='USA'))))
         frees = list(Free.objects.filter(evento=evento, vendedor=rrpp, cliente__isnull=False).
             values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
             frees=Count('lista'),
             used_frees=Count('lista', filter=Q(estado='USA'))))
-        all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['cliente__pk'], x['lista__pk']))
+        all_invis = sorted(list(itertools.chain(frees,)), key=lambda x: (x['cliente__pk'], x['lista__pk']))
         if len(all_invis) > 0:
             for common, invis in itertools.groupby(all_invis, key=lambda x: (x['cliente__pk'], x['lista__pk'])):
                 lista = ListaInvitados.objects.get(pk=common[1])
