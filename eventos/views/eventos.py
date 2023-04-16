@@ -383,7 +383,6 @@ class PanelEventoUsuario(AdminView):
         c['invitaciones'] = invitaciones
         c['frees'] = rrpp.free_set.filter(evento=evento)
         c['invitaciones'] = self.parse_invitaciones(rrpp, evento)
-        c['back'] = '/e/{}'.format(evento.slug)
         return c
 
     def get(self, request, rrpp, evento, *args, **kwargs):
