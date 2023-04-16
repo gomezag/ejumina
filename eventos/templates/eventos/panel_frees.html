@@ -7,9 +7,9 @@
 <h1 class="title is-1">
     {{evento.name}}
 </h1>
+<form action="" method="post" class="table-btn-container">
+    {% csrf_token %}
 <div>
-    <form action="" method="post" class="table-btn-container">
-        {% csrf_token %}
         <table class="table tabla-personas">
             <thead>
             <tr>
@@ -66,9 +66,9 @@
             {% endfor %}
             </tbody>
         </table>
-</div>
-<div class="">
-    <input type="submit" class="button is-info" value="Editar Frees">
-</div>
+    </div>
+    <div class="">
+        <input type="submit" class="button is-info" value="Editar Frees">
+    </div>
 </form>
 {% endblock %}
