@@ -7,6 +7,7 @@
 <h1 class="title is-1">
     {{evento.name}}
 </h1>
+<div>
 <form action="" method="post" class="table-btn-container">
     {% csrf_token %}
 <div>
@@ -71,4 +72,5 @@
         <input type="submit" class="button is-info" value="Editar Frees">
     </div>
 </form>
+    </div>
 {% endblock %}
