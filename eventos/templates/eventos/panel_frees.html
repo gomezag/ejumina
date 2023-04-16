@@ -8,9 +8,9 @@
     {{evento.name}}
 </h1>
 <div>
-<form action="" method="post" class="table-btn-container">
+<form action="" method="post" class="is-horizontal is-centered">
     {% csrf_token %}
-<div>
+<div class="field">
         <table class="table tabla-personas">
             <thead>
             <tr>
@@ -44,7 +44,7 @@
                     {{user.usedfree_count}}/{{user.free_count}}
                 </td>
                 {% if not user|has_group:'admin' %}
-                <td>
+                <td class="table-btn-container">
                     {% with nonusedfrees=user.free_count|sub:user.usedfree_count %}
                     {% include 'eventos/forms/free-form.html' with inputId=user.input_id frees=nonusedfrees %}
                     {% endwith %}
@@ -57,10 +57,6 @@
                     <p> Es admin. </p>
                 </td>
                 <td>
-                    {{user.invitados}}
-                    {% for cliente in user.invitados %}
-                        {{cliente.nombre}}
-                    {% endfor %}
                 </td>
                 {% endif %}
             </tr>
@@ -68,7 +64,7 @@
             </tbody>
         </table>
     </div>
-    <div class="">
+    <div class="field is-flex is-justify-content-center">
         <input type="submit" class="button is-info" value="Editar Frees">
     </div>
 </form>
