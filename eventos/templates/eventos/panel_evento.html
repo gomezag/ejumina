@@ -17,8 +17,9 @@
 <h2 class="title is-1">
     {{evento.name}}
 </h2>
+{% if request.user|has_group:'admin' %}
 <a href="/e/{{evento.slug}}/frees" class="button is-info">Admin. Frees</a>
-
+{% endif %}
 <h4 class="title is-3">
     Invitaciones: {{invi_dadas}}
 </h4>

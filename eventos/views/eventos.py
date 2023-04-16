@@ -260,7 +260,7 @@ class PanelEventoPersona(BasicView):
 
                 for free in frees:
                     if free.estado == 'ACT':
-                        if request.user.groups.filter(name='admin').exists():
+                        if free.vendedor.groups.filter(name='admin').exists():
                             free.delete()
                         else:
                             free.cliente = None
@@ -333,8 +333,7 @@ class PanelFrees(AdminView):
                     for n in range(-frees):
                         try:
                             free = free_list[n]
-                            free.cliente=None
-                            free.save()
+                            free.delete()
                         except IndexError:
                             print('Se intentaron borrar mas frees de los que tenia un usuario')
                             pass
@@ -416,7 +415,7 @@ class PanelEventoUsuario(AdminView):
 
             for free in frees:
                 if free.estado == 'ACT':
-                    if request.user.groups.filter(name='admin').exists():
+                    if free.vendedor.groups.filter(name='admin').exists():
                         free.delete()
                     else:
                         free.cliente = None
