@@ -376,15 +376,23 @@ html {
 }
 .plus-button.green {
     background-color: green;
+    border-color: green;
     color: white;
 }
 
 .plus-button.blue {
     background-color: blue;
+    border-color: blue;
     color: white;
 }
 .plus-button.red {
     background-color: red;
+    border-color: red;
+    color: white;
+}
+.plus-button.yellow {
+    background-color: #d1c44f;
+    border-color: #d1c44f;
     color: white;
 }
 
@@ -395,6 +403,7 @@ tr.red {
 tr.yellow {
     background-color: #F6F5E1;
 }
+
 
 table .plus-button{
     margin-right: 0px;

@@ -50,10 +50,13 @@
                 '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
                     <i class="fa fa-pencil"></i>
                 </button>
+                {% if evento.estado == 'ACT' %}
+                    <a href='e/{{evento.slug}}/frees' class="plus-button yellow"> <i class="fa fa-ticket"></i></a>
+                {% endif %}
                 </div>
             </td>
             <td>
-                <a href='e/{{evento.slug}}/frees' class="button is-info">Admin. Frees</a>
+
             </td>
             {% endif %}
     {% endfor %}
