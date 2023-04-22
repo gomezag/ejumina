@@ -28,10 +28,10 @@
                     <i class="fa fa-pencil"></i>
                 </button>
                 <form method="POST" action=""
-                onsubmit="return confirm('Seguro que queres desactivar a esta persona?');">
+                onsubmit="return confirm('Banear a esta persona?');">
                        {% csrf_token %}
-                        <input type="hidden" name="delete" value="{{persona.pk}}">
-                        <button class="plus-button in-table red" type="submit" value="DELETE"><i class="fa fa-trash"></i></button>
+                        <input type="hidden" name="deactivate" value="{{persona.pk}}">
+                        <button class="plus-button in-table red" type="submit" value="deactivate"><i class="fa fa-times"></i></button>
                 </form>
                 {% else %}
                 <form method="POST" action=""
@@ -39,6 +39,12 @@
                        {% csrf_token %}
                         <input type="hidden" name="reactivate" value="{{persona.pk}}">
                         <button class="plus-button in-table green" type="submit" value="reactivate"><i class="fa fa-share-square-o"></i></button>
+                </form>
+                <form method="POST" action=""
+                onsubmit="return confirm('Queres BORRAR a esta persona?');">
+                       {% csrf_token %}
+                        <input type="hidden" name="delete" value="{{persona.pk}}">
+                        <button class="plus-button in-table red" type="submit" value="delete"><i class="fa fa-trash"></i></button>
                 </form>
                 {% endif %}
                 {% endif %}

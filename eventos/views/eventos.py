@@ -8,9 +8,8 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
 from django.core.validators import integer_validator
-from django.contrib.auth.models import Group
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q, F, Value, Subquery, OuterRef, CharField
+from django.db.models import Count, Q, F, Value
 from django.db.models.functions import Concat
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -30,7 +29,7 @@ class ListaEventos(BasicView):
         if validate_in_group(user, ('admin', )):
             c['eventos'] = Evento.objects.all().order_by('estado', '-fecha')
         else:
-            c['eventos'] = Evento.objects.filter(estado='ACT')
+            c['eventos'] = Evento.objects.filter(estado='ACT').order_by('-fecha')
         if user.groups.filter(name='admin').exists():
             c['form'] = EventoForm()
             c['edit_form'] = EventoForm(auto_id='edit')
@@ -212,7 +211,8 @@ class PanelEventoPersona(BasicView):
                 'invis': 0,
                 'frees': 0,
                 'used_invis': 0,
-                'used_frees': 0
+                'used_frees': 0,
+                'evento': evento
             }
             [r.update(i) for i in invis]
             out.append(r)
@@ -244,7 +244,9 @@ class PanelEventoPersona(BasicView):
         evento = Evento.objects.get(slug=evento)
         checkin = request.POST.get('checkin', None)
         delete = request.POST.get('delete', None)
-        c = {}
+        form = None
+        c = self.get_context_data(request.user, persona, evento)
+        c['alert_msg'] = []
         if validate_in_group(request.user, ('rrpp', 'admin')) and delete:
             try:
                 integer_validator(request.POST['lista'])
@@ -252,8 +254,8 @@ class PanelEventoPersona(BasicView):
                 lista = ListaInvitados.objects.get(pk=request.POST['lista'])
                 rrpp = Usuario.objects.get(pk=request.POST['rrpp'])
             except Exception as e:
-                return HttpResponseRedirect('/')
-            if not validate_in_group(request.user, ('admin')) and rrpp != request.user:
+                return HttpResponseRedirect('')
+            if (not validate_in_group(request.user, ('admin', ))) and (rrpp != request.user):
                 c['alert_msg'].append('No podes borrar entradas que no son tuyas!')
             else:
                 invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
@@ -275,7 +277,6 @@ class PanelEventoPersona(BasicView):
                         invi.delete()
                     else:
                         c['alert_msg'] = ['No se puede borrar una entrada usada!']
-                form = MultiInviAssignToPersona(request.user, persona)
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
@@ -286,7 +287,6 @@ class PanelEventoPersona(BasicView):
                 c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
                 c['checkin_errors'] = checkin_form.errors
-            form = MultiInviAssignToPersona(request.user, persona)
             c['checkin_form'] = checkin_form
         elif validate_in_group(request.user, ('rrpp', 'admin')):
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
@@ -294,6 +294,8 @@ class PanelEventoPersona(BasicView):
                 form.save(request.user, persona, evento)
 
         c.update(self.get_context_data(request.user, persona, evento))
+        if not form:
+            form = MultiInviAssignToPersona(request.user, persona)
         c['form'] = form
         return render(request, self.template_name, context=c)
 
