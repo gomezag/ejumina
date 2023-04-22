@@ -11,6 +11,8 @@ from django.db.models.fields import CharField, SlugField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from simple_history.models import HistoricalRecords
+
 from .eventos import Evento
 from .users import Usuario, Persona
 from eventos.utils import unique_slugify, validate_in_group
@@ -54,6 +56,7 @@ class Invitacion(models.Model):
     vendedor = ForeignKey(Usuario, on_delete=models.PROTECT, null=True, blank=False)
     cliente = ForeignKey(Persona, on_delete=models.PROTECT, null=True, blank=True)
     lista = ForeignKey(ListaInvitados, null=False, on_delete=models.PROTECT, blank=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"Invitacion a {self.evento.name} - {self.get_estado_display()} - {self.vendedor.first_name} a" \
@@ -67,6 +70,7 @@ class Free(models.Model):
     vendedor = ForeignKey(Usuario, on_delete=models.PROTECT, null=False, blank=False)
     cliente = ForeignKey(Persona, on_delete=models.PROTECT, null=True, blank=True)
     lista = ForeignKey(ListaInvitados, null=True, on_delete=models.PROTECT, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \

@@ -9,6 +9,8 @@ from django.db.models import Model
 from django.db.models.fields import CharField, DateField, SlugField
 from django.utils.timezone import now
 
+from simple_history.models import HistoricalRecords
+
 from eventos.utils import unique_slugify
 
 
@@ -23,6 +25,7 @@ class Evento(Model):
     estado = CharField(max_length=3, blank=False, null=False, choices=ESTADOS_EVENTO)
     fecha = DateField(default=now)
     slug = SlugField(blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return " - ".join([self.estado, self.name, str(self.fecha)])
