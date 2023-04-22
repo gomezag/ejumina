@@ -51,7 +51,7 @@
                     <i class="fa fa-pencil"></i>
                 </button>
                 {% if evento.estado == 'ACT' %}
-                    <a href='e/{{evento.slug}}/frees' class="plus-button yellow"> <i class="fa fa-ticket"></i></a>
+                    <button onclick=window.location.href='e/{{evento.slug}}/frees' class="plus-button yellow"> <i class="fa fa-ticket"></i></button>
                 {% endif %}
                 </div>
             </td>
