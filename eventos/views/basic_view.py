@@ -27,7 +27,7 @@ class BasicView(UserPassesTestMixin, View):
         c = dict()
         c['usuario'] = user
         c['groups'] = [g.name for g in user.groups.all()]
-        c['eventos'] = Evento.objects.all()
+        c['nav_eventos'] = Evento.objects.filter(estado='ACT').order_by('-fecha')
         c['back'] = '/'
 
         return c
