@@ -33,7 +33,29 @@
     Checked-in: {{checked_in}}
 </h4>
 <input class="input searchbar" id="searchbar" type="text">
+<script nonce="{{request.csp_nonce}}">
+function search() {
+  var key = document.getElementById("searchbar").value;
+  var url = window.location.href;
 
+  // Remove any existing persona parameter
+  url = url.replace(/[\?&]persona=[^&]+/g, '');
+
+  // Check if page parameter is already present
+  if (url.includes('page=')) {
+    // Modify page parameter to 1 and add persona parameter
+    url = url.replace(/page=[^&]+/g, 'page=1&persona=' + encodeURIComponent(key));
+  } else {
+    // Add both page and persona parameters
+    url += (url.includes('?') ? '&' : '?') + 'page=1&persona=' + encodeURIComponent(key);
+  }
+
+  window.location.href = url;
+}
+document.getElementById("searchbar").addEventListener("keyup", function(event) {
+    search();
+});
+</script>
 <div class="table-container">
 {% include 'eventos/tablas/tabla_personas.html' %}
 </div>

@@ -11,6 +11,8 @@ from django.core.validators import integer_validator
 from django.db.models.base import ObjectDoesNotExist
 from django.db.models import Count, Q, F, Value
 from django.db.models.functions import Concat
+from django.core.paginator import Paginator
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
@@ -124,8 +126,17 @@ class PanelEvento(BasicView):
             c['evento'] = Evento.objects.all()[0]
 
         #TODO: En vez de ocultar, marcarlas en gris y sin link
-        c['personas'] = self.parse_invitaciones(Persona.objects.filter(estado='ACT'), c['evento'], user)
-
+        personas = Persona.objects.filter(estado='ACT')
+        if persona:
+            print('looking here')
+            personas = personas.filter(nombre__icontains=persona)
+            c['query_key'] = persona
+        personas.order_by('nombre')
+        paginator = Paginator(personas, 20)
+        persona_set = paginator.get_page(kwargs.get('page', 1))
+        c['page_obj'] = persona_set
+        c['personas'] = self.parse_invitaciones(persona_set, c['evento'], user)
+        c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
                                                                 evento=c['evento'],
@@ -156,7 +167,8 @@ class PanelEvento(BasicView):
             HttpResponseRedirect('/')
         # Check query
         persona = request.GET.get('persona', None)
-        c = self.get_context_data(user, evento, persona)
+        c = self.get_context_data(user, evento, persona=persona, page=request.GET.get('page', None))
+
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=evento)
             c['persona_form'] = form

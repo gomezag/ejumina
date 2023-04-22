@@ -1,4 +1,39 @@
 {% load auth_extras %}
+
+{% if page_obj %}
+{% if page_obj.has_other_pages %}
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+    {% if page_obj.has_previous %}
+    <a class="pagination-previous plink" href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-chevron-circle-left"></i></a>
+    {% endif %}
+    {% if page_obj.has_next %}
+    <a class="pagination-next plink" href="?page={{ page_obj.next_page_number }}"><i class="fa fa-chevron-circle-right"></i></a>
+    {% endif %}
+    <ul class="pagination-list">
+        {% if page_obj.start_index > 1 and page_obj.number > 3 %}
+        <li><a class="pagination-link plink" href="?page=1&persona={{query_key}}">1</a></li>
+        {% endif %}
+        {% if page_obj.start_index > 1 and page_obj.number > 3%}
+        <li><span class="pagination-ellipsis plink">&hellip;</span></li>
+        {% endif %}
+        {% for page in page_obj.paginator.page_range %}
+        {% if page_obj.number == page %}
+        <li><a class="pagination-link is-current plink">{{ page }}</a></li>
+        {% else %}
+        {% if page > page_obj.number|add:'-2' and page < page_obj.number|add:'2' %}
+        <li><a class="pagination-link plink" href="?page={{ page }}&persona={{query_key}}">{{ page }}</a></li>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% if page_obj.number < page_obj.paginator.num_pages|sub:1 %}
+            <li><span class="pagination-ellipsis plink">&hellip;</span></li>
+            <li><a class="pagination-link plink" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endif %}
+
 <table class="tabla-personas table is-bordered is-fullwidth is-hoverable" id="tabla_personas">
     <thead>
     <tr>

@@ -12,6 +12,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 --fontsize-l: 45px;
 --fontsize-xl: 60px;
 --fontsize-s: 17px;
+--fontcolor: #7a7a7a;
 }
 
 .autocomplete-items {
@@ -419,6 +420,12 @@ table .plus-button{
     width: 70px;
     height: 100px;
     font-size: 5rem;
+}
+
+.plink{
+    font-size: var(--fontsize);
+    color: var(--fontcolor);
+    border: 0;
 }
 
 input::-webkit-outer-spin-button,
