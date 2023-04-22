@@ -10,7 +10,7 @@
     <a class="pagination-next plink" href="?page={{ page_obj.next_page_number }}"><i class="fa fa-chevron-circle-right"></i></a>
     {% endif %}
     <ul class="pagination-list">
-        {% if page_obj.start_index > 1 and page_obj.number > 3 %}
+        {% if page_obj.start_index > 1 and page_obj.number > 2 %}
         <li><a class="pagination-link plink" href="?page=1&persona={{query_key}}">1</a></li>
         {% endif %}
         {% if page_obj.start_index > 1 and page_obj.number > 3%}
@@ -25,8 +25,10 @@
         {% endif %}
         {% endif %}
         {% endfor %}
-        {% if page_obj.number < page_obj.paginator.num_pages|sub:1 %}
+        {% if page_obj.number < page_obj.paginator.num_pages|sub:2 %}
             <li><span class="pagination-ellipsis plink">&hellip;</span></li>
+        {% endif %}
+        {% if page_obj.number < page_obj.paginator.num_pages|sub:1 %}
             <li><a class="pagination-link plink" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
         {% endif %}
     </ul>
