@@ -151,11 +151,14 @@ class PanelEvento(BasicView):
 
     def get(self, request, evento, *args, **kwargs):
         user = request.user
+        evento = Evento.objects.get(slug=evento)
+        if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
+            HttpResponseRedirect('/')
         # Check query
         persona = request.GET.get('persona', None)
         c = self.get_context_data(user, evento, persona)
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
-            form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=Evento.objects.get(slug=evento))
+            form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=evento)
             c['persona_form'] = form
 
         return super().get(request, c)
@@ -163,6 +166,8 @@ class PanelEvento(BasicView):
     def post(self, request, evento, *args, **kwargs):
         evento = Evento.objects.get(slug=evento)
         user = request.user
+        if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
+            HttpResponseRedirect('/')
         c = self.get_context_data(user, evento, None)
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
@@ -233,6 +238,8 @@ class PanelEventoPersona(BasicView):
     def get(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
+        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin', ))):
+            HttpResponseRedirect('/')
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
         if validate_in_group(usuario, ('admin', 'entrada')):
@@ -242,6 +249,8 @@ class PanelEventoPersona(BasicView):
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
+        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin', ))):
+            HttpResponseRedirect('/')
         checkin = request.POST.get('checkin', None)
         delete = request.POST.get('delete', None)
         form = None
