@@ -17,6 +17,7 @@ from eventos.models import Persona, Evento, Free, Invitacion, ListaInvitados, Us
 from .basic_view import BasicView, AdminView
 from .eventos import PanelEventoPersona
 
+
 class ListaPersona(AdminView):
     template_name = 'eventos/lista_personas.html'
 

@@ -105,13 +105,13 @@ class PanelEvento(BasicView):
             listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
                                                        Q(personas_free=persona, free__evento=evento.pk)).distinct()
             r.append({'nombre': persona.nombre,
-                                  'cedula': persona.cedula if persona.cedula else '',
-                                  'pk': persona.pk,
-                                  'invis': invitaciones.count(),
-                                  'invis_usadas': invitaciones.filter(estado='USA').count(),
-                                  'frees': frees.count(),
-                                  'frees_usadas': frees.filter(estado='USA').count(),
-                                  'listas': list(listas)})
+                      'cedula': persona.cedula if persona.cedula else '',
+                      'pk': persona.pk,
+                      'invis': invitaciones.count(),
+                      'invis_usadas': invitaciones.filter(estado='USA').count(),
+                      'frees': frees.count(),
+                      'frees_usadas': frees.filter(estado='USA').count(),
+                      'listas': list(listas)})
         return r
 
     def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
