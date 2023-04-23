@@ -422,6 +422,10 @@ table .plus-button{
     font-size: 5rem;
 }
 
+.filter-button {
+
+}
+
 .plink{
     font-size: var(--fontsize);
     color: var(--fontcolor);

@@ -25,8 +25,13 @@ autocomplete(document.getElementById("searchbar"), reducedAvailableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
 
 window.addEventListener("load",function() {
-    autocomplete(document.getElementById("invi_persona"), availableTags);
-    document.getElementById("invi_persona").value = "{{keyword}}";
+    try{
+        autocomplete(document.getElementById("invi_persona"), availableTags);
+        document.getElementById("invi_persona").value = "{{keyword}}";
+    }
+    catch (error) {
+
+    }
 });
 
 </script>
