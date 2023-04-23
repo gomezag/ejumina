@@ -1,8 +1,9 @@
 import re
 import os
+import csv
+from io import StringIO
 
 from openpyxl import load_workbook
-#import pandas as pd
 
 from django.template.defaultfilters import slugify
 from django.core.mail import EmailMessage
@@ -118,18 +119,33 @@ def validate_in_group(user, valids):
 
 
 def mail_event_attendees(user, personas):
-    # df = pd.DataFrame(personas)
-    # df = df.drop('pk', axis=1)
-    # # Convert the dataframe to a CSV string
-    # print(df)
-    # csv_data = df.to_csv(index=False)
-    # # Create the email message and attach the CSV file
-    # email = EmailMessage(
-    #     subject='Query Results Email',
-    #     body='Please find the attached CSV file with the query results.',
-    #     from_email='from@example.com',
-    #     to=[user.email],
-    # )
-    # email.attach('query_results.csv', csv_data, 'text/csv')
-    # email.send()
+    # Create a StringIO object to write CSV data to
+    csv_buffer = StringIO()
+    for persona in personas:
+        listas = ",".join([p.nombre for p in persona['listas']])
+        persona.update(listas=str(listas))
+    # Create a CSV writer object using the StringIO object
+    writer = csv.DictWriter(csv_buffer, fieldnames=personas[0].keys())
+
+    # Write the header row based on the keys of the first dictionary
+    writer.writeheader()
+
+    # Write the data rows based on the dictionaries in the list
+    for data_dict in personas:
+        writer.writerow(data_dict)
+
+    # Reset the StringIO object to the beginning
+    csv_buffer.seek(0)
+
+    # Return the CSV string
+    csv_data=csv_buffer.read()
+    # Create the email message and attach the CSV file
+    email = EmailMessage(
+        subject='Query Results Email',
+        body='Please find the attached CSV file with the query results.',
+        from_email='from@example.com',
+        to=[user.email],
+    )
+    email.attach('query_results.csv', csv_data, 'text/csv')
+    email.send()
     raise Exception('No implementado')
