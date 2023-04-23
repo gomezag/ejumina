@@ -86,7 +86,7 @@ class PanelPersona(AdminView):
         c['persona'] = persona
         invitaciones = []
         for evento in Evento.objects.all():
-            event_invis = PanelEventoPersona.parse_invitaciones(persona, evento)
+            event_invis = PanelEventoPersona.parse_invitaciones(persona, evento, user)
             if event_invis:
                 invitaciones.append({'name': evento.name, 'invis': event_invis})
         c['eventos_info'] = invitaciones
