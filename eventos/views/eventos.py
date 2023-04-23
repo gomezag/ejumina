@@ -124,10 +124,6 @@ class PanelEvento(BasicView):
 
         #TODO: En vez de ocultar, marcarlas en gris y sin link
         personas = Persona.objects.filter(estado='ACT')
-        if persona:
-            print('looking here')
-            personas = personas.filter(nombre__icontains=persona)
-            c['query_key'] = persona
 
         if validate_in_group(user, ('admin', 'entrada')):
             personas = personas.annotate(
@@ -203,6 +199,9 @@ class PanelEvento(BasicView):
         personas = personas.order_by('nombre')
 
         c['personas_invitadas'] = personas.values('nombre', 'cedula', 'pk')
+        if persona:
+            personas = personas.filter(Q(nombre__icontains=persona)|Q(cedula__icontains=persona))
+            c['query_key'] = persona
         personas = self.parse_invitaciones(personas, evento)
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))

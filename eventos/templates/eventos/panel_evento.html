@@ -44,15 +44,12 @@ function search() {
   var url = window.location.href;
 
   // Remove any existing persona parameter
-  if(key) {
-    console.log('searching new persona ' + key);
     if (url.includes('persona=')) {
-        url = url.replace(/(persona=).*?(&|$)/, '$1'+key+'$2');
+        url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
     }
     else{
-        url += (url.includes('?') ? '&' : '?') + "persona="+key;
+        url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
     }
-  }
 
   // Check if page parameter is already present
   if (url.includes('page=')) {
