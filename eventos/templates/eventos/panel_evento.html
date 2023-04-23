@@ -20,7 +20,7 @@
 <p class="title is-1">
     {{evento.name}} &nbsp; &nbsp;
     {% if request.user|has_group:'admin' %}
-    <button href="/e/{{evento.slug}}/frees" class="plus-button yellow is-info"><i class="fa fa-ticket"></i></button>
+    <a href="/e/{{evento.slug}}/frees" class="plus-button yellow is-info"><i class="fa fa-ticket"></i></a>
     {% endif %}
 </p>
 <div class="container body-content">

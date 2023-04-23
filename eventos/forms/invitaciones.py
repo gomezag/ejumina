@@ -51,7 +51,7 @@ class MultiInviAssignToPersona(forms.Form):
         if validate_in_group(usuario, ('admin', )):
             max_frees = 1000
         else:
-            max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True)
+            max_frees = Free.objects.filter(vendedor=usuario, cliente__isnull=True, estado='ACT')
             if evento:
                 max_frees = max_frees.filter(evento=evento)
             max_frees = max_frees.count()

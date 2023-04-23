@@ -362,6 +362,9 @@ class PanelEventoPersona(BasicView):
         usuario = request.user
         if validate_in_group(usuario, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
+        if validate_in_group(usuario, ('admin', 'rrpp')):
+            form = MultiInviAssignToPersona(request.user, persona, evento=evento)
+            c['form'] = form
         return render(request, self.template_name, context=c)
 
     def post(self, request, persona, evento, *args, **kwargs):
@@ -389,7 +392,6 @@ class PanelEventoPersona(BasicView):
                                                          lista=lista, evento=evento)
                 frees = Free.objects.filter(cliente=persona, vendedor=rrpp,
                                             lista=lista, evento=evento)
-
                 for free in frees:
                     if free.estado == 'ACT':
                         if free.vendedor.groups.filter(name='admin').exists():
@@ -418,13 +420,15 @@ class PanelEventoPersona(BasicView):
                 print(checkin_form.errors)
             c['checkin_form'] = checkin_form
         elif validate_in_group(request.user, ('rrpp', 'admin')):
-            form = MultiInviAssignToPersona(request.user, persona, data=request.POST)
+            form = MultiInviAssignToPersona(request.user, persona, data=request.POST, evento=evento)
             if form.is_valid():
                 form.save(request.user, persona, evento)
 
         c.update(self.get_context_data(request.user, persona, evento))
         if not form:
-            form = MultiInviAssignToPersona(request.user, persona)
+            form = MultiInviAssignToPersona(request.user, persona, evento=evento)
+            if not validate_in_group(request.user, ('admin', )):
+                form.fields['frees'].attributes['max'] = request.user.free_set(estado='ACT', evento=evento, cliente__isnull=True)
         c['form'] = form
         return render(request, self.template_name, context=c)
 
