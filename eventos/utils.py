@@ -118,7 +118,7 @@ def validate_in_group(user, valids):
     return any([g in groups for g in valids])
 
 
-def mail_event_attendees(user, personas):
+def mail_event_attendees(user, personas, evento):
     # Create a StringIO object to write CSV data to
     csv_buffer = StringIO()
     for persona in personas:
@@ -140,12 +140,13 @@ def mail_event_attendees(user, personas):
     # Return the CSV string
     csv_data=csv_buffer.read()
     # Create the email message and attach the CSV file
+    title = 'Invitados para el evento '+evento.name
+    body = 'Te adjuntamos la lista de invitados para el evento '+evento.name
     email = EmailMessage(
-        subject='Query Results Email',
-        body='Please find the attached CSV file with the query results.',
-        from_email='from@example.com',
+        subject=title,
+        body=body,
+        from_email=os.getenv('MAIL_USR'),
         to=[user.email],
     )
     email.attach('query_results.csv', csv_data, 'text/csv')
     email.send()
-    raise Exception('No implementado')

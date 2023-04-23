@@ -89,7 +89,8 @@ class ListaEventos(BasicView):
                     if not list:
                         c['alert_msg'] = ['No se encontraron invitaciones para este evento.']
                     else:
-                        mail_event_attendees(request.user, list)
+                        mail_event_attendees(request.user, list, evento)
+                        c['alert_msg'] = ['Mail enviado con éxito!', ]
                 except Exception as e:
                     print(e)
                     c['alert_msg'] = ['Hubo un error al enviar el mail.']
