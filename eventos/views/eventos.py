@@ -9,10 +9,12 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.core.validators import integer_validator
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q, F, Value, Case, When, IntegerField, Aggregate, CharField
+from django.db.models import Count, Q, F, Value, Case, When, IntegerField, Aggregate, CharField, Subquery, Prefetch, OuterRef, JSONField, QuerySet, prefetch_related_objects
 from django.db.models.functions import Concat
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.serializers import serialize
 from django.core.paginator import Paginator
-
+import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
@@ -96,23 +98,18 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     @staticmethod
-    def parse_invitaciones(persona_set, evento, user):
+    def parse_invitaciones(persona_set, evento):
         r = []
         for persona in persona_set:
-            invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona)
-            frees = Free.objects.filter(evento=evento, cliente=persona)
-            if not validate_in_group(user, ('admin', 'entrada')):
-                frees = frees.filter(vendedor=user)
-                invitaciones = invitaciones.filter(vendedor=user)
             listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
                                                        Q(personas_free=persona, free__evento=evento.pk)).distinct()
             r.append({'nombre': persona.nombre,
                       'cedula': persona.cedula if persona.cedula else '',
                       'pk': persona.pk,
-                      'invis': invitaciones.count(),
-                      'invis_usadas': invitaciones.filter(estado='USA').count(),
-                      'frees': frees.count(),
-                      'frees_usadas': frees.filter(estado='USA').count(),
+                      'invis': persona.invis,
+                      'used_invis': persona.used_invis,
+                      'frees': persona.frees,
+                      'used_frees': persona.used_frees,
                       'listas': list(listas)})
         return r
 
@@ -131,7 +128,7 @@ class PanelEvento(BasicView):
             print('looking here')
             personas = personas.filter(nombre__icontains=persona)
             c['query_key'] = persona
-        personas.order_by('nombre')
+
         if validate_in_group(user, ('admin', 'entrada')):
             personas = personas.annotate(
                 invis=Count(
@@ -204,12 +201,14 @@ class PanelEvento(BasicView):
             )
         personas = personas.filter(Q(invis__gt=0)|Q(frees__gt=0))
         personas = personas.order_by('nombre')
+
         c['personas_invitadas'] = personas.values('nombre', 'cedula', 'pk')
-        personas = personas.values('pk', 'nombre', 'cedula', 'invis', 'used_invis', 'frees', 'used_frees')
+        personas = self.parse_invitaciones(personas, evento)
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))
-        c['personas_page'] = persona_set
         c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')
+        c['personas_page'] = persona_set
+
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
                                                                 evento=c['evento'],

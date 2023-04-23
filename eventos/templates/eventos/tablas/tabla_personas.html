@@ -63,7 +63,6 @@
     </thead>
     <tbody>
     {% for persona in personas_page.object_list %}
-    {% if persona.invis > 0 or persona.frees > 0 %}
         <tr>
             <td>
                 <p>{{persona.invis}}</p>
@@ -81,7 +80,9 @@
                 {{persona.cedula}}
             </td>
             <td>
-
+                {% for lista in persona.listas %}
+                    <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
+                {% endfor %}
             </td>
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
@@ -94,7 +95,6 @@
             </td>
             {% endif %}
         </tr>
-    {% endif %}
     {% endfor %}
     </tbody>
 </table>
