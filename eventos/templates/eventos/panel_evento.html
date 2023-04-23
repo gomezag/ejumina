@@ -2,8 +2,8 @@
 {% load auth_extras %}
 {% load static %}
 {% block breadcrumbs %}
-    <li class=""><a href="#">Eventos</a></li>
-    <li class="is-active"><a href="/e/{{evento.pk}}">{{evento.name}}</a></li>
+<li class=""><a href="#">Eventos</a></li>
+<li class="is-active"><a href="/e/{{evento.pk}}">{{evento.name}}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -12,37 +12,55 @@
 {% if checkin_errors %}
 <script nonce="{{request.csp_nonce}}">
     window.alert({{checkin_errors}});
+
+
 </script>
 {% endif %}
-<h2 class="title is-1">
-    {{evento.name}}
-</h2>
-{% if request.user|has_group:'admin' %}
-<a href="/e/{{evento.slug}}/frees" class="button is-info">Admin. Frees</a>
-{% endif %}
-<h4 class="title is-3">
-    Invitaciones: {{invi_dadas}}
-</h4>
 
-{% if frees_total %}
-<h4 class="title is-3">
-    Frees: {{frees_dados}}/{{frees_total}}
-</h4>
-{% endif %}
-<h4 class="title is-3">
-    Checked-in: {{checked_in}}
-</h4>
-<div class="field has-addons">
-    <div class="control">
-    <input class="input searchbar " id="searchbar" type="text">
+<p class="title is-1">
+    {{evento.name}} &nbsp; &nbsp;
+    {% if request.user|has_group:'admin' %}
+    <button href="/e/{{evento.slug}}/frees" class="plus-button yellow is-info"><i class="fa fa-ticket"></i></button>
+    {% endif %}
+</p>
+<div class="container body-content">
+    <div class="columns">
+        <div class="column">
+        </div>
+        <div class="column">
+            <h4 class="title is-3">
+                Invitados: {{invi_dadas}}
+            </h4>
+        </div>
     </div>
-    <div class="control">
-        <button class="button searchbar" onclick="search('');"><i class="fa fa-search"></i></button>
+    <div class="columns">
+        <div class="column">
+            <h4 class="title is-3">
+                Checked-in: {{checked_in}}
+            </h4>
+        </div>
+        <div class="column">
+            <h4 class="title is-3">
+                Frees: {{frees_dados}}/{{frees_total}}
+            </h4>
+        </div>
     </div>
 </div>
+<div class="container">
+    <div class="field has-addons">
+        <div class="control">
+            <input class="input searchbar " id="searchbar" type="text">
+        </div>
+        <div class="control">
+            <button class="button searchbar" onclick="search('');"><i class="fa fa-search"></i></button>
+        </div>
+    </div>
 {% if query_key %}
-<button class="button filter-button" onclick="search('delete');"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i class="fa fa-close"></i></button>
+<button class="button filter-button" onclick="search('delete');"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
+        class="fa fa-close"></i></button>
 {% endif %}
+
+</div>
 <script nonce="{{request.csp_nonce}}">
 function search(do_delete) {
   if(do_delete){
@@ -82,9 +100,11 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
         search('');
     }
 });
+
+
 </script>
 <div class="table-container">
-{% include 'eventos/tablas/tabla_personas.html' %}
+    {% include 'eventos/tablas/tabla_personas.html' %}
 </div>
 {% include 'eventos/setups/autocomplete_setup.html' %}
 
@@ -97,13 +117,13 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
 </div>
 
 <div class="modal{% if persona_form.errors %} is-active {% endif %}" id="lista-dialog">
-      <div class="modal-content">
-          <span id='lista-close' class="close">&times;</span>
-          <form class="modal-form" id='invi-form' method="post" action="">
+    <div class="modal-content">
+        <span id='lista-close' class="close">&times;</span>
+        <form class="modal-form" id='invi-form' method="post" action="">
             {% csrf_token %}
             {% include 'eventos/forms/invitacion-form.html' with form=persona_form %}
-          </form>
-      </div>
+        </form>
+    </div>
 </div>
 {% include 'eventos/setups/modal_setup.html' with ModalName='lista'%}
 <script nonce="{{request.csp_nonce}}">
@@ -144,17 +164,19 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
               buttonSend.disabled = true;
             }
     };
+
+
 </script>
 {% endif %}
 {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
 <div class="modal" id="checkin-dialog">
-      <div class="modal-content">
-          <span id='checkin-close' class="close">&times;</span>
-          <form class="modal-form" id="checkin-form" method="post" action="">
+    <div class="modal-content">
+        <span id='checkin-close' class="close">&times;</span>
+        <form class="modal-form" id="checkin-form" method="post" action="">
             {% csrf_token %}
             {% include 'eventos/forms/checkin-form.html' with form=checkin_form %}
-          </form>
-      </div>
+        </form>
+    </div>
 </div>
 <script nonce="{{request.csp_nonce}}">
 
@@ -177,6 +199,8 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
               buttonSend.disabled = true;
             }
     };
+
+
 </script>
 <script nonce="{{request.csp_nonce}}">
     function openCheckInModal(id, f_max, f_min, i_max, i_min){
@@ -188,6 +212,8 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
         document.getElementById("{{checkin_form.check_invis.id_for_label}}").max=i_max-i_min;
         document.getElementById("{{checkin_form.check_invis.id_for_label}}").min=-i_min;
     };
+
+
 </script>
 {% include 'eventos/setups/modal_setup.html' with ModalName='checkin' noBtn=1%}
 {% endif %}

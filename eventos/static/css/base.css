@@ -428,6 +428,16 @@ table .plus-button{
     font-size: 5rem;
 }
 
+p.title{
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.body-content {
+    width: 80%;
+}
+
 .filter-button {
 
 }
@@ -477,6 +487,14 @@ hr {
     .body-content {font-size: var(--fontsize);}
     .body-content p.info {font-size: var(--fontsize-s);}
     .body-form select { font-size:var(--fontsize);}
+
+p.title i{
+    font-size: var(--fontsize);
+}
+    p.title button.plus-button{
+    width: var(--fontsize-l);
+    height: var(--fontsize-l);
+    }
     .table { font-size: var(--fontsize);}
     .table input {font-size: var(--fontsize);}
     .navbar-item { font-size: var(--fontsize-l);}
