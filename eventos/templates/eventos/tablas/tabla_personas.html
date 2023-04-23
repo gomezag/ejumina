@@ -1,35 +1,35 @@
 {% load auth_extras %}
 
-{% if page_obj %}
-{% if page_obj.has_other_pages %}
+{% if personas_page %}
+{% if personas_page.has_other_pages %}
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-    {% if page_obj.has_previous %}
-    <a class="pagination-previous plink" href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-chevron-circle-left"></i></a>
+    {% if personas_page.has_previous %}
+    <a class="pagination-previous plink" href="?page={{ personas_page.previous_page_number }}&persona={{query_key}}"><i class="fa fa-chevron-circle-left"></i></a>
     {% endif %}
-    {% if page_obj.has_next %}
-    <a class="pagination-next plink" href="?page={{ page_obj.next_page_number }}"><i class="fa fa-chevron-circle-right"></i></a>
+    {% if personas_page.has_next %}
+    <a class="pagination-next plink" href="?page={{ personas_page.next_page_number }}&persona={{query_key}}"><i class="fa fa-chevron-circle-right"></i></a>
     {% endif %}
     <ul class="pagination-list">
-        {% if page_obj.start_index > 1 and page_obj.number > 2 %}
+        {% if personas_page.start_index > 1 and personas_page.number > 2 %}
         <li><a class="pagination-link plink" href="?page=1&persona={{query_key}}">1</a></li>
         {% endif %}
-        {% if page_obj.start_index > 1 and page_obj.number > 3%}
+        {% if personas_page.start_index > 1 and page_obj.number > 3%}
         <li><span class="pagination-ellipsis plink">&hellip;</span></li>
         {% endif %}
-        {% for page in page_obj.paginator.page_range %}
-        {% if page_obj.number == page %}
-        <li><a class="pagination-link is-current plink">{{ page }}</a></li>
-        {% else %}
-        {% if page > page_obj.number|add:'-2' and page < page_obj.number|add:'2' %}
-        <li><a class="pagination-link plink" href="?page={{ page }}&persona={{query_key}}">{{ page }}</a></li>
-        {% endif %}
-        {% endif %}
+        {% for page in personas_page.paginator.page_range %}
+            {% if personas_page.number == page %}
+            <li><a class="pagination-link is-current plink" href="?page={{page}}&persona={{query_key}}">{{page}}</a></li>
+            {% else %}
+            {% if page > personas_page.number|add:'-2' and page < personas_page.number|add:'2' %}
+            <li><a class="pagination-link plink" href="?page={{page}}&persona={{query_key}}">{{page}}</a></li>
+            {% endif %}
+            {% endif %}
         {% endfor %}
-        {% if page_obj.number < page_obj.paginator.num_pages|sub:2 %}
+        {% if personas_page.number < personas_page.paginator.num_pages|sub:2 %}
             <li><span class="pagination-ellipsis plink">&hellip;</span></li>
         {% endif %}
-        {% if page_obj.number < page_obj.paginator.num_pages|sub:1 %}
-            <li><a class="pagination-link plink" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+        {% if personas_page.number < personas_page.paginator.num_pages|sub:1 %}
+            <li><a class="pagination-link plink" href="?page={{ personas_page.paginator.num_pages }}&persona={{query_key}}">{{ personas_page.paginator.num_pages }}</a></li>
         {% endif %}
     </ul>
 </nav>
@@ -62,16 +62,16 @@
     </tr>
     </thead>
     <tbody>
-    {% for persona in personas %}
+    {% for persona in personas_page.object_list %}
     {% if persona.invis > 0 or persona.frees > 0 %}
         <tr>
             <td>
                 <p>{{persona.invis}}</p>
-                <p>({{persona.invis_usadas}})</p>
+                <p>({{persona.used_invis}})</p>
             </td>
             <td>
                 <p>{{persona.frees}}</p>
-                <p>({{persona.frees_usadas}})</p>
+                <p>({{persona.used_frees}})</p>
 
             </td>
             <td>
@@ -81,15 +81,13 @@
                 {{persona.cedula}}
             </td>
             <td>
-                {% for lista in persona.listas %}
-                    <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
-                {% endfor %}
+
             </td>
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
                 <div class="table-btn-container">
                 <button class="plus-button green" onclick="openCheckInModal({{persona.pk}},
-                {{persona.frees}}, {{persona.frees_usadas}}, {{persona.invis}}, {{persona.invis_usadas}});">
+                {{persona.frees}}, {{persona.used_frees}}, {{persona.invis}}, {{persona.used_invis}});">
                     <i class="fa fa-check"></i>
                 </button>
                 </div>

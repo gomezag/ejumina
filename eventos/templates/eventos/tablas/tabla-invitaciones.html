@@ -62,7 +62,7 @@
                     {% if request.user|has_group:"entrada" or request.user|has_group:"admin"%}
                     <div class="field">
                         <button class="plus-button in-table green"
-                                onclick="openCheckInModal({{invitacion.persona.pk}}, {{invitacion.frees}},
+                                onclick="openCheckInModal({{invitacion.rrpp.pk}}, {{invitacion.frees}},
                                 {{invitacion.used_frees}}, {{invitacion.invis}}, {{invitacion.used_invis}}, {{invitacion.lista_id}});">
                             <i class="fa fa-check"></i>
                         </button>

@@ -9,7 +9,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.core.validators import integer_validator
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q, F, Value
+from django.db.models import Count, Q, F, Value, Case, When, IntegerField, Aggregate, CharField
 from django.db.models.functions import Concat
 from django.core.paginator import Paginator
 
@@ -132,10 +132,82 @@ class PanelEvento(BasicView):
             personas = personas.filter(nombre__icontains=persona)
             c['query_key'] = persona
         personas.order_by('nombre')
+        if validate_in_group(user, ('admin', 'entrada')):
+            personas = personas.annotate(
+                invis=Count(
+                    Case(
+                        When(
+                            invitacion__evento=evento.pk, then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                frees=Count(
+                    Case(
+                        When(
+                            free__vendedor=user, free__evento=evento, then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                used_invis=Count(
+                    Case(
+                        When(
+                            invitacion__evento=evento, invitacion__estado='USA', then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                used_frees=Count(
+                    Case(
+                        When(
+                            free__evento=evento, free__estado='USA', then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+            )
+        else:
+            personas = personas.annotate(
+                invis=Count(
+                    Case(
+                        When(
+                            invitacion__vendedor=user, invitacion__evento=evento, then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                frees=Count(
+                    Case(
+                        When(
+                            free__vendedor=user, free__evento=evento, then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                used_invis=Count(
+                    Case(
+                        When(
+                            invitacion__vendedor=user, invitacion__evento=evento, invitacion__estado='USA',  then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+                used_frees=Count(
+                    Case(
+                        When(
+                            free__vendedor=user, free__evento=evento, free__estado='USA', then=1
+                        ),
+                        output_field=IntegerField()
+                    )
+                ),
+            )
+        personas = personas.filter(Q(invis__gt=0)|Q(frees__gt=0))
+        personas = personas.order_by('nombre')
+        personas = personas.values('pk', 'nombre', 'cedula', 'invis', 'used_invis', 'frees', 'used_frees')
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))
-        c['page_obj'] = persona_set
-        c['personas'] = self.parse_invitaciones(persona_set, c['evento'], user)
+        c['personas_page'] = persona_set
         c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
@@ -156,6 +228,7 @@ class PanelEvento(BasicView):
                                                     estado='USA',
                                                     cliente__estado='ACT',
                                                     cliente__isnull=False).count()
+
         if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return c
@@ -165,22 +238,22 @@ class PanelEvento(BasicView):
         evento = Evento.objects.get(slug=evento)
         if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
             HttpResponseRedirect('/')
-        # Check query
-        persona = request.GET.get('persona', None)
-        c = self.get_context_data(user, evento, persona=persona, page=request.GET.get('page', None))
+        c = self.get_context_data(user, evento,
+                                  persona=request.GET.get('persona', None),
+                                  page=request.GET.get('page', None))
 
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=evento)
             c['persona_form'] = form
 
-        return super().get(request, c)
+        return render(request, self.template_name, context=c)
 
     def post(self, request, evento, *args, **kwargs):
         evento = Evento.objects.get(slug=evento)
         user = request.user
         if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
             HttpResponseRedirect('/')
-        c = self.get_context_data(user, evento, None)
+        c = {}
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
         if validate_in_group(user, ('rrpp', 'admin')) and invitar:
@@ -200,7 +273,9 @@ class PanelEvento(BasicView):
                 c['checkin_errors'] = checkin_form.errors
                 print(c['checkin_errors'])
             c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
-        c.update(self.get_context_data(user, evento=evento))
+        c.update(self.get_context_data(user, evento,
+                                  persona=request.GET.get('persona', None),
+                                  page=request.GET.get('page', None)))
         return render(request, self.template_name, context=c)
 
 
@@ -299,8 +374,9 @@ class PanelEventoPersona(BasicView):
                     else:
                         c['alert_msg'] = ['No se puede borrar una entrada usada!']
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
-            id_lista = request.POST.get('lista')
+            id_lista = request.POST.get('id_lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
+            print(checkin, id_lista, evento)
             if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
                 invis = checkin_form.cleaned_data['check_invis']
@@ -308,6 +384,7 @@ class PanelEventoPersona(BasicView):
                 c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
                 c['checkin_errors'] = checkin_form.errors
+                print(checkin_form.errors)
             c['checkin_form'] = checkin_form
         elif validate_in_group(request.user, ('rrpp', 'admin')):
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST)

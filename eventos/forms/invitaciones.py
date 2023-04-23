@@ -208,9 +208,9 @@ class CheckInForm(forms.Form):
         evento = kwargs.pop('evento', None)
         extra = {}
         if self._vendedor:
-            extra.update({'vendedor': self._vendedor})
+            extra.update({'vendedor': Usuario.objects.get(pk=self._vendedor)})
         if self._lista:
-            extra.update({'lista': self._lista})
+            extra.update({'lista': ListaInvitados.objects.get(pk=self._lista)})
         if not evento or not isinstance(evento, Evento):
             return False
         self.evento = evento
@@ -219,6 +219,7 @@ class CheckInForm(forms.Form):
             persona = self.cleaned_data['persona']
             n_invis = self.cleaned_data['check_invis']
             n_frees = self.cleaned_data['check_frees']
+            print(persona, n_invis, n_frees, evento, extra)
             if n_invis > Invitacion.objects.filter(cliente=persona, evento=evento, estado='ACT', **extra).count() and n_invis > 0:
                 self.add_error('check_invis','Demasiados check-ins para esta persona y evento.')
                 return False
