@@ -207,18 +207,22 @@ class PanelEvento(BasicView):
         persona_set = paginator.get_page(kwargs.get('page', 1))
         c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')
         c['personas_page'] = persona_set
-
-        if any([r in c['groups'] for r in ('rrpp', 'admin')]):
-            c['invi_dadas'] = c['evento'].invitacion_set.filter(vendedor=c['usuario'],
-                                                                evento=c['evento'],
-                                                                cliente__estado='ACT',
-                                                                cliente__isnull=False).count()
-            c['frees_dados'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                           evento=c['evento'],
-                                                           cliente__estado='ACT',
-                                                           cliente__isnull=False).count()
-            c['frees_total'] = c['evento'].free_set.filter(vendedor=c['usuario'],
-                                                           evento=c['evento']).count()
+        if validate_in_group(user, ('admin', 'entrada')):
+            c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente__isnull=False).count()
+            c['frees_dados'] = c['evento'].free_set.filter(cliente__isnull=False).count()
+            c['frees_total'] = c['evento'].free_set.count()
+            c['checked_in'] = c['evento'].invitacion_set.filter(estado='USA',
+                                                         cliente__isnull=False).count()
+            c['checked_in'] += c['evento'].free_set.filter(estado='USA',
+                                                    cliente__isnull=False).count()
+        else:
+            c['invi_dadas'] = user.invitacion_set.filter(evento=c['evento'],
+                                                         cliente__estado='ACT',
+                                                         cliente__isnull=False).count()
+            c['frees_dados'] = user.free_set.filter(evento=c['evento'],
+                                                    cliente__estado='ACT',
+                                                    cliente__isnull=False).count()
+            c['frees_total'] = user.free_set.filter(evento=c['evento']).count()
             c['checked_in'] = user.invitacion_set.filter(evento=c['evento'],
                                                          estado='USA',
                                                          cliente__estado='ACT',
