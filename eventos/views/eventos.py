@@ -204,6 +204,7 @@ class PanelEvento(BasicView):
             )
         personas = personas.filter(Q(invis__gt=0)|Q(frees__gt=0))
         personas = personas.order_by('nombre')
+        c['personas_invitadas'] = personas.values('nombre', 'cedula', 'pk')
         personas = personas.values('pk', 'nombre', 'cedula', 'invis', 'used_invis', 'frees', 'used_frees')
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))

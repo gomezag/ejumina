@@ -40,22 +40,18 @@
 <script nonce="{{request.csp_nonce}}">
 function search() {
   var key = document.getElementById("searchbar").value;
-  console.log(key);
 
   var url = window.location.href;
-    console.log(url);
 
   // Remove any existing persona parameter
   if(key) {
     console.log('searching new persona ' + key);
     if (url.includes('persona=')) {
-        console.log('replacing persona');
         url = url.replace(/(persona=).*?(&|$)/, '$1'+key+'$2');
     }
     else{
         url += (url.includes('?') ? '&' : '?') + "persona="+key;
     }
-    console.log(url)
   }
 
   // Check if page parameter is already present
@@ -71,6 +67,7 @@ function search() {
 
   window.location.href = url;
 }
+
 document.getElementById("searchbar").addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -82,6 +79,7 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
 {% include 'eventos/tablas/tabla_personas.html' %}
 </div>
 {% include 'eventos/setups/autocomplete_setup.html' %}
+
 {% endblock %}
 
 {% block dialog %}
