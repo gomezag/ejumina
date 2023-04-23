@@ -46,10 +46,10 @@ class ListaEventos(BasicView):
         return super().get(request, c)
 
     def post(self, request):
-        if not request.user.groups.filter(name='admin').exists():
+        if not validate_in_group(request.user, ('admin', 'entrada')):
             return self.get(request, extras={'alert_msg': ['No autorizado']})
         c = self.get_context_data(request.user)
-        if request.POST.get('delete', None) is not None:
+        if request.POST.get('delete', None) is not None and validate_in_group(request.user, ('admin', )):
             try:
                 evento = Evento.objects.get(pk=request.POST['delete'])
                 if evento.estado == 'ACT':
@@ -59,7 +59,7 @@ class ListaEventos(BasicView):
                 evento.save()
             except Exception as e:
                 pass
-        elif request.POST.get('delete_evento', None) is not None:
+        elif request.POST.get('delete_evento', None) is not None and validate_in_group(request.user, ('admin', )):
             try:
                 evento_id = request.POST.get('delete_evento', None)
                 if evento_id:
@@ -70,7 +70,7 @@ class ListaEventos(BasicView):
                         c['alert_msg'] = ['El nombre escrito no coincide con el nombre del evento!']
             except ObjectDoesNotExist:
                 c['alert_msg'] = ['El evento no existe!']
-        elif request.POST.get('edit', None) is not None:
+        elif request.POST.get('edit', None) is not None and validate_in_group(request.user, ('admin', )):
             try:
                 evento = Evento.objects.get(pk=request.POST['edit'])
                 form = EventoForm(request.POST, instance=evento, auto_id='edit')
@@ -95,13 +95,14 @@ class ListaEventos(BasicView):
                     c['alert_msg'] = ['Hubo un error al enviar el mail.']
             except ObjectDoesNotExist:
                 pass
-        else:
+        elif validate_in_group(request.user, ('admin', )):
             form = EventoForm(request.POST)
             if form.is_valid():
                 form.save()
             else:
                 c['alert_msg'] = ['El formulario tuvo errores.']
             c['form'] = form
+
         return render(request, self.template_name, context=c)
 
 
@@ -109,10 +110,12 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     @staticmethod
-    def parse_invitaciones(evento, user, persona=None):
+    def parse_invitaciones(evento, user, persona=None, queryset=None):
 
-        #TODO: En vez de ocultar, marcarlas en gris y sin link
-        personas = Persona.objects.filter(estado='ACT')
+        if not queryset:
+            personas = Persona.objects.filter(estado='ACT')
+        else:
+            personas = queryset
 
         if validate_in_group(user, ('admin', 'entrada')):
             personas = personas.annotate(
@@ -192,8 +195,12 @@ class PanelEvento(BasicView):
             personas = personas.filter(Q(nombre__icontains=persona)|Q(cedula__icontains=persona))
         r = []
         for persona in personas:
-            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
-                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
+            if validate_in_group(user, ('admin', 'entrada')):
+                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
+                                                           Q(personas_free=persona, free__evento=evento.pk)).distinct()
+            else:
+                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk, invitacion__vendedor=user) |
+                                                       Q(personas_free=persona, free__evento=evento.pk, free__vendedor=user)).distinct()
             r.append({'nombre': persona.nombre,
                       'cedula': persona.cedula if persona.cedula else '',
                       'pk': persona.pk,
@@ -300,13 +307,19 @@ class PanelEventoPersona(BasicView):
     template_name = 'eventos/persona_view_evento.html'
 
     @staticmethod
-    def parse_invitaciones(persona, evento):
+    def parse_invitaciones(persona, evento, user):
         out = []
-        invis = list(Invitacion.objects.filter(evento=evento, cliente=persona).
+        if validate_in_group(user, ('admin', 'entrada')):
+            invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona)
+            frees = Free.objects.filter(evento=evento, cliente=persona)
+        else:
+            invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona, vendedor=user)
+            frees = Free.objects.filter(evento=evento, cliente=persona, vendedor=user)
+        invis = list(invitaciones.
             values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
             invis=Count('lista'),
             used_invis=Count('lista', filter=Q(estado='USA'))))
-        frees = list(Free.objects.filter(evento=evento, cliente=persona).
+        frees = list(frees.
             values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
             frees=Count('lista'),
             used_frees=Count('lista', filter=Q(estado='USA'))))
@@ -335,7 +348,7 @@ class PanelEventoPersona(BasicView):
         c['evento'] = evento
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
-        c['invitaciones'] = self.parse_invitaciones(persona, evento)
+        c['invitaciones'] = self.parse_invitaciones(persona, evento, user)
         c['back'] = '/e/{}'.format(evento.slug)
         return c
 
