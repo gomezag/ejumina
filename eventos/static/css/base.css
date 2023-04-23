@@ -420,7 +420,6 @@ table .plus-button{
     align-items: center;
     column-gap: 5px;
     flex-wrap: wrap;
-    height: 12vh;
 }
 
 .modal-form .plus-button {
