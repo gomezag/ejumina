@@ -397,6 +397,10 @@ html {
     color: white;
 }
 
+
+.searchbar { font-size: var(--fontsize-l)};
+
+
 tr.red {
     background-color: #FB928E;
 }
@@ -413,7 +417,10 @@ table .plus-button{
 .table-btn-container {
     display: flex;
     flex-direction: row;
-    align-items: last baseline;
+    align-items: center;
+    column-gap: 5px;
+    flex-wrap: wrap;
+    height: 12vh;
 }
 
 .modal-form .plus-button {
@@ -462,10 +469,10 @@ hr {
     z-index:4;
 }
 
-/* Smartphones in landscape */
+/* Smartphones in portrait */
 @media only screen
   and (min-device-width: 100px)
-  and (max-device-width: 871px){
+  and (max-device-width: 871px) {
     .body-form { font-size: var(--fontsize);}
     .body-form input { font-size: var(--fontsize-l);}
     .body-content {font-size: var(--fontsize);}
@@ -486,7 +493,7 @@ hr {
     .table-btn-container i{font-size: var(--fontsize-xl);}
     .table-btn-container .plus-button{width:var(--fontsize-xl);height:var(--fontsize-xl);border-radius:var(--fontsize-xl);}
     .table-btn-container .plus-button i{font-size: var(--fontsize-l)}
-    .table-btn-container {flex-direction: column; align-items: center;}
+    .table-btn-container {flex-direction: column; align-items: center; row-gap: 3px; flex-wrap: wrap; height: 16vw;}
     .navbar-dropdown .is-active {
       display: block;
     }

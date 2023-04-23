@@ -9,19 +9,16 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.core.validators import integer_validator
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q, F, Value, Case, When, IntegerField, Aggregate, CharField, Subquery, Prefetch, OuterRef, JSONField, QuerySet, prefetch_related_objects
+from django.db.models import Count, Q, F, Value, Case, When, IntegerField
 from django.db.models.functions import Concat
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.serializers import serialize
 from django.core.paginator import Paginator
-import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
 
 from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm, FreeAssign
 from eventos.views.basic_view import BasicView, AdminView
-from eventos.utils import validate_in_group
+from eventos.utils import validate_in_group, mail_event_attendees
 from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
 
 
@@ -84,6 +81,20 @@ class ListaEventos(BasicView):
                 c['edit_form'] = form
             except ObjectDoesNotExist:
                 pass
+        elif request.POST.get('mail_csv', None):
+            try:
+                evento = Evento.objects.get(pk=request.POST['mail_csv'])
+                try:
+                    brief_list, list = PanelEvento.parse_invitaciones(evento, request.user)
+                    if not list:
+                        c['alert_msg'] = ['No se encontraron invitaciones para este evento.']
+                    else:
+                        mail_event_attendees(request.user, list)
+                except Exception as e:
+                    print(e)
+                    c['alert_msg'] = ['Hubo un error al enviar el mail.']
+            except ObjectDoesNotExist:
+                pass
         else:
             form = EventoForm(request.POST)
             if form.is_valid():
@@ -98,29 +109,7 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     @staticmethod
-    def parse_invitaciones(persona_set, evento):
-        r = []
-        for persona in persona_set:
-            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
-                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
-            r.append({'nombre': persona.nombre,
-                      'cedula': persona.cedula if persona.cedula else '',
-                      'pk': persona.pk,
-                      'invis': persona.invis,
-                      'used_invis': persona.used_invis,
-                      'frees': persona.frees,
-                      'used_frees': persona.used_frees,
-                      'listas': list(listas)})
-        return r
-
-    def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
-        c = super().get_context_data(user, *args, **kwargs)
-        if evento and not isinstance(evento, Evento):
-            c['evento'] = Evento.objects.get(slug=evento)
-        elif isinstance(evento, Evento):
-            c['evento'] = evento
-        else:
-            c['evento'] = Evento.objects.all()[0]
+    def parse_invitaciones(evento, user, persona=None):
 
         #TODO: En vez de ocultar, marcarlas en gris y sin link
         personas = Persona.objects.filter(estado='ACT')
@@ -138,7 +127,7 @@ class PanelEvento(BasicView):
                 frees=Count(
                     Case(
                         When(
-                            free__vendedor=user, free__evento=evento, then=1
+                            free__evento=evento, then=1
                         ),
                         output_field=IntegerField()
                     )
@@ -198,11 +187,36 @@ class PanelEvento(BasicView):
         personas = personas.filter(Q(invis__gt=0)|Q(frees__gt=0))
         personas = personas.order_by('nombre')
 
-        c['personas_invitadas'] = personas.values('nombre', 'cedula', 'pk')
+        full_list = personas.values('nombre', 'cedula', 'pk')
         if persona:
             personas = personas.filter(Q(nombre__icontains=persona)|Q(cedula__icontains=persona))
+        r = []
+        for persona in personas:
+            listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
+                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
+            r.append({'nombre': persona.nombre,
+                      'cedula': persona.cedula if persona.cedula else '',
+                      'pk': persona.pk,
+                      'invis': persona.invis,
+                      'used_invis': persona.used_invis,
+                      'frees': persona.frees,
+                      'used_frees': persona.used_frees,
+                      'listas': list(listas)})
+        return full_list, r
+
+    def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
+        c = super().get_context_data(user, *args, **kwargs)
+        if evento and not isinstance(evento, Evento):
+            c['evento'] = Evento.objects.get(slug=evento)
+        elif isinstance(evento, Evento):
+            c['evento'] = evento
+        else:
+            c['evento'] = Evento.objects.all()[0]
+
+        full_list, personas = self.parse_invitaciones(evento, user, persona=persona)
+        c['personas_invitadas'] = full_list
+        if persona:
             c['query_key'] = persona
-        personas = self.parse_invitaciones(personas, evento)
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))
         c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')

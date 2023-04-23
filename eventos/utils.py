@@ -2,8 +2,10 @@ import re
 import os
 
 from openpyxl import load_workbook
+import pandas as pd
 
 from django.template.defaultfilters import slugify
+from django.core.mail import EmailMessage
 
 
 def parse_excel_import(f):
@@ -114,3 +116,19 @@ def validate_in_group(user, valids):
     groups = [g.name for g in user.groups.all()]
     return any([g in groups for g in valids])
 
+
+def mail_event_attendees(user, personas):
+    df = pd.DataFrame(personas)
+    df = df.drop('pk', axis=1)
+    # Convert the dataframe to a CSV string
+    print(df)
+    csv_data = df.to_csv(index=False)
+    # Create the email message and attach the CSV file
+    email = EmailMessage(
+        subject='Query Results Email',
+        body='Please find the attached CSV file with the query results.',
+        from_email='from@example.com',
+        to=[user.email],
+    )
+    email.attach('query_results.csv', csv_data, 'text/csv')
+    email.send()

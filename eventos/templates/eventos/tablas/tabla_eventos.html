@@ -52,6 +52,12 @@
                 </button>
                 {% if evento.estado == 'ACT' %}
                     <button onclick=window.location.href='e/{{evento.slug}}/frees' class="plus-button yellow"> <i class="fa fa-ticket"></i></button>
+                    <form method="POST" action=""
+                        onsubmit="return confirm('Seguro que queres enviarte la lista de invitados?');">
+                               {% csrf_token %}
+                                <input type="hidden" name="mail_csv" value="{{evento.pk}}">
+                                <button class="plus-button in-table yellow" type="submit" value="mail_csv"><i class="fa fa-envelope"></i></button>
+                    </form>
                 {% endif %}
                 </div>
             </td>
