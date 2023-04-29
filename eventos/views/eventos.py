@@ -203,19 +203,19 @@ class PanelEvento(BasicView):
         else:
             c['invi_dadas'] = user.invitacion_set.filter(evento=c['evento'],
                                                          cliente__estado='ACT',
-                                                         cliente__isnull=False, venededor=user).count()
+                                                         cliente__isnull=False, vendedor=user).count()
             c['frees_dados'] = user.free_set.filter(evento=c['evento'],
                                                     cliente__estado='ACT',
-                                                    cliente__isnull=False, venededor=user).count()
-            c['frees_total'] = user.free_set.filter(evento=c['evento'], venededor=user).count()
+                                                    cliente__isnull=False, vendedor=user).count()
+            c['frees_total'] = user.free_set.filter(evento=c['evento'], vendedor=user).count()
             c['checked_in'] = user.invitacion_set.filter(evento=c['evento'],
                                                          estado='USA',
                                                          cliente__estado='ACT',
-                                                         cliente__isnull=False, venededor=user).count()
+                                                         cliente__isnull=False, vendedor=user).count()
             c['checked_in'] += user.free_set.filter(evento=c['evento'],
                                                     estado='USA',
                                                     cliente__estado='ACT',
-                                                    cliente__isnull=False, venededor=user).count()
+                                                    cliente__isnull=False, vendedor=user).count()
 
         if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
@@ -391,8 +391,8 @@ class PanelEventoPersona(BasicView):
         if not form:
             form = MultiInviAssignToPersona(request.user, persona, evento=evento)
             if not validate_in_group(request.user, ('admin',)):
-                form.fields['frees'].attributes['max'] = request.user.free_set(estado='ACT', evento=evento,
-                                                                               cliente__isnull=True)
+                form.fields['frees'].widget.max_value = request.user.free_set.filter(estado='ACT', evento=evento,
+                                                                               cliente__isnull=True).count()
         c['form'] = form
         return render(request, self.template_name, context=c)
 
