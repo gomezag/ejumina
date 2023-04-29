@@ -16,7 +16,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import itertools
 
-from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm, FreeAssign
+from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm, \
+    FreeAssign
 from eventos.views.basic_view import BasicView, AdminView
 from eventos.utils import validate_in_group, mail_event_attendees
 from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
@@ -27,7 +28,7 @@ class ListaEventos(BasicView):
 
     def get_context_data(self, user, *args, **kwargs):
         c = super().get_context_data(user)
-        if validate_in_group(user, ('admin', )):
+        if validate_in_group(user, ('admin',)):
             c['eventos'] = Evento.objects.all().order_by('estado', '-fecha')
         else:
             c['eventos'] = Evento.objects.filter(estado='ACT').order_by('-fecha')
@@ -49,7 +50,7 @@ class ListaEventos(BasicView):
         if not validate_in_group(request.user, ('admin', 'entrada')):
             return self.get(request, extras={'alert_msg': ['No autorizado']})
         c = self.get_context_data(request.user)
-        if request.POST.get('delete', None) is not None and validate_in_group(request.user, ('admin', )):
+        if request.POST.get('delete', None) is not None and validate_in_group(request.user, ('admin',)):
             try:
                 evento = Evento.objects.get(pk=request.POST['delete'])
                 if evento.estado == 'ACT':
@@ -59,7 +60,7 @@ class ListaEventos(BasicView):
                 evento.save()
             except Exception as e:
                 pass
-        elif request.POST.get('delete_evento', None) is not None and validate_in_group(request.user, ('admin', )):
+        elif request.POST.get('delete_evento', None) is not None and validate_in_group(request.user, ('admin',)):
             try:
                 evento_id = request.POST.get('delete_evento', None)
                 if evento_id:
@@ -70,7 +71,7 @@ class ListaEventos(BasicView):
                         c['alert_msg'] = ['El nombre escrito no coincide con el nombre del evento!']
             except ObjectDoesNotExist:
                 c['alert_msg'] = ['El evento no existe!']
-        elif request.POST.get('edit', None) is not None and validate_in_group(request.user, ('admin', )):
+        elif request.POST.get('edit', None) is not None and validate_in_group(request.user, ('admin',)):
             try:
                 evento = Evento.objects.get(pk=request.POST['edit'])
                 form = EventoForm(request.POST, instance=evento, auto_id='edit')
@@ -96,7 +97,7 @@ class ListaEventos(BasicView):
                     c['alert_msg'] = ['Hubo un error al enviar el mail.']
             except ObjectDoesNotExist:
                 pass
-        elif validate_in_group(request.user, ('admin', )):
+        elif validate_in_group(request.user, ('admin',)):
             form = EventoForm(request.POST)
             if form.is_valid():
                 form.save()
@@ -120,88 +121,50 @@ class PanelEvento(BasicView):
 
         if validate_in_group(user, ('admin', 'entrada')):
             personas = personas.annotate(
-                invis=Count(
-                    Case(
-                        When(
-                            invitacion__evento=evento.pk, then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                frees=Count(
-                    Case(
-                        When(
-                            free__evento=evento, then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                used_invis=Count(
-                    Case(
-                        When(
-                            invitacion__evento=evento, invitacion__estado='USA', then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                used_frees=Count(
-                    Case(
-                        When(
-                            free__evento=evento, free__estado='USA', then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
+                invis=Count('invitacion__pk',
+                            filter=Q(invitacion__evento=evento.pk), distinct=True
+                            ),
+                frees=Count('free__pk',
+                            filter=Q(free__evento=evento), distinct=True
+                            ),
+                used_invis=Count('invitacion__pk',
+                                 filter=Q(invitacion__evento=evento, invitacion__estado='USA'), distinct=True
+                                 ),
+                used_frees=Count('free__pk',
+                                 filter=Q(free__evento=evento, free__estado='USA'), distinct=True
+                                 ),
             )
         else:
             personas = personas.annotate(
-                invis=Count(
-                    Case(
-                        When(
-                            invitacion__vendedor=user, invitacion__evento=evento, then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                frees=Count(
-                    Case(
-                        When(
-                            free__vendedor=user, free__evento=evento, then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                used_invis=Count(
-                    Case(
-                        When(
-                            invitacion__vendedor=user, invitacion__evento=evento, invitacion__estado='USA',  then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
-                used_frees=Count(
-                    Case(
-                        When(
-                            free__vendedor=user, free__evento=evento, free__estado='USA', then=1
-                        ),
-                        output_field=IntegerField()
-                    )
-                ),
+                invis=Count('invitacion__pk',
+                            filter=Q(invitacion__vendedor=user, invitacion__evento=evento.pk), distinct=True
+                            ),
+                frees=Count('free__pk',
+                            filter=Q(free__vendedor=user, free__evento=evento), distinct=True
+                            ),
+                used_invis=Count('invitacion__pk',
+                                 filter=Q(invitacion__vendedor=user, invitacion__evento=evento,
+                                          invitacion__estado='USA'), distinct=True
+                                 ),
+                used_frees=Count('free__pk',
+                                 filter=Q(free__vendedor=user, free__evento=evento, free__estado='USA'), distinct=True
+                                 ),
             )
-        personas = personas.filter(Q(invis__gt=0)|Q(frees__gt=0))
+        personas = personas.filter(Q(invis__gt=0) | Q(frees__gt=0))
         personas = personas.order_by('nombre')
 
         full_list = personas.values('nombre', 'cedula', 'pk')
         if persona:
-            personas = personas.filter(Q(nombre__icontains=persona)|Q(cedula__icontains=persona))
+            personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
         r = []
         for persona in personas:
             if validate_in_group(user, ('admin', 'entrada')):
                 listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
-                                                           Q(personas_free=persona, free__evento=evento.pk)).distinct()
+                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
             else:
-                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk, invitacion__vendedor=user) |
-                                                       Q(personas_free=persona, free__evento=evento.pk, free__vendedor=user)).distinct()
+                listas = ListaInvitados.objects.filter(
+                    Q(personas=persona, invitacion__evento=evento.pk, invitacion__vendedor=user) |
+                    Q(personas_free=persona, free__evento=evento.pk, free__vendedor=user)).distinct()
             r.append({'nombre': persona.nombre,
                       'cedula': persona.cedula if persona.cedula else '',
                       'pk': persona.pk,
@@ -234,9 +197,9 @@ class PanelEvento(BasicView):
             c['frees_dados'] = c['evento'].free_set.filter(cliente__isnull=False).count()
             c['frees_total'] = c['evento'].free_set.count()
             c['checked_in'] = c['evento'].invitacion_set.filter(estado='USA',
-                                                         cliente__isnull=False).count()
+                                                                cliente__isnull=False).count()
             c['checked_in'] += c['evento'].free_set.filter(estado='USA',
-                                                    cliente__isnull=False).count()
+                                                           cliente__isnull=False).count()
         else:
             c['invi_dadas'] = user.invitacion_set.filter(evento=c['evento'],
                                                          cliente__estado='ACT',
@@ -261,7 +224,7 @@ class PanelEvento(BasicView):
     def get(self, request, evento, *args, **kwargs):
         user = request.user
         evento = Evento.objects.get(slug=evento)
-        if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
+        if evento.estado != 'ACT' and (validate_in_group(user, ('admin',))):
             HttpResponseRedirect('/')
         c = self.get_context_data(user, evento,
                                   persona=request.GET.get('persona', None),
@@ -276,7 +239,7 @@ class PanelEvento(BasicView):
     def post(self, request, evento, *args, **kwargs):
         evento = Evento.objects.get(slug=evento)
         user = request.user
-        if evento.estado != 'ACT' and (validate_in_group(user, ('admin', ))):
+        if evento.estado != 'ACT' and (validate_in_group(user, ('admin',))):
             HttpResponseRedirect('/')
         c = {}
         checkin = request.POST.get('checkin', False)
@@ -299,8 +262,8 @@ class PanelEvento(BasicView):
                 print(c['checkin_errors'])
             c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
         c.update(self.get_context_data(user, evento,
-                                  persona=request.GET.get('persona', None),
-                                  page=request.GET.get('page', None)))
+                                       persona=request.GET.get('persona', None),
+                                       page=request.GET.get('page', None)))
         return render(request, self.template_name, context=c)
 
 
@@ -317,11 +280,11 @@ class PanelEventoPersona(BasicView):
             invitaciones = Invitacion.objects.filter(evento=evento, cliente=persona, vendedor=user)
             frees = Free.objects.filter(evento=evento, cliente=persona, vendedor=user)
         invis = list(invitaciones.
-            values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
+        values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
             invis=Count('lista'),
             used_invis=Count('lista', filter=Q(estado='USA'))))
         frees = list(frees.
-            values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
+        values('vendedor__pk', 'lista__pk', 'lista__nombre').annotate(
             frees=Count('lista'),
             used_frees=Count('lista', filter=Q(estado='USA'))))
         all_invis = sorted(list(itertools.chain(invis, frees)), key=lambda x: (x['vendedor__pk'], x['lista__pk']))
@@ -356,7 +319,7 @@ class PanelEventoPersona(BasicView):
     def get(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
-        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin', ))):
+        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin',))):
             HttpResponseRedirect('/')
         c = self.get_context_data(request.user, persona, evento)
         usuario = request.user
@@ -370,7 +333,7 @@ class PanelEventoPersona(BasicView):
     def post(self, request, persona, evento, *args, **kwargs):
         persona = Persona.objects.get(pk=persona)
         evento = Evento.objects.get(slug=evento)
-        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin', ))):
+        if evento.estado != 'ACT' and (validate_in_group(request.user, ('admin',))):
             HttpResponseRedirect('/')
         checkin = request.POST.get('checkin', None)
         delete = request.POST.get('delete', None)
@@ -385,7 +348,7 @@ class PanelEventoPersona(BasicView):
                 rrpp = Usuario.objects.get(pk=request.POST['rrpp'])
             except Exception as e:
                 return HttpResponseRedirect('')
-            if (not validate_in_group(request.user, ('admin', ))) and (rrpp != request.user):
+            if (not validate_in_group(request.user, ('admin',))) and (rrpp != request.user):
                 c['alert_msg'].append('No podes borrar entradas que no son tuyas!')
             else:
                 invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
@@ -427,8 +390,9 @@ class PanelEventoPersona(BasicView):
         c.update(self.get_context_data(request.user, persona, evento))
         if not form:
             form = MultiInviAssignToPersona(request.user, persona, evento=evento)
-            if not validate_in_group(request.user, ('admin', )):
-                form.fields['frees'].attributes['max'] = request.user.free_set(estado='ACT', evento=evento, cliente__isnull=True)
+            if not validate_in_group(request.user, ('admin',)):
+                form.fields['frees'].attributes['max'] = request.user.free_set(estado='ACT', evento=evento,
+                                                                               cliente__isnull=True)
         c['form'] = form
         return render(request, self.template_name, context=c)
 
@@ -439,11 +403,11 @@ class PanelFrees(AdminView):
     def get_context_data(self, user, evento, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
         evento = Evento.objects.get(slug=evento)
-        users = Usuario.objects.filter(Q(groups__name='rrpp')|Q(groups__name='admin'))
+        users = Usuario.objects.filter(Q(groups__name='rrpp') | Q(groups__name='admin'))
         users = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
-                                    usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
-                                                                           free__evento=evento)),
-                                    input_id=Concat(F('username'), Value("_frees"))).order_by('first_name')
+                               usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
+                                                                     free__evento=evento)),
+                               input_id=Concat(F('username'), Value("_frees"))).order_by('first_name')
         c['users'] = users
         c['evento'] = evento
         return c
@@ -490,10 +454,10 @@ class PanelEventoUsuario(AdminView):
     def parse_invitaciones(rrpp, evento):
         out = []
         frees = list(Free.objects.filter(evento=evento, vendedor=rrpp, cliente__isnull=False).
-            values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
+        values('cliente__pk', 'lista__pk', 'lista__nombre').annotate(
             frees=Count('lista'),
             used_frees=Count('lista', filter=Q(estado='USA'))))
-        all_invis = sorted(list(itertools.chain(frees,)), key=lambda x: (x['cliente__pk'], x['lista__pk']))
+        all_invis = sorted(list(itertools.chain(frees, )), key=lambda x: (x['cliente__pk'], x['lista__pk']))
         if len(all_invis) > 0:
             for common, invis in itertools.groupby(all_invis, key=lambda x: (x['cliente__pk'], x['lista__pk'])):
                 lista = ListaInvitados.objects.get(pk=common[1])
@@ -509,7 +473,7 @@ class PanelEventoUsuario(AdminView):
                 [r.update(i) for i in invis]
                 out.append(r)
         else:
-          out = []
+            out = []
         return out
 
     def get_context_data(self, user, rrpp, evento, *args, **kwargs):
@@ -535,7 +499,7 @@ class PanelEventoUsuario(AdminView):
         evento = Evento.objects.get(slug=evento)
         checkin = request.POST.get('checkin', None)
         delete = request.POST.get('delete', None)
-        c = {'alert_msg':[]}
+        c = {'alert_msg': []}
         if delete:
             try:
                 integer_validator(request.POST['lista'])
@@ -572,4 +536,3 @@ class PanelEventoUsuario(AdminView):
             c['checkin_form'] = CheckInForm()
         c.update(self.get_context_data(request.user, rrpp, evento))
         return render(request, self.template_name, context=c)
-
