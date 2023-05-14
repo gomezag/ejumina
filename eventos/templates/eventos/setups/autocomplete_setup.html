@@ -27,7 +27,7 @@ document.getElementById("searchbar").value = "{{keyword}}";
 window.addEventListener("load",function() {
     try{
         autocomplete(document.getElementById("invi_persona"), availableTags);
-        document.getElementById("invi_persona").value = "{{keyword}}";
+        autocomplete(document.getElementById("invi_cedula"), availableTags);
     }
     catch (error) {
 
