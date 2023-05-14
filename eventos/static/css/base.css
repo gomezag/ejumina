@@ -38,8 +38,8 @@ html {
 }
 
 .navbar-dropdown .navbar-item {
-    font-size: 2.5rem;
-    left: 3rem;
+    font-size: var(--fontsize-s);
+    min-width: 200px;
 }
 
 
