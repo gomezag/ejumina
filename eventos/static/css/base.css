@@ -9,6 +9,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 
 :root {
 --fontsize: 35px;
+--fontsize-ls: 27px;
 --fontsize-l: 45px;
 --fontsize-xl: 60px;
 --fontsize-s: 17px;
@@ -558,5 +559,5 @@ hr {
     .navbar-burger.is-active span:nth-child(3) {
     transform: translateY(-4px) rotate(-45deg)
     }
-    .pagination {font-size-adjust: 0.3;}
+    .pagination {font-size:var(--fontsize-ls);}
 }
