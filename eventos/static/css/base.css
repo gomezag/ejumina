@@ -400,8 +400,8 @@ html {
 }
 
 
-.searchbar { font-size: var(--fontsize-l)};
-
+.searchbar { font-size: var(--fontsize-l);}
+div.field.has-addons { justify-content: center;}
 
 tr.red {
     background-color: #FB928E;
@@ -490,7 +490,7 @@ hr {
     .body-content p.info {font-size: var(--fontsize-s);}
     .body-form select { font-size:var(--fontsize);}
 
-    .content-body {max-width: 90%;}
+    .content-body {max-width: 90%; align-items: center;}
     .content-body div.container {width: 100%;}
 
     p.title i{
