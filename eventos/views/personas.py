@@ -11,6 +11,8 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 from django.shortcuts import render
 from django.core.validators import integer_validator
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 from eventos.forms import PersonaForm, MultiInviAssignToPersona
 from eventos.models import Persona, Evento, Free, Invitacion, ListaInvitados, Usuario
@@ -22,24 +24,34 @@ class ListaPersona(AdminView):
     template_name = 'eventos/lista_personas.html'
 
     def get_context_data(self, user, persona=None, *args, **kwargs):
+        page = kwargs.get('page', 1)
         c = super(ListaPersona, self).get_context_data(user, *args, **kwargs)
-        c['personas'] = Persona.objects.all().order_by('estado')
+        personas = Persona.objects.all()
+        if persona:
+            personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
+        personas = personas.order_by('nombre').order_by('estado')
+        paginator = Paginator(personas, 20)
+        c['query_key'] = persona
+        c['personas_page'] = paginator.get_page(page)
         c['form'] = PersonaForm()
         c['edit_form'] = PersonaForm(auto_id='edit')
         return c
 
     def get(self, request, *args, **kwargs):
-
         user = request.user
-        c = self.get_context_data(user)
+        c = self.get_context_data(user,
+                                  persona=request.GET.get('persona', None),
+                                  page=request.GET.get('page', None))
 
         return render(request=request, template_name=self.template_name, context=c)
 
     def post(self, request, *args, **kwargs):
-        c = self.get_context_data(request.user)
+        c = self.get_context_data(request.user,
+                                  persona=request.GET.get('persona', None),
+                                  page=request.GET.get('page', None))
         if request.POST.get('deactivate', None) is not None:
             try:
-                persona = Persona.objects.get(pk=request.POST['delete'])
+                persona = Persona.objects.get(pk=request.POST['deactivate'])
                 persona.estado = 'INA'
                 persona.save()
             except Exception as e:
@@ -73,7 +85,10 @@ class ListaPersona(AdminView):
             form = PersonaForm(data=request.POST)
             if form.is_valid():
                 form.save()
-        c.update(self.get_context_data(request.user))
+        c.update(self.get_context_data(request.user,
+                                       persona=request.GET.get('persona', None),
+                                       page=request.GET.get('page', None)
+                                       ))
         return render(request, template_name=self.template_name, context=c)
 
 

@@ -13,7 +13,7 @@
         {% if personas_page.start_index > 1 and personas_page.number > 2 %}
         <li><a class="pagination-link plink" href="?page=1&persona={{query_key}}">1</a></li>
         {% endif %}
-        {% if personas_page.start_index > 1 and page_obj.number > 3%}
+        {% if personas_page.start_index > 1 and personas_page.number > 3%}
         <li><span class="pagination-ellipsis plink">&hellip;</span></li>
         {% endif %}
         {% for page in personas_page.paginator.page_range %}

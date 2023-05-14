@@ -85,6 +85,8 @@ html {
     margin-bottom: var(--fontsize-xl);
 }
 
+
+
 .navbar {
     background-color: black;
 }
@@ -488,6 +490,9 @@ hr {
     .body-content p.info {font-size: var(--fontsize-s);}
     .body-form select { font-size:var(--fontsize);}
 
+    .content-body {max-width: 90%;}
+    .content-body div.container {width: 100%;}
+
     p.title i{
     font-size: var(--fontsize-l);
     }
@@ -553,4 +558,5 @@ hr {
     .navbar-burger.is-active span:nth-child(3) {
     transform: translateY(-4px) rotate(-45deg)
     }
+    .pagination {font-size-adjust: 0.3;}
 }

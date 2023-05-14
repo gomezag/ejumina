@@ -1,4 +1,94 @@
 {% load auth_extras %}
+
+<div class="container">
+    <div class="field has-addons">
+        <div class="control">
+            <input class="input searchbar " id="searchbar" type="text">
+        </div>
+        <div class="control">
+            <button class="button searchbar" onclick="search('');"><i class="fa fa-search"></i></button>
+        </div>
+    </div>
+{% if query_key %}
+<button class="button filter-button" onclick="search('delete');"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
+        class="fa fa-close"></i></button>
+{% endif %}
+<script nonce="{{request.csp_nonce}}">
+function search(do_delete) {
+  if(do_delete){
+    var key = '';
+  }
+  else{
+    var key = document.getElementById("searchbar").value;
+  }
+
+  var url = window.location.href;
+
+  // Remove any existing persona parameter
+    if (url.includes('persona=')) {
+        url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
+    }
+    else{
+        url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
+    }
+
+  // Check if page parameter is already present
+  if (url.includes('page=')) {
+    if(key){
+        // Modify page parameter to 1 and add persona parameter
+        url = url.replace(/(page=).*?(&)/, '$1' +'1'+'$2');
+    }
+  }
+  else {
+    url += (url.includes('?') ? '&' : '?') + "page=1";
+  }
+
+  window.location.href = url;
+}
+
+document.getElementById("searchbar").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        search('');
+    }
+});
+</script>
+{% if personas_page %}
+{% if personas_page.has_other_pages %}
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+    {% if personas_page.has_previous %}
+    <a class="pagination-previous plink" href="?page={{ personas_page.previous_page_number }}&persona={{query_key}}"><i class="fa fa-chevron-circle-left"></i></a>
+    {% endif %}
+    {% if personas_page.has_next %}
+    <a class="pagination-next plink" href="?page={{ personas_page.next_page_number }}&persona={{query_key}}"><i class="fa fa-chevron-circle-right"></i></a>
+    {% endif %}
+    <ul class="pagination-list">
+        {% if personas_page.start_index > 1 and personas_page.number > 2 %}
+        <li><a class="pagination-link plink" href="?page=1&persona={{query_key}}">1</a></li>
+        {% endif %}
+        {% if personas_page.start_index > 1 and personas_page.number > 3%}
+            <li><span class="pagination-ellipsis plink">&hellip;</span></li>
+        {% endif %}
+        {% for page in personas_page.paginator.page_range %}
+            {% if personas_page.number == page %}
+            <li><a class="pagination-link is-current plink" href="?page={{page}}&persona={{query_key}}">{{page}}</a></li>
+            {% else %}
+            {% if page > personas_page.number|add:'-2' and page < personas_page.number|add:'2' %}
+            <li><a class="pagination-link plink" href="?page={{page}}&persona={{query_key}}">{{page}}</a></li>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if personas_page.number < personas_page.paginator.num_pages|sub:2 %}
+            <li><span class="pagination-ellipsis plink">&hellip;</span></li>
+        {% endif %}
+        {% if personas_page.number < personas_page.paginator.num_pages|sub:1 %}
+            <li><a class="pagination-link plink" href="?page={{ personas_page.paginator.num_pages }}&persona={{query_key}}">{{ personas_page.paginator.num_pages }}</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endif %}
+
 <table class="tabla-personas table" id="tabla_personas">
     <tr>
         <th onclick="sortTable(0)">
@@ -11,10 +101,16 @@
             Acciones
         </th>
     </tr>
-    {% for persona in personas %}
+    {% for persona in personas_page.object_list %}
         <tr {% if persona.estado == 'INA' %} class="deactivated" {% endif %}>
             <td>
-                <a href="/p/{{persona.pk}}/">{{persona.nombre}}</a>
+                <a href="/p/{{persona.pk}}/">
+                    {% if persona.nombre %}
+                        {{persona.nombre}}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </a>
             </td>
             <td>
                 {{persona.cedula}}
