@@ -29,9 +29,9 @@ class ListaPersona(AdminView):
         personas = Persona.objects.all()
         if persona:
             personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
+            c['query_key'] = persona
         personas = personas.order_by('nombre').order_by('estado')
         paginator = Paginator(personas, 20)
-        c['query_key'] = persona
         c['personas_page'] = paginator.get_page(page)
         c['form'] = PersonaForm()
         c['edit_form'] = PersonaForm(auto_id='edit')
