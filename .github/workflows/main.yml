@@ -9,10 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Create SSH key
-        uses: D3rHase/ssh-command-action@v0.2.2
+      - name: Build
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{secrets.NC_HOST}} # Remote server address / ip - required
-          user: ${{secrets.NC_USR}} # Remote server user - required
+          user: ${{variables.NC_USR}} # Remote server user - required
+          port: 21098
           private_key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
+          passphrase: ${{secrets.NC_DEPLOY_PWD}}
           command: echo 'hello world'
