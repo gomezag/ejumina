@@ -17,4 +17,4 @@ jobs:
           port: 21098
           key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
           passphrase: ${{secrets.NC_DEPLOY_PWD}}
-          command: echo 'hello world'
+          script: whoami
