@@ -17,4 +17,4 @@ jobs:
           port: ${{secrets.NC_PORT}}
           key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
           passphrase: ${{secrets.NC_DEPLOY_PWD}}
-          script: ~/scripts/build_ejumina.sh test
+          script: sh ~/scripts/build_ejumina.sh test
