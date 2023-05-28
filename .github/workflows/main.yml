@@ -2,7 +2,7 @@ name: Build & Deploy
 on:
   push:
     tags:
-      - 'api-calls'
+      - 'test'
   workflow_dispatch:
 
 jobs:
@@ -17,5 +17,5 @@ jobs:
           port: ${{secrets.NC_PORT}}
           key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
           passphrase: ${{secrets.NC_DEPLOY_PWD}}
-          script: whoami
+          script: ~/scripts/build_ejumina.sh test
           debug: true
