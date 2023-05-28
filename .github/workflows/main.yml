@@ -12,8 +12,8 @@ jobs:
       - name: Build
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: $NC_HST # Remote server address / ip - required
-          user: $NC_USR # Remote server user - required
+          host: ${{vars.NC_HST}} # Remote server address / ip - required
+          user: ${{vars.NC_USR}} # Remote server user - required
           port: 21098
           key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
           passphrase: ${{secrets.NC_DEPLOY_PWD}}
