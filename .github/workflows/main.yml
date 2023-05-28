@@ -18,3 +18,4 @@ jobs:
           key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
           passphrase: ${{secrets.NC_DEPLOY_PWD}}
           script: whoami
+          debug: true
