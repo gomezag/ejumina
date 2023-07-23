@@ -190,7 +190,6 @@ class PanelEvento(BasicView):
             c['query_key'] = persona
         paginator = Paginator(personas, 20)
         persona_set = paginator.get_page(kwargs.get('page', 1))
-        c['personas_query'] = Persona.objects.all().values('nombre', 'cedula', 'pk')
         c['personas_page'] = persona_set
         if validate_in_group(user, ('admin', 'entrada')):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente__isnull=False).count()

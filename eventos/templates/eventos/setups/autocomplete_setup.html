@@ -23,15 +23,49 @@ var reducedAvailableTags = [[
 ];
 autocomplete(document.getElementById("searchbar"), reducedAvailableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
-
 window.addEventListener("load",function() {
     try{
-        autocomplete(document.getElementById("invi_persona"), availableTags);
-        autocomplete(document.getElementById("invi_cedula"), availableTags);
+        document.getElementById("invi_persona").addEventListener("input", getPersonData);
+        document.getElementById("invi_cedula").addEventListener("input", getPersonData);
     }
     catch (error) {
 
     }
 });
+
+function getPersonData(e) {
+    var name = document.getElementById("invi_persona").value;
+    var cedula = document.getElementById("invi_cedula").value;
+    var csrftoken = getCookie('csrftoken');
+    $.ajax({
+          type: "POST",
+          url: "/api/search/persona/",
+          dataType: "json",
+          data: {
+              "invi-name": name,
+              "invi-cedula": cedula,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(data) {
+             form_autocomplete(e.target, [data.personas]);
+          }
+      });
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 </script>

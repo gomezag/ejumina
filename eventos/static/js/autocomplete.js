@@ -31,49 +31,18 @@ function autocomplete(inp, arr) {
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
-          if(inp.id == 'invi_persona') {
-              b.innerHTML = "<p>"+arr[0][i][0]+"</p>";
-              //console.log(b.innerHTML);
-          }
-          else{if(inp.id == 'invi_cedula') {
-                b.innerHTML = "<p>"+arr[0][i][0]+"</p>";
-          }
-          else{
-              b.innerHTML = "<a href='/e/"+arr[1]+"/p/"+arr[0][i][1]+"/'> "+arr[0][i][0]+"</a>";
-              //console.log(b.innerHTML);
-          }}
+          b.innerHTML = "<a href='/e/"+arr[1]+"/p/"+arr[0][i][1]+"/'> "+arr[0][i][0]+"</a>";
+          //console.log(b.innerHTML);
           b.classList.add('opciones');
           b.classList.add('li');
           /*insert a input field that will hold the current array item's value:*/
          // b.innerHTML += "</a>"
           b.innerHTML += "<input type='hidden' value='" + arr[0][i][0] + "'>";
-          if(inp.id == 'invi_persona'){
-              b.addEventListener("click", function(e) {
-                  /*insert the value for the autocomplete text field and close lists*/
-                  var data = this.getElementsByTagName("input")[0].value.split(' - ')
-                  inp.value = data[0];
-                  document.getElementById('invi_cedula').value = data[1]
-                  closeAllLists();
-                  checkForm();
-              });
-          }
-          else{if(inp.id == 'invi_cedula'){
-              b.addEventListener("click", function(e) {
-                  /*insert the value for the autocomplete text field and close lists*/
-                  var data = this.getElementsByTagName("input")[0].value.split(' - ')
-                  inp.value = data[1];
-                  document.getElementById('invi_persona').value = data[0]
-                  closeAllLists();
-                  checkForm();
-              });
-          }
-          else{
-              b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field and close lists*/
-                  inp.value = this.getElementsByTagName("input")[0].value;
-                  closeAllLists();
-              });
-          }}
+          b.addEventListener("click", function(e) {
+          /*insert the value for the autocomplete text field and close lists*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              closeAllLists();
+          });
           a.appendChild(b);
         }
       }
@@ -136,6 +105,7 @@ document.addEventListener("click", function (e) {
 });
 }
 
+
 function getPosts(){
     let keyword = encodeURIComponent(document.getElementById("searchbar").value);
     if(keyword==null || keyword=="" || keyword==" "){
@@ -143,9 +113,7 @@ function getPosts(){
     }
     else{
         let url = "/?persona="+keyword;
-        console.log(url)
         window.location.href = url;
     }
 }
-
 
