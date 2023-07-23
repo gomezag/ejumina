@@ -58,6 +58,11 @@ class Invitacion(models.Model):
     lista = ForeignKey(ListaInvitados, null=False, on_delete=models.PROTECT, blank=False)
     history = HistoricalRecords()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['evento', 'cliente', 'vendedor', 'estado'])
+        ]
+
     def __str__(self):
         return f"Invitacion a {self.evento.name} - {self.get_estado_display()} - {self.vendedor.first_name} a" \
                f" {self.cliente.nombre}"
@@ -71,6 +76,11 @@ class Free(models.Model):
     cliente = ForeignKey(Persona, on_delete=models.PROTECT, null=True, blank=True)
     lista = ForeignKey(ListaInvitados, null=True, on_delete=models.PROTECT, blank=True)
     history = HistoricalRecords()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['evento', 'cliente', 'vendedor', 'estado'])
+        ]
 
     def __str__(self):
         return f"Free a {str(self.evento.name)} - {self.get_estado_display()} - {self.vendedor.first_name} " \

@@ -6,7 +6,7 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.contrib.auth.models import AbstractUser, Group
-from django.db.models import Model
+from django.db.models import Model, Index
 from django.db.models.fields import CharField
 from simple_history.models import HistoricalRecords
 
@@ -22,6 +22,11 @@ class Persona(Model):
     estado = CharField(max_length=3, blank=False, null=False, choices=ESTADOS_CLIENTES, default='ACT')
     cedula = CharField(max_length=11, blank=False, null=True, unique=True)
     history = HistoricalRecords()
+
+    class Meta:
+        indexes = [
+            Index(fields=['estado', ])
+        ]
 
     def __str__(self):
         return " - ".join([str(self.nombre), str(self.estado)])
