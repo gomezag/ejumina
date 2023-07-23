@@ -9,9 +9,11 @@ import json
 class Personas(View):
     def post(self, request):
         data = request.POST
-        name = data.get('invi-name', None)
-        cedula = data.get('invi-cedula', None)
+        name = data.get('invi_persona', None)
+        cedula = data.get('invi_cedula', None)
         personas = Persona.objects.all()
+        print(name, cedula)
+        print(request.POST)
         if not name and not cedula:
             return JsonResponse(data={'personas':[]})
         if name:

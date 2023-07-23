@@ -25,27 +25,41 @@ autocomplete(document.getElementById("searchbar"), reducedAvailableTags);
 document.getElementById("searchbar").value = "{{keyword}}";
 window.addEventListener("load",function() {
     try{
-        document.getElementById("invi_persona").addEventListener("input", getPersonData);
-        document.getElementById("invi_cedula").addEventListener("input", getPersonData);
+        document.getElementById("invi_persona").addEventListener("keyup", delay(getPersonData, 500));
+        document.getElementById("invi_persona").autocomplete = 'off';
+        document.getElementById("invi_cedula").addEventListener("keyup", delay(getPersonData, 500));
+        document.getElementById("invi_cedula").autocomplete = 'off';
     }
     catch (error) {
 
     }
 });
 
+function delay(callback, ms) {
+  var timer = 0;
+  return function() {
+    var context = this, args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      callback.apply(context, args);
+    }, ms || 0);
+  };
+}
+
 function getPersonData(e) {
-    var name = document.getElementById("invi_persona").value;
+    var name = e.target.id;
+    var val = e.target.value;
     var cedula = document.getElementById("invi_cedula").value;
     var csrftoken = getCookie('csrftoken');
+    var data = {
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+          };
+    data[name] = val;
     $.ajax({
           type: "POST",
           url: "/api/search/persona/",
           dataType: "json",
-          data: {
-              "invi-name": name,
-              "invi-cedula": cedula,
-              csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
+          data: data,
           success: function(data) {
              form_autocomplete(e.target, [data.personas]);
           }
