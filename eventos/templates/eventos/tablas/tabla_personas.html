@@ -79,10 +79,26 @@
             <td>
                 {{persona.cedula}}
             </td>
-            <td>
-                {% for lista in persona.listas %}
-                    <font color="{{lista.color}}">{{lista.nombre}}</font>{% if not forloop.last %},{% endif %}
-                {% endfor %}
+            <td id="{{persona.pk}}-listas">
+                <script>
+                    var csrftoken = getCookie('csrftoken');
+                    var data = {
+                              csrfmiddlewaretoken: '{{ csrf_token }}',
+                              evento: '{{evento.pk}}',
+                              persona: '{{persona.pk}}',
+                          };
+                    $.ajax({
+                          type: "POST",
+                          url: "/api/evento/getlistas/",
+                          dataType: "json",
+                          data: data,
+                          success: function(data) {
+                             console.log(data);
+                             document.getElementById("{{persona.pk}}-listas").innerHTML = data.listas;
+                          }
+                      });
+
+                </script>
             </td>
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
