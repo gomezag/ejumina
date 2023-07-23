@@ -115,7 +115,7 @@ class PanelEvento(BasicView):
     def parse_invitaciones(evento, user, persona=None, queryset=None):
 
         if not queryset:
-            personas = Persona.objects.filter(estado='ACT', invitacion__evento=evento)
+            personas = Persona.objects.filter(estado='ACT')
         else:
             personas = queryset
 
