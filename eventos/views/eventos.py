@@ -9,7 +9,7 @@ El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 """
 from django.core.validators import integer_validator
 from django.db.models.base import ObjectDoesNotExist
-from django.db.models import Count, Q, F, Value, Case, When, IntegerField
+from django.db.models import Count, Q, F, Value,  Case, When, IntegerField
 from django.db.models.functions import Concat
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
@@ -21,6 +21,7 @@ from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiIn
 from eventos.views.basic_view import BasicView, AdminView
 from eventos.utils import validate_in_group, mail_event_attendees
 from eventos.models import Invitacion, Evento, ListaInvitados, Persona, Free, Usuario
+from django.db import connection
 
 
 class ListaEventos(BasicView):
@@ -165,7 +166,6 @@ class PanelEvento(BasicView):
                                  filter=Q(free__vendedor=user, free__evento=evento, free__estado='USA'), distinct=True
                                  ),
             )
-        #personas = personas.filter(Q(invis__gt=0) | Q(frees__gt=0))
         personas = personas.order_by('nombre')
         if persona:
             personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
@@ -195,20 +195,15 @@ class PanelEvento(BasicView):
         persona_set = paginator.get_page(kwargs.get('page', 1))
 
         r = []
-        extra_data = {
-            'total_invis': 0,
-            'total_frees': 0,
-            'used_invis': 0,
-            'used_frees': 0,
-        }
+
         for person in persona_set:
-            if validate_in_group(user, ('admin', 'entrada')):
-                listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento.pk) |
-                                                       Q(personas_free=person, free__evento=evento.pk)).distinct()
-            else:
-                listas = ListaInvitados.objects.filter(
-                    Q(personas=person, invitacion__evento=evento.pk, invitacion__vendedor=user) |
-                    Q(personas_free=person, free__evento=evento.pk, free__vendedor=user)).distinct()
+            # if validate_in_group(user, ('admin', 'entrada')):
+            #     listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento) |
+            #                                            Q(personas_free=person, free__evento=evento)).distinct()
+            # else:
+            #     listas = ListaInvitados.objects.filter(
+            #         Q(personas=person, invitacion__evento=evento, invitacion__vendedor=user) |
+            #         Q(personas_free=person, free__evento=evento, free__vendedor=user)).distinct()
             r.append({'nombre': person.nombre,
                       'cedula': person.cedula if person.cedula else '',
                       'pk': person.pk,
@@ -216,7 +211,8 @@ class PanelEvento(BasicView):
                       'used_invis': person.used_invis,
                       'frees': person.frees,
                       'used_frees': person.used_frees,
-                      'listas': list(listas)})
+                      # 'listas': list(listas)
+                      })
 
         persona_set.object_list = r
         c['personas_invitadas'] = full_list
@@ -248,6 +244,7 @@ class PanelEvento(BasicView):
                                                     cliente__estado='ACT',
                                                     cliente__isnull=False, vendedor=user).count()
 
+        # [print(query['time'], query['sql']) for query in connection.queries]
         if validate_in_group(user, ('admin', 'entrada')):
             c['checkin_form'] = CheckInForm()
         return c
