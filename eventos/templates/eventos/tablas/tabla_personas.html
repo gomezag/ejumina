@@ -80,6 +80,7 @@
                 {{persona.cedula}}
             </td>
             <td id="{{persona.pk}}-listas">
+                <i>Cargando...</i>
                 <script>
                     var csrftoken = getCookie('csrftoken');
                     var data = {
@@ -93,7 +94,6 @@
                           dataType: "json",
                           data: data,
                           success: function(data) {
-                             console.log(data);
                              document.getElementById("{{persona.pk}}-listas").innerHTML = data.listas;
                           }
                       });
