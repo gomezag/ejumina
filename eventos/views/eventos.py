@@ -174,7 +174,7 @@ class PanelEvento(BasicView):
 
     @staticmethod
     def parse_invitaciones(evento, user, persona=None, queryset=None):
-        personas = PanelEvento.get_lista_invitados(evento, user)
+        personas = PanelEvento.get_lista_invitados(evento, user, persona=persona, queryset=queryset)
         full_list = personas.values('nombre', 'cedula', 'pk')
 
         return full_list, personas
