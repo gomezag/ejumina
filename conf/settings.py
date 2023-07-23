@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
     'eventos',
+    'api'
 ]
 
 MIDDLEWARE = [
