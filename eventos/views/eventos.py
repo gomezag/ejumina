@@ -88,6 +88,20 @@ class ListaEventos(BasicView):
                 evento = Evento.objects.get(pk=request.POST['mail_csv'])
                 try:
                     brief_list, persona_set = PanelEvento.parse_invitaciones(evento, request.user)
+                    persona_set = persona_set.annotate(
+                        invis=Count('invitacion__pk',
+                                    filter=Q(invitacion__evento=evento.pk), distinct=True
+                                    ),
+                        frees=Count('free__pk',
+                                    filter=Q(free__evento=evento), distinct=True
+                                    ),
+                        used_invis=Count('invitacion__pk',
+                                         filter=Q(invitacion__evento=evento, invitacion__estado='USA'), distinct=True
+                                         ),
+                        used_frees=Count('free__pk',
+                                         filter=Q(free__evento=evento, free__estado='USA'), distinct=True
+                                         ),
+                    )
                     r = []
                     for person in persona_set:
                         listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento.pk) |
@@ -135,37 +149,6 @@ class PanelEvento(BasicView):
             personas = personas.filter(Q(invitacion__evento=evento) | Q(free__evento=evento)).distinct()
         else:
             personas = queryset
-        if validate_in_group(user, ('admin', 'entrada')):
-            personas = personas.annotate(
-                invis=Count('invitacion__pk',
-                            filter=Q(invitacion__evento=evento.pk), distinct=True
-                            ),
-                frees=Count('free__pk',
-                            filter=Q(free__evento=evento), distinct=True
-                            ),
-                used_invis=Count('invitacion__pk',
-                                 filter=Q(invitacion__evento=evento, invitacion__estado='USA'), distinct=True
-                                 ),
-                used_frees=Count('free__pk',
-                                 filter=Q(free__evento=evento, free__estado='USA'), distinct=True
-                                 ),
-            )
-        else:
-            personas = personas.annotate(
-                invis=Count('invitacion__pk',
-                            filter=Q(invitacion__vendedor=user, invitacion__evento=evento.pk), distinct=True
-                            ),
-                frees=Count('free__pk',
-                            filter=Q(free__vendedor=user, free__evento=evento), distinct=True
-                            ),
-                used_invis=Count('invitacion__pk',
-                                 filter=Q(invitacion__vendedor=user, invitacion__evento=evento,
-                                          invitacion__estado='USA'), distinct=True
-                                 ),
-                used_frees=Count('free__pk',
-                                 filter=Q(free__vendedor=user, free__evento=evento, free__estado='USA'), distinct=True
-                                 ),
-            )
         personas = personas.order_by('nombre')
         if persona:
             personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
@@ -191,19 +174,45 @@ class PanelEvento(BasicView):
         full_list, personas = self.parse_invitaciones(evento, user, persona=persona)
 
         paginator = Paginator(personas, 20)
+        page = paginator.get_page(kwargs.get('page', 1))
+        persona_set = page.object_list
 
-        persona_set = paginator.get_page(kwargs.get('page', 1))
+        if validate_in_group(user, ('admin', 'entrada')):
+            persona_set = persona_set.annotate(
+                invis=Count('invitacion__pk',
+                            filter=Q(invitacion__evento=evento.pk), distinct=True
+                            ),
+                frees=Count('free__pk',
+                            filter=Q(free__evento=evento), distinct=True
+                            ),
+                used_invis=Count('invitacion__pk',
+                                 filter=Q(invitacion__evento=evento, invitacion__estado='USA'), distinct=True
+                                 ),
+                used_frees=Count('free__pk',
+                                 filter=Q(free__evento=evento, free__estado='USA'), distinct=True
+                                 ),
+            )
+        else:
+            persona_set = persona_set.annotate(
+                invis=Count('invitacion__pk',
+                            filter=Q(invitacion__vendedor=user, invitacion__evento=evento.pk), distinct=True
+                            ),
+                frees=Count('free__pk',
+                            filter=Q(free__vendedor=user, free__evento=evento), distinct=True
+                            ),
+                used_invis=Count('invitacion__pk',
+                                 filter=Q(invitacion__vendedor=user, invitacion__evento=evento,
+                                          invitacion__estado='USA'), distinct=True
+                                 ),
+                used_frees=Count('free__pk',
+                                 filter=Q(free__vendedor=user, free__evento=evento, free__estado='USA'), distinct=True
+                                 ),
+            )
 
         r = []
 
         for person in persona_set:
-            # if validate_in_group(user, ('admin', 'entrada')):
-            #     listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento) |
-            #                                            Q(personas_free=person, free__evento=evento)).distinct()
-            # else:
-            #     listas = ListaInvitados.objects.filter(
-            #         Q(personas=person, invitacion__evento=evento, invitacion__vendedor=user) |
-            #         Q(personas_free=person, free__evento=evento, free__vendedor=user)).distinct()
+
             r.append({'nombre': person.nombre,
                       'cedula': person.cedula if person.cedula else '',
                       'pk': person.pk,
@@ -211,14 +220,13 @@ class PanelEvento(BasicView):
                       'used_invis': person.used_invis,
                       'frees': person.frees,
                       'used_frees': person.used_frees,
-                      # 'listas': list(listas)
                       })
 
-        persona_set.object_list = r
+        page.object_list = r
+        c['personas_page'] = page
         c['personas_invitadas'] = full_list
         if persona:
             c['query_key'] = persona
-        c['personas_page'] = persona_set
         if validate_in_group(user, ('admin', 'entrada')):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente__isnull=False).count()
             c['frees_dados'] = c['evento'].free_set.filter(cliente__isnull=False).count()
