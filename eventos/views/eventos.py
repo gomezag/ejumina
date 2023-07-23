@@ -86,11 +86,26 @@ class ListaEventos(BasicView):
             try:
                 evento = Evento.objects.get(pk=request.POST['mail_csv'])
                 try:
-                    brief_list, list = PanelEvento.parse_invitaciones(evento, request.user)
-                    if not list:
+                    brief_list, persona_set = PanelEvento.parse_invitaciones(evento, request.user)
+                    r = []
+                    for person in persona_set:
+                        listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento.pk) |
+                                                               Q(personas_free=person,
+                                                                 free__evento=evento.pk)).distinct()
+
+                        r.append({'nombre': person.nombre,
+                                  'cedula': person.cedula if person.cedula else '',
+                                  'pk': person.pk,
+                                  'invis': person.invis,
+                                  'used_invis': person.used_invis,
+                                  'frees': person.frees,
+                                  'used_frees': person.used_frees,
+                                  'listas': list(listas)})
+
+                    if not r:
                         c['alert_msg'] = ['No se encontraron invitaciones para este evento.']
                     else:
-                        mail_event_attendees(request.user, list, evento)
+                        mail_event_attendees(request.user, r, evento)
                         c['alert_msg'] = ['Mail enviado con éxito!', ]
                 except Exception as e:
                     print(e)
@@ -112,13 +127,13 @@ class PanelEvento(BasicView):
     template_name = 'eventos/panel_evento.html'
 
     @staticmethod
-    def parse_invitaciones(evento, user, persona=None, queryset=None):
+    def get_lista_invitados(evento, user, persona=None, queryset=None):
 
         if not queryset:
             personas = Persona.objects.filter(estado='ACT')
+            personas = personas.filter(Q(invitacion__evento=evento) | Q(free__evento=evento)).distinct()
         else:
             personas = queryset
-
         if validate_in_group(user, ('admin', 'entrada')):
             personas = personas.annotate(
                 invis=Count('invitacion__pk',
@@ -150,30 +165,19 @@ class PanelEvento(BasicView):
                                  filter=Q(free__vendedor=user, free__evento=evento, free__estado='USA'), distinct=True
                                  ),
             )
-        personas = personas.filter(Q(invis__gt=0) | Q(frees__gt=0))
+        #personas = personas.filter(Q(invis__gt=0) | Q(frees__gt=0))
         personas = personas.order_by('nombre')
-
-        full_list = personas.values('nombre', 'cedula', 'pk')
         if persona:
             personas = personas.filter(Q(nombre__icontains=persona) | Q(cedula__icontains=persona))
-        r = []
-        for persona in personas:
-            if validate_in_group(user, ('admin', 'entrada')):
-                listas = ListaInvitados.objects.filter(Q(personas=persona, invitacion__evento=evento.pk) |
-                                                       Q(personas_free=persona, free__evento=evento.pk)).distinct()
-            else:
-                listas = ListaInvitados.objects.filter(
-                    Q(personas=persona, invitacion__evento=evento.pk, invitacion__vendedor=user) |
-                    Q(personas_free=persona, free__evento=evento.pk, free__vendedor=user)).distinct()
-            r.append({'nombre': persona.nombre,
-                      'cedula': persona.cedula if persona.cedula else '',
-                      'pk': persona.pk,
-                      'invis': persona.invis,
-                      'used_invis': persona.used_invis,
-                      'frees': persona.frees,
-                      'used_frees': persona.used_frees,
-                      'listas': list(listas)})
-        return full_list, r
+
+        return personas
+
+    @staticmethod
+    def parse_invitaciones(evento, user, persona=None, queryset=None):
+        personas = PanelEvento.get_lista_invitados(evento, user)
+        full_list = personas.values('nombre', 'cedula', 'pk')
+
+        return full_list, personas
 
     def get_context_data(self, user, evento=None, persona=None, *args, **kwargs):
         c = super().get_context_data(user, *args, **kwargs)
@@ -182,14 +186,42 @@ class PanelEvento(BasicView):
         elif isinstance(evento, Evento):
             c['evento'] = evento
         else:
-            c['evento'] = Evento.objects.all()[0]
+            c['evento'] = Evento.objects.filter(estado='ACT').first()
 
         full_list, personas = self.parse_invitaciones(evento, user, persona=persona)
+
+        paginator = Paginator(personas, 20)
+
+        persona_set = paginator.get_page(kwargs.get('page', 1))
+
+        r = []
+        extra_data = {
+            'total_invis': 0,
+            'total_frees': 0,
+            'used_invis': 0,
+            'used_frees': 0,
+        }
+        for person in persona_set:
+            if validate_in_group(user, ('admin', 'entrada')):
+                listas = ListaInvitados.objects.filter(Q(personas=person, invitacion__evento=evento.pk) |
+                                                       Q(personas_free=person, free__evento=evento.pk)).distinct()
+            else:
+                listas = ListaInvitados.objects.filter(
+                    Q(personas=person, invitacion__evento=evento.pk, invitacion__vendedor=user) |
+                    Q(personas_free=person, free__evento=evento.pk, free__vendedor=user)).distinct()
+            r.append({'nombre': person.nombre,
+                      'cedula': person.cedula if person.cedula else '',
+                      'pk': person.pk,
+                      'invis': person.invis,
+                      'used_invis': person.used_invis,
+                      'frees': person.frees,
+                      'used_frees': person.used_frees,
+                      'listas': list(listas)})
+
+        persona_set.object_list = r
         c['personas_invitadas'] = full_list
         if persona:
             c['query_key'] = persona
-        paginator = Paginator(personas, 20)
-        persona_set = paginator.get_page(kwargs.get('page', 1))
         c['personas_page'] = persona_set
         if validate_in_group(user, ('admin', 'entrada')):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente__isnull=False).count()
