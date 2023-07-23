@@ -14,14 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name='invitacion',
-            index=models.Index(fields=['evento', 'cliente', 'vendedor'], name='eventos_inv_evento__37828e_idx'),
-        ),
-        migrations.RemoveIndex(
-            model_name='invitacion',
-            name='eventos_inv_evento__37828e_idx',
-        ),
-        migrations.AddIndex(
-            model_name='invitacion',
             index=models.Index(fields=['evento', 'cliente', 'vendedor', 'estado'], name='eventos_inv_evento__5dc332_idx'),
         ),
         migrations.AddIndex(
