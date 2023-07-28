@@ -17,6 +17,7 @@
 
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
+      {% if request.user.is_authenticated %}
       <div class="navbar-item is-hoverable has-dropdown">
         <a class="navbar-link" data-target="eventos">
           Eventos
@@ -30,6 +31,7 @@
           {% endfor %}
         </div>
       </div>
+      {% endif %}
       {% if request.user|has_group:"admin" %}
       <a class="navbar-item" href="/importar">
         Importar Excel
