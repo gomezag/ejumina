@@ -214,3 +214,6 @@ ENV/
 
 # End of https://www.gitignore.io/api/macos,linux,django,python,pycharm
 /frontend/
+/tests/.pytest_cache/
+/tests/chromedriver.exe
+/tests/geckodriver.exe
