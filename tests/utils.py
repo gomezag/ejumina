@@ -5,14 +5,20 @@ import re
 
 
 def login_as_user(driver, username):
-    url = BASE_URL
-    driver.get(url)
+    driver.get(BASE_URL)
     navbar = driver.find_element_by_id('navbarBasicExample')
     navbar_items = navbar.find_elements_by_class_name('navbar-item')
     navbar_items[-1].click()
     driver.find_element_by_id('id_username').send_keys(username)
     driver.find_element_by_id('id_password').send_keys(username)
     driver.find_element_by_css_selector("button[type='submit']").click()
+
+
+def current_user(driver):
+    username_on_top = driver.find_element(By.CSS_SELECTOR,
+                                          'div.navbar-brand').find_element(By.CSS_SELECTOR,
+                                                                           'a.navbar-item').text
+    return username_on_top.split(', ')[1]
 
 
 def create_evento(driver, evento_name, fecha=None):
@@ -32,6 +38,7 @@ def create_evento(driver, evento_name, fecha=None):
 
 
 def delete_evento(driver, event_name):
+    driver.get(BASE_URL)
     event_row = find_evento_in_table(driver, event_name)
     pencil = event_row.find_element(By.CSS_SELECTOR, 'button.plus-button i.fa.fa-pencil')
     pencil.click()  # Open the edit modal
@@ -66,20 +73,21 @@ def find_evento_in_table(driver, event_name):
 
 
 def invite_person(driver, event, person, user, as_user):
-    login_as_user(driver, as_user)
-    event_row = find_evento_in_table(driver, event)
-    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
-    driver.find_element_by_id('add-lista').click()
-    modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
+    try:
+        login_as_user(driver, as_user)
+        event_row = find_evento_in_table(driver, event)
+        event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+        driver.find_element_by_id('add-lista').click()
+        modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
 
-    modal.find_element_by_id('invi_persona').send_keys(person[0])
-    modal.find_element_by_id('invi_cedula').send_keys(person[1])
+        modal.find_element_by_id('invi_persona').send_keys(person[0])
+        modal.find_element_by_id('invi_cedula').send_keys(person[1])
 
-    modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
-    confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
-    confirm_btn.click()
-
-    login_as_user(driver, user)
+        modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
+        confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
+        confirm_btn.click()
+    finally:
+        login_as_user(driver, user)
 
 
 def find_persona_in_page(driver, persona):
@@ -103,7 +111,16 @@ def find_persona_in_page(driver, persona):
     return persona_row
 
 
-def find_invitacion_from_user(driver, user):
+def find_invitacion_from_user(driver, user, person, event):
+    driver.get(BASE_URL)
+    # Go to event
+    event_row = find_evento_in_table(driver, event)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+
+    # Find person in list
+    person_row = find_persona_in_page(driver, person)
+    person_row.find_element(By.CSS_SELECTOR, 'td a').click()
+
     # Get the TR element for the evento in eventos view.
     invi_table = driver.find_element(By.CSS_SELECTOR, 'table.table.tabla-personas')
     invi_rows = invi_table.find_elements_by_tag_name('tr')[1:]
@@ -123,3 +140,18 @@ def find_invitacion_from_user(driver, user):
     return invi_row
 
 
+def remove_invitation_from_user(driver, user, person, event):
+    cuser = current_user(driver)
+    try:
+        if user != cuser and user != 'admin':
+            login_as_user(driver, user)
+
+        # Find invitation and delete
+        invi_row = find_invitacion_from_user(driver, user, person, event)
+
+        invi_row.find_element(By.CSS_SELECTOR, 'button.plus-button.in-table.red').click()
+        driver.switch_to.alert.accept()
+
+    finally:
+        if user != cuser and user != 'admin':
+            login_as_user(driver, cuser)

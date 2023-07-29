@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 from constants import *
 from utils import *
+import pdb
 
 
 @pytest.fixture(scope='session')
@@ -26,22 +27,41 @@ def user(driver, request):
 @pytest.fixture(scope='module')
 def evento(driver, user):
 
-    # Login as admin
-    login_as_user(driver, 'admin')
+    try:
+        if user != 'admin':
+            # Login as admin
+            login_as_user(driver, 'admin')
 
-    # Create event
-    create_evento(driver, TEST_EVENT_NAME)
-
-    # Login again as user
-    login_as_user(driver, user)
+        # Create event
+        create_evento(driver, TEST_EVENT_NAME)
+    finally:
+        if user != 'admin':
+            # Login again as user
+            login_as_user(driver, user)
 
     yield TEST_EVENT_NAME
 
-    # Login as admin
-    login_as_user(driver, 'admin')
+    try:
+        if user != 'admin':
+            # Login as admin
+            login_as_user(driver, 'admin')
+        # Delete event
+        delete_evento(driver, TEST_EVENT_NAME)
+    finally:
+        if user != 'admin':
+            # Login as user
+            login_as_user(driver, user)
 
-    # Delete event
-    delete_evento(driver, TEST_EVENT_NAME)
 
-    # Login as user
-    login_as_user(driver, user)
+@pytest.fixture(scope='function')
+def invi_person(driver, user, evento):
+    person = TEST_PERSONAS[0]
+    if user in ['admin', 'rrpp']:
+        as_user = user
+    else:
+        as_user = 'rrpp'
+    invite_person(driver, evento, person, user, as_user)
+    try:
+        yield person
+    finally:
+        remove_invitation_from_user(driver, as_user, person, evento)

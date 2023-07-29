@@ -1,7 +1,7 @@
 import pytest
 import logging
 from utils import *
-
+import pdb
 logger = logging.getLogger(__name__)
 
 
@@ -139,22 +139,20 @@ def test_crear_usuario(driver, user):
 def test_can_invite_someone_new(driver, user, evento):
     event_row = find_evento_in_table(driver, evento)
     event_row.find_element(By.CSS_SELECTOR, 'td a').click()
-    if user == 'entrada':
-        with pytest.raises(NoSuchElementException):
-            driver.find_element_by_id('add-lista')
-    elif user == 'admin':
-        pytest.skip('Admin not tested ftm.')
-    elif user == 'rrpp':
+    if user in ['rrpp', 'admin']:
+        # Open form
         driver.find_element_by_id('add-lista').click()
         modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
         test_person = TEST_PERSONAS[0]
 
+        # Fillout form
         modal.find_element_by_id('invi_persona').send_keys(test_person[0])
         modal.find_element_by_id('invi_cedula').send_keys(test_person[1])
 
         input_invi = modal.find_element_by_id('invi_invitaciones')
         old_val = int(input_invi.get_attribute('value'))
 
+        # Check number buttons work
         modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
         new_val = int(input_invi.get_attribute('value'))
         assert new_val == old_val+1
@@ -163,6 +161,7 @@ def test_can_invite_someone_new(driver, user, evento):
         new_val = int(input_invi.get_attribute('value'))
         assert new_val == old_val
 
+        # Add one invite
         modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
 
         confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
@@ -170,21 +169,90 @@ def test_can_invite_someone_new(driver, user, evento):
 
         confirm_btn.click()
 
-        person_row = find_persona_in_page(driver, test_person)
-        person_row.find_element(By.CSS_SELECTOR, 'td a').click()
-
-        invi_row = find_invitacion_from_user(driver, user)
+        # Remove invitation
+        invi_row = find_invitacion_from_user(driver, user, test_person, evento)
 
         invi_row.find_element(By.CSS_SELECTOR, 'button.plus-button.in-table.red').click()
         alert = driver.switch_to.alert
         assert alert.text == 'Seguro que queres borrar estas entradas?'
 
         alert.accept()
+    else:
+        with pytest.raises(NoSuchElementException):
+            driver.find_element_by_id('add-lista')
 
 
-@pytest.mark.skip(reason="Not done yet.")
-def test_checkin_person(driver, user, evento):
-    pass
+def test_checkin_person(driver, user, evento, invi_person):
+    # Go to event
+    event_row = find_evento_in_table(driver, evento)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+
+    # Find person in list
+    person_row = find_persona_in_page(driver, invi_person)
+
+    # Get number of checked in invitations
+    invis = person_row.find_elements_by_tag_name('td')[0].text
+    checked_in_invis = int(re.search("(?<=\().*?(?=\))", invis).group())
+    assert checked_in_invis == 0
+
+    if user in ['admin', 'entrada']:
+        # Click Checkin button
+        person_row.find_element(By.CSS_SELECTOR, 'button.plus-button.green i.fa.fa-check').click()
+
+        # Get modal
+        modal = driver.find_element_by_id('checkin-dialog')
+        assert 'is-active' in modal.get_attribute('class')
+
+        check_invi_input = modal.find_element_by_id('id_check_invis')
+        old_input = check_invi_input.get_attribute('value')
+        modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
+        new_input = check_invi_input.get_attribute('value')
+        assert int(old_input)+1 == int(new_input)
+
+        modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-minus-circle').click()
+        new_input = check_invi_input.get_attribute('value')
+        assert int(old_input) == int(new_input)
+
+        modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle').click()
+        modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button.is-info').click()
+
+        # Get alert message
+        modal = driver.find_element_by_id('alert-dialog')
+        assert 'is-active' in modal.get_attribute('class')
+        assert modal.find_elements(By.CSS_SELECTOR, 'div.modal-card-body p')[1].text == '1 Invitados y 0 Frees'
+
+        modal.find_element_by_id('alert-close').click()
+
+        # Find person in list
+        person_row = find_persona_in_page(driver, invi_person)
+
+        # Get number of checked in invitations
+        invis = person_row.find_elements_by_tag_name('td')[0].text
+        checked_in_invis = int(re.search("(?<=\().*?(?=\))", invis).group())
+        assert checked_in_invis == 1
+
+        # Click Checkin button
+        person_row.find_element(By.CSS_SELECTOR, 'button.plus-button.green i.fa.fa-check').click()
+
+        # Get modal
+        modal = driver.find_element_by_id('checkin-dialog')
+        modal.find_element(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-minus-circle').click()
+        modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button.is-info').click()
+
+        # Get alert message
+        modal = driver.find_element_by_id('alert-dialog')
+        modal.find_element_by_id('alert-close').click()
+
+        # Find person in list
+        person_row = find_persona_in_page(driver, invi_person)
+
+        # Get number of checked in invitations
+        invis = person_row.find_elements_by_tag_name('td')[0].text
+        checked_in_invis = int(re.search("(?<=\().*?(?=\))", invis).group())
+        assert checked_in_invis == 0
+    else:
+        with pytest.raises(NoSuchElementException):
+            person_row.find_element(By.CSS_SELECTOR, 'button.plus-button.green i.fa.fa-check').click()
 
 
 @pytest.mark.skip(reason="Not done yet.")
@@ -208,5 +276,5 @@ def test_rrpp_invites_are_not_in_rrpp2_list(driver, user, evento):
 
 
 @pytest.mark.skip(reason="Not done yet.")
-def test_cant_invite_banned_person(driver, user, evento):
+def test_banned_person(driver, user, evento):
     pass
