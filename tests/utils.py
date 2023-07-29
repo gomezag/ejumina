@@ -140,6 +140,25 @@ def find_invitacion_from_user(driver, user, person, event):
     return invi_row
 
 
+def find_user_in_page(driver, user):
+    # Get the TR element for the evento in eventos view.
+    persona_table = driver.find_element_by_class_name('tabla-personas')
+    persona_rows = persona_table.find_elements_by_tag_name('tr')[1:]
+    persona_row = None
+    for row in persona_rows:
+        try:
+            name_el = row.find_element(By.CSS_SELECTOR, 'td')
+            if name_el.text == user:
+                persona_row = row
+                break
+        except NoSuchElementException:
+            pass
+    if not persona_row:
+        raise NoSuchElementException('No person with that name and ci found.')
+
+    return persona_row
+
+
 def remove_invitation_from_user(driver, user, person, event):
     cuser = current_user(driver)
     try:

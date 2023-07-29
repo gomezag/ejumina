@@ -300,9 +300,29 @@ def test_cant_give_frees_not_assigned(driver, user, evento):
     pass
 
 
-@pytest.mark.skip(reason="Not done yet.")
-def test_can_assign_frees(driver, user, evento):
-    pass
+def test_can_assign_frees_to_rrpp(driver, user, evento):
+    driver.get(BASE_URL)
+    event_row = find_evento_in_table(driver, evento)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+    if user == 'admin':
+        driver.find_element(By.CSS_SELECTOR, 'a.plus-button.yellow i.fa.fa-ticket').click()
+
+        user_row = find_user_in_page(driver, 'rrpp')
+        frees_old = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
+        driver.find_element_by_id('rrpp_frees').send_keys('4')
+        driver.find_element(By.CSS_SELECTOR, 'div.field input[type="submit"].button.is-info').click()
+        user_row = find_user_in_page(driver, 'rrpp')
+        frees_now = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
+        assert int(frees_now) - int(frees_old) == 4
+        driver.find_element_by_id('rrpp_frees').send_keys('-4')
+        driver.find_element(By.CSS_SELECTOR, 'div.field input[type="submit"].button.is-info').click()
+        user_row = find_user_in_page(driver, 'rrpp')
+        frees_now = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
+        assert int(frees_now) - int(frees_old) == 0
+
+    else:
+        with pytest.raises(NoSuchElementException):
+            driver.find_element(By.CSS_SELECTOR, 'a.plus-button.yellow i.fa.fa-ticket')
 
 
 @pytest.mark.skip(reason="Not done yet.")

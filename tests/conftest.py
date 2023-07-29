@@ -24,33 +24,20 @@ def user(driver, request):
     yield username
 
 
-@pytest.fixture(scope='module')
-def evento(driver, user):
+@pytest.fixture(scope='package')
+def evento(driver):
 
-    try:
-        if user != 'admin':
-            # Login as admin
-            login_as_user(driver, 'admin')
+    login_as_user(driver, 'admin')
 
-        # Create event
-        create_evento(driver, TEST_EVENT_NAME)
-    finally:
-        if user != 'admin':
-            # Login again as user
-            login_as_user(driver, user)
+    # Create event
+    create_evento(driver, TEST_EVENT_NAME)
 
     yield TEST_EVENT_NAME
 
-    try:
-        if user != 'admin':
-            # Login as admin
-            login_as_user(driver, 'admin')
-        # Delete event
-        delete_evento(driver, TEST_EVENT_NAME)
-    finally:
-        if user != 'admin':
-            # Login as user
-            login_as_user(driver, user)
+    # Login as admin
+    login_as_user(driver, 'admin')
+    # Delete event
+    delete_evento(driver, TEST_EVENT_NAME)
 
 
 @pytest.fixture(scope='class')
