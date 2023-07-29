@@ -210,3 +210,19 @@ def checkin_invi_person(driver, evento, person, n_invis=1, n_frees=0):
     finally:
         if cuser not in ['admin', 'entrada']:
             login_as_user(driver, cuser)
+
+
+def assign_free_to_user(driver, evento, user, n_frees=1):
+    cuser = current_user(driver)
+    if cuser != 'admin':
+        login_as_user(driver, 'admin')
+    driver.get(BASE_URL)
+    event_row = find_evento_in_table(driver, evento)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+    driver.find_element(By.CSS_SELECTOR, 'a.plus-button.yellow i.fa.fa-ticket').click()
+    driver.find_element_by_id('{}_frees'.format(user)).clear()
+    driver.find_element_by_id('{}_frees'.format(user)).send_keys(str(n_frees))
+    driver.find_element(By.CSS_SELECTOR, 'div.field input[type="submit"].button.is-info').click()
+
+    if cuser != 'admin':
+        login_as_user(driver, cuser)

@@ -1,10 +1,8 @@
 import pytest
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 from constants import *
 from utils import *
-import pdb
 
 
 @pytest.fixture(scope='session')
@@ -59,3 +57,15 @@ def checkin_person(driver, user, evento, invi_person):
     checkin_invi_person(driver, evento, invi_person, n_invis=1)
     yield invi_person
     checkin_invi_person(driver, evento, invi_person, n_invis=-1)
+
+
+@pytest.fixture
+def free_assign(driver, user, evento):
+    if user == 'admin':
+        yield None
+    elif user == 'rrpp':
+        assign_free_to_user(driver, evento, user, n_frees=1)
+        yield 1
+        assign_free_to_user(driver, evento, user, n_frees=-1)
+    else:
+        yield None

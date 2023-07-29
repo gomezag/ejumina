@@ -2,7 +2,7 @@ import pytest
 import logging
 from utils import *
 import time
-import pdb
+
 logger = logging.getLogger(__name__)
 
 
@@ -102,39 +102,6 @@ def test_create_and_delete_evento(driver, user):
         tabla_eventos = driver.find_element_by_id('tabla_personas')
         event_rows = tabla_eventos.find_elements_by_tag_name('tr')[1:]
         assert len(event_rows) == old_len
-
-
-@pytest.mark.skip(reason="can't delete user after creating it")
-def test_crear_usuario(driver, user):
-
-    pytest.skip('Skipping as long we can''t delete created test users')
-
-    url = 'http://127.0.0.1:8000/'
-    driver.get(url)
-
-    navbar = driver.find_element_by_id('navbarBasicExample')
-    navbar_start = navbar.find_elements_by_class_name('navbar-start')[0]
-    other_items = navbar_start.find_elements_by_xpath('./a[@class="navbar-item"]')
-    usuarios_btn = [item for item in other_items if item.text == 'Usuarios'][0]
-    usuarios_btn.click()
-
-    driver.find_element_by_id('add-form').click()
-    modal = driver.find_element(By.CSS_SELECTOR, 'div.modal.is-active')
-    assert modal.get_attribute('id') == 'form-dialog'
-    forms = modal.find_elements_by_tag_name('form')
-    assert len(forms) == 1
-    form = forms[0]
-    fields = form.find_elements_by_tag_name('input')
-    assert len(fields) == 5
-
-    form.find_element_by_id('id_username').send_keys(TEST_USER)
-    form.find_element_by_id('id_first_name').send_keys(TEST_USER)
-    form.find_element_by_id('id_email').send_keys(TEST_EMAIL)
-    form.find_element(By.CSS_SELECTOR, 'input.button.is-info[type="submit"]').click()
-
-    users_els = driver.find_elements(By.CSS_SELECTOR, 'div.card.user-card')
-    users = [el[0] for el in users_els]
-    assert any([u == TEST_USER for u in users])
 
 
 def test_can_invite_someone_new(driver, user, evento):
@@ -320,16 +287,120 @@ def test_can_assign_frees_to_rrpp(driver, user, evento):
             driver.find_element(By.CSS_SELECTOR, 'a.plus-button.yellow i.fa.fa-ticket')
 
 
-@pytest.mark.skip(reason="Not done yet.")
 def test_cant_give_frees_not_assigned(driver, user, evento):
-    pass
+    driver.get(BASE_URL)
+    event_row = find_evento_in_table(driver, evento)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+    if user == 'rrpp':
+        # Open form
+        driver.find_element_by_id('add-lista').click()
+        modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
+        test_person = TEST_PERSONAS[0]
+
+        # Fillout form
+        modal.find_element_by_id('invi_persona').send_keys(test_person[0])
+        modal.find_element_by_id('invi_cedula').send_keys(test_person[1])
+
+        input_frees = modal.find_element_by_id('invi_frees')
+        old_val = int(input_frees.get_attribute('value'))
+
+        # Check plus button wont work
+        modal.find_elements(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle')[1].click()
+        new_val = int(input_frees.get_attribute('value'))
+        assert new_val == old_val
+        input_frees.clear()
+        input_frees.send_keys('1')
+
+        confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
+
+        confirm_btn.click()
+        assert 'is-active' in modal.get_attribute('class')
+    elif user == 'admin':
+        pytest.skip('Admins can always give out frees.')
+    else:
+        with pytest.raises(NoSuchElementException):
+            driver.find_element_by_id('add-lista')
 
 
-@pytest.mark.skip(reason="Not done yet.")
-def test_can_give_frees(driver, user, evento):
-    pass
+def test_can_give_frees(driver, user, evento, free_assign):
+    driver.get(BASE_URL)
+    event_row = find_evento_in_table(driver, evento)
+    event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+    if user in ['admin', 'rrpp']:
+        # Open form
+        driver.find_element_by_id('add-lista').click()
+        modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
+        test_person = TEST_PERSONAS[0]
+
+        # Fillout form
+        modal.find_element_by_id('invi_persona').send_keys(test_person[0])
+        modal.find_element_by_id('invi_cedula').send_keys(test_person[1])
+
+        input_frees = modal.find_element_by_id('invi_frees')
+        old_val = int(input_frees.get_attribute('value'))
+
+        # Check number buttons work
+        modal.find_elements(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle')[1].click()
+        new_val = int(input_frees.get_attribute('value'))
+        assert new_val == old_val + 1
+
+        modal.find_elements(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-minus-circle')[1].click()
+        new_val = int(input_frees.get_attribute('value'))
+        assert new_val == old_val
+
+        # Add one invite
+        modal.find_elements(By.CSS_SELECTOR, 'div.plus-button i.fa.fa-plus-circle')[1].click()
+
+        confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
+        assert confirm_btn.get_attribute('value') == 'Invitar'
+
+        confirm_btn.click()
+        # Remove invitation
+        invi_row = find_invitacion_from_user(driver, user, test_person, evento)
+
+        invi_row.find_element(By.CSS_SELECTOR, 'button.plus-button.in-table.red').click()
+        alert = driver.switch_to.alert
+        assert alert.text == 'Seguro que queres borrar estas entradas?'
+
+        alert.accept()
+    else:
+        with pytest.raises(NoSuchElementException):
+            driver.find_element_by_id('add-lista')
 
 
 @pytest.mark.skip(reason="Not done yet.")
 def test_banned_person(driver, user, evento):
     pass
+
+
+@pytest.mark.skip(reason="can't delete user after creating it")
+def test_crear_usuario(driver, user):
+
+    pytest.skip('Skipping as long we can''t delete created test users')
+
+    url = 'http://127.0.0.1:8000/'
+    driver.get(url)
+
+    navbar = driver.find_element_by_id('navbarBasicExample')
+    navbar_start = navbar.find_elements_by_class_name('navbar-start')[0]
+    other_items = navbar_start.find_elements_by_xpath('./a[@class="navbar-item"]')
+    usuarios_btn = [item for item in other_items if item.text == 'Usuarios'][0]
+    usuarios_btn.click()
+
+    driver.find_element_by_id('add-form').click()
+    modal = driver.find_element(By.CSS_SELECTOR, 'div.modal.is-active')
+    assert modal.get_attribute('id') == 'form-dialog'
+    forms = modal.find_elements_by_tag_name('form')
+    assert len(forms) == 1
+    form = forms[0]
+    fields = form.find_elements_by_tag_name('input')
+    assert len(fields) == 5
+
+    form.find_element_by_id('id_username').send_keys(TEST_USER)
+    form.find_element_by_id('id_first_name').send_keys(TEST_USER)
+    form.find_element_by_id('id_email').send_keys(TEST_EMAIL)
+    form.find_element(By.CSS_SELECTOR, 'input.button.is-info[type="submit"]').click()
+
+    users_els = driver.find_elements(By.CSS_SELECTOR, 'div.card.user-card')
+    users = [el[0] for el in users_els]
+    assert any([u == TEST_USER for u in users])
