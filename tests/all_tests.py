@@ -295,11 +295,6 @@ class TestsWithInvite:
             login_as_user(driver, 'rrpp')
 
 
-@pytest.mark.skip(reason="Not done yet.")
-def test_cant_give_frees_not_assigned(driver, user, evento):
-    pass
-
-
 def test_can_assign_frees_to_rrpp(driver, user, evento):
     driver.get(BASE_URL)
     event_row = find_evento_in_table(driver, evento)
@@ -323,6 +318,11 @@ def test_can_assign_frees_to_rrpp(driver, user, evento):
     else:
         with pytest.raises(NoSuchElementException):
             driver.find_element(By.CSS_SELECTOR, 'a.plus-button.yellow i.fa.fa-ticket')
+
+
+@pytest.mark.skip(reason="Not done yet.")
+def test_cant_give_frees_not_assigned(driver, user, evento):
+    pass
 
 
 @pytest.mark.skip(reason="Not done yet.")
