@@ -150,8 +150,44 @@ def remove_invitation_from_user(driver, user, person, event):
         invi_row = find_invitacion_from_user(driver, user, person, event)
 
         invi_row.find_element(By.CSS_SELECTOR, 'button.plus-button.in-table.red').click()
-        driver.switch_to.alert.accept()
+        alert = driver.switch_to.alert
+        alert.accept()
 
     finally:
         if user != cuser and user != 'admin':
+            login_as_user(driver, cuser)
+
+
+def checkin_invi_person(driver, evento, person, n_invis=1, n_frees=0):
+    cuser = current_user(driver)
+    try:
+        if cuser not in ['admin', 'entrada']:
+            login_as_user(driver, 'entrada')
+        driver.get(BASE_URL)
+        invi_person = person
+        # Go to event
+        event_row = find_evento_in_table(driver, evento)
+        event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+
+        # Find person in list
+        person_row = find_persona_in_page(driver, invi_person)
+
+        # Click Checkin button
+        person_row.find_element(By.CSS_SELECTOR, 'button.plus-button.green i.fa.fa-check').click()
+
+        # Get modal
+        modal = driver.find_element_by_id('checkin-dialog')
+
+        # Check in
+        modal.find_element_by_id('id_check_invis').clear()
+        modal.find_element_by_id('id_check_invis').send_keys(str(n_invis))
+        modal.find_element_by_id('id_check_frees').clear()
+        modal.find_element_by_id('id_check_frees').send_keys(str(n_frees))
+        modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button.is-info').click()
+
+        # Close alert message
+        driver.find_element_by_id('alert-dialog').find_element_by_id('alert-close').click()
+
+    finally:
+        if cuser not in ['admin', 'entrada']:
             login_as_user(driver, cuser)

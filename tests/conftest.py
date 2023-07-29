@@ -53,7 +53,7 @@ def evento(driver, user):
             login_as_user(driver, user)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='class')
 def invi_person(driver, user, evento):
     person = TEST_PERSONAS[0]
     if user in ['admin', 'rrpp']:
@@ -65,3 +65,10 @@ def invi_person(driver, user, evento):
         yield person
     finally:
         remove_invitation_from_user(driver, as_user, person, evento)
+
+
+@pytest.fixture(scope='function')
+def checkin_person(driver, user, evento, invi_person):
+    checkin_invi_person(driver, evento, invi_person, n_invis=1)
+    yield invi_person
+    checkin_invi_person(driver, evento, invi_person, n_invis=-1)
