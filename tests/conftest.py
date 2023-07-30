@@ -69,3 +69,11 @@ def free_assign(driver, user, evento):
         assign_free_to_user(driver, evento, user, n_frees=-1)
     else:
         yield None
+
+
+@pytest.fixture(scope='session')
+def persona(driver):
+    person = TEST_PERSONAS[1]
+    create_persona(driver, person)
+    yield person
+    delete_persona(driver, person)

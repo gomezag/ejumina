@@ -368,9 +368,51 @@ def test_can_give_frees(driver, user, evento, free_assign):
             driver.find_element_by_id('add-lista')
 
 
-@pytest.mark.skip(reason="Not done yet.")
-def test_banned_person(driver, user, evento):
-    pass
+def test_create_and_delete_person(driver, user):
+    driver.get(BASE_URL+'personas')
+    person = ('askdfj', '12039')
+    if user == 'admin':
+        driver.find_element_by_id('add-form').click()
+        modal = driver.find_element_by_id('form-dialog')
+
+        modal.find_element_by_id('id_nombre').send_keys(person[0])
+        modal.find_element_by_id('id_cedula').send_keys(person[1])
+        modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button').click()
+
+        # Deactivate person
+
+        persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+        persona_row.find_element(By.CSS_SELECTOR,
+                                 'button[type="submit"].plus-button.in-table.red i.fa.fa-times').click()
+        driver.switch_to.alert.accept()
+
+        # Delete person
+        driver.get(driver.current_url)
+        persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+        persona_row.find_element(By.CSS_SELECTOR,
+                                 'button[type="submit"].plus-button.in-table.red i.fa.fa-trash').click()
+        driver.switch_to.alert.accept()
+        with pytest.raises(NoSuchElementException):
+            driver.get(driver.current_url)
+            find_persona_in_page(driver, person, ci_row=1, name_row=0)
+    else:
+        assert driver.current_url == BASE_URL
+
+
+def test_banned_person(driver, user, evento, persona):
+    if user in ['admin', 'rrpp']:
+        ban_persona(driver, persona)
+        try:
+            invite_person(driver, evento, persona, user, user)
+            driver.get(BASE_URL)
+            event_row = find_evento_in_table(driver, evento)
+            event_row.find_element(By.CSS_SELECTOR, 'td a').click()
+            with pytest.raises(NoSuchElementException):
+                find_persona_in_page(driver, persona)
+        finally:
+            unban_persona(driver, persona)
+    else:
+        pytest.skip('Not applicable for user {}'.format(user))
 
 
 @pytest.mark.skip(reason="can't delete user after creating it")

@@ -15,10 +15,13 @@ def login_as_user(driver, username):
 
 
 def current_user(driver):
-    username_on_top = driver.find_element(By.CSS_SELECTOR,
-                                          'div.navbar-brand').find_element(By.CSS_SELECTOR,
-                                                                           'a.navbar-item').text
-    return username_on_top.split(', ')[1]
+    try:
+        username_on_top = driver.find_element(By.CSS_SELECTOR,
+                                              'div.navbar-brand').find_element(By.CSS_SELECTOR,
+                                                                               'a.navbar-item').text
+        return username_on_top.split(', ')[1]
+    except:
+        return ''
 
 
 def create_evento(driver, evento_name, fecha=None):
@@ -90,7 +93,7 @@ def invite_person(driver, event, person, user, as_user):
         login_as_user(driver, user)
 
 
-def find_persona_in_page(driver, persona):
+def find_persona_in_page(driver, persona, ci_row=3, name_row=2):
     # Get the TR element for the evento in eventos view.
     persona_name, persona_ci = persona
     persona_table = driver.find_element_by_id('tabla_personas')
@@ -98,8 +101,8 @@ def find_persona_in_page(driver, persona):
     persona_row = None
     for row in persona_rows:
         try:
-            name_el = row.find_element(By.CSS_SELECTOR, 'td a')
-            ci_el = row.find_elements_by_tag_name('td')[3]
+            name_el = row.find_elements_by_tag_name('td')[name_row]
+            ci_el = row.find_elements_by_tag_name('td')[ci_row]
             if name_el.text == persona_name and ci_el.text == persona_ci:
                 persona_row = row
                 break
@@ -226,3 +229,75 @@ def assign_free_to_user(driver, evento, user, n_frees=1):
 
     if cuser != 'admin':
         login_as_user(driver, cuser)
+
+
+def create_persona(driver, person):
+    cuser = current_user(driver)
+    if cuser != 'admin':
+        login_as_user(driver, 'admin')
+
+    driver.get(BASE_URL+'personas')
+    driver.find_element_by_id('add-form').click()
+    modal = driver.find_element_by_id('form-dialog')
+
+    modal.find_element_by_id('id_nombre').send_keys(person[0])
+    modal.find_element_by_id('id_cedula').send_keys(person[1])
+    modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button').click()
+
+    if cuser != 'admin':
+        login_as_user(driver, cuser)
+
+
+def ban_persona(driver, person):
+    cuser = current_user(driver)
+    if cuser != 'admin':
+        login_as_user(driver, 'admin')
+
+    driver.get(BASE_URL+'personas')
+    persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+    persona_row.find_element(By.CSS_SELECTOR,
+                             'button[type="submit"].plus-button.in-table.red i.fa.fa-times').click()
+    driver.switch_to.alert.accept()
+
+    if cuser != 'admin':
+        login_as_user(driver, cuser)
+
+
+def delete_persona(driver, person):
+    cuser = current_user(driver)
+    if cuser != 'admin':
+        login_as_user(driver, 'admin')
+
+    driver.get(BASE_URL+'personas')
+    # Delete person
+    persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+    try:
+        persona_row.find_element(By.CSS_SELECTOR,
+                                 'button[type="submit"].plus-button.in-table.red i.fa.fa-trash').click()
+        driver.switch_to.alert.accept()
+    except NoSuchElementException:
+        ban_persona(driver, person)
+        driver.get(BASE_URL + 'personas')
+        persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+        persona_row.find_element(By.CSS_SELECTOR,
+                                 'button[type="submit"].plus-button.in-table.red i.fa.fa-trash').click()
+        driver.switch_to.alert.accept()
+
+    if cuser != 'admin':
+        login_as_user(driver, cuser)
+
+
+def unban_persona(driver, person):
+    cuser = current_user(driver)
+    if cuser != 'admin':
+        login_as_user(driver, 'admin')
+
+    driver.get(BASE_URL+'personas')
+    persona_row = find_persona_in_page(driver, person, ci_row=1, name_row=0)
+    persona_row.find_element(By.CSS_SELECTOR,
+                             'button[type="submit"].plus-button.in-table.green i.fa.fa-share-square-o').click()
+    driver.switch_to.alert.accept()
+
+    if cuser != 'admin':
+        login_as_user(driver, cuser)
+
