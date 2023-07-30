@@ -21,13 +21,13 @@ class Personas(BasicView, View):
         print(name, cedula)
         print(request.POST)
         if not name and not cedula:
-            return JsonResponse(data={'personas':[]})
+            return JsonResponse(data={'personas': []})
         if name:
             personas = personas.filter(nombre__icontains=name)
         if cedula:
             personas = personas.filter(cedula__icontains=cedula)
 
-        personas = [(p.nombre, p.cedula, p.pk) for p in personas]
+        personas = [(p.nombre, p.cedula, p.pk) for p in personas[:10]]
 
         return JsonResponse(data={'personas': personas})
 
@@ -35,7 +35,7 @@ class Personas(BasicView, View):
 def get_listas_for_persona_and_evento(request):
     user = request.user
     listas = []
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
         data = request.POST
         persona = data.get('persona', None)
         evento = data.get('evento', None)
