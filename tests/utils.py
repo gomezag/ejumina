@@ -2,6 +2,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from constants import *
 import re
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support.expected_conditions import alert_is_present
 
 
 def login_as_user(driver, username):
@@ -301,3 +303,20 @@ def unban_persona(driver, person):
     if cuser != 'admin':
         login_as_user(driver, cuser)
 
+
+def ajax_injection(driver):
+    ajax_injection = \
+        '$.ajax({{' \
+        '   type: "POST",' \
+        '   url: "{}",' \
+        '   dataType: "json",' \
+        '   data: {{}},' \
+        '   success: function(data) {{' \
+        '      alert(data);' \
+        '   }},' \
+        '   error: function(r) {{' \
+        '       alert(r.status);' \
+        '   }}' \
+        '}});'.format(driver.current_url)
+    driver.execute_script(ajax_injection)
+    WebDriverWait(driver, timeout=3).until(alert_is_present())

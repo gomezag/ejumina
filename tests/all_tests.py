@@ -7,6 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 def test_navbar_without_login(driver):
+    """
+    Test that the navbar without authentication shows only the Login button
+    """
     url = BASE_URL
     driver.get(url)
     navbar = driver.find_element_by_id('navbarBasicExample')
@@ -20,6 +23,9 @@ def test_navbar_without_login(driver):
 
 
 def test_login(driver, user):
+    """
+    Test that a user can login using the fixture user.
+    """
     username_on_top = driver.find_element(By.CSS_SELECTOR,
                                           'div.navbar-brand').find_element(By.CSS_SELECTOR,
                                                                            'a.navbar-item').text
@@ -27,6 +33,10 @@ def test_login(driver, user):
 
 
 def test_navbar_logged_in(driver, user):
+    """
+    Test that the navbar elements for an user matches the definition.
+
+    """
     navbar = driver.find_element_by_id('navbarBasicExample')
     navbar_start = navbar.find_elements_by_class_name('navbar-start')[0]
     eventos = navbar_start.find_element(By.CSS_SELECTOR, 'div.navbar-item.is-hoverable.has-dropdown')
@@ -43,6 +53,9 @@ def test_navbar_logged_in(driver, user):
 
 
 def test_create_and_delete_evento(driver, user):
+    """
+    Test create evento for admin and not allowed for other users.
+    """
     url = BASE_URL
     driver.get(url)
 
@@ -53,10 +66,7 @@ def test_create_and_delete_evento(driver, user):
 
     # Create a new test event
     driver.get(BASE_URL)
-    if user != 'admin':
-        with pytest.raises(NoSuchElementException):
-            driver.find_element_by_id('add-form')
-    else:
+    if user == 'admin':
         driver.find_element_by_id('add-form').click()
         modal = driver.find_element(By.CSS_SELECTOR, '.modal.is-active')
         fields = modal.find_elements_by_class_name('field')
@@ -102,6 +112,13 @@ def test_create_and_delete_evento(driver, user):
         tabla_eventos = driver.find_element_by_id('tabla_personas')
         event_rows = tabla_eventos.find_elements_by_tag_name('tr')[1:]
         assert len(event_rows) == old_len
+    else:
+        with pytest.raises(NoSuchElementException):
+            driver.find_element_by_id('add-form')
+        ajax_injection(driver)
+        alert = driver.switch_to.alert
+        assert alert.text == '403'
+        alert.accept()
 
 
 def test_can_invite_someone_new(driver, user, evento):
@@ -148,11 +165,21 @@ def test_can_invite_someone_new(driver, user, evento):
     else:
         with pytest.raises(NoSuchElementException):
             driver.find_element_by_id('add-lista')
+        ajax_injection(driver)
+        alert = driver.switch_to.alert
+        assert alert.text == '403'
+        alert.accept()
 
 
 class TestsWithInvite:
 
     def test_checkin_person(self, driver, user, evento, invi_person):
+        """
+        Test the checkin workflow.
+        With an invited person, go to the Event page, find the person in the table
+        and check in said person.
+        Afterwards, check the person out.
+        """
         # Go to event
         event_row = find_evento_in_table(driver, evento)
         event_row.find_element(By.CSS_SELECTOR, 'td a').click()
