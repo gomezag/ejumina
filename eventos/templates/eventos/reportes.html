@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load auth_extras %}
+{% block go_back %} / {% endblock %}
+{% block content %}
+
+<div id='users-pie'><!-- Plotly chart will be drawn inside this DIV --></div>
+<div id='users-bar'><!-- Plotly chart will be drawn inside this DIV --></div>
+<div id='users-lines'><!-- Plotly chart will be drawn inside this DIV --></div>
+
+<script nonce="{{request.csp_nonce}}">
+
+
+var layout = {
+  height: 400,
+  width: 500
+};
+var userBarData = {{user_bar_data|safe}};
+var userScatterData = {{user_scatter_data|safe}};
+Plotly.newPlot('users-lines', userScatterData, layout);
+
+var layout = {barmode: 'stack'};
+Plotly.newPlot('users-bar', userBarData, layout);
+
+</script>
+{% endblock %}

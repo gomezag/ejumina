@@ -23,4 +23,5 @@ urlpatterns = [
     path('l/<slug:lista>/', PanelListasInvitados.as_view()),
     path('importar', ImportView.as_view()),
     path('importar/confirmar/', ImportExcelToEvento.as_view()),
+    path('reportes', ReporteView.as_view()),
 ]
