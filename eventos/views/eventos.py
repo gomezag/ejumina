@@ -223,10 +223,10 @@ class PanelEvento(BasicView):
                       })
 
         page.object_list = r
-        c['personas_page'] = page
         c['personas_invitadas'] = full_list
         if persona:
             c['query_key'] = persona
+        c['personas_page'] = page
         if validate_in_group(user, ('admin', 'entrada')):
             c['invi_dadas'] = c['evento'].invitacion_set.filter(cliente__isnull=False).count()
             c['frees_dados'] = c['evento'].free_set.filter(cliente__isnull=False).count()

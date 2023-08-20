@@ -11,3 +11,4 @@ from .auth_view import *
 from .eventos import *
 from .usuarios import *
 from .imports import *
+from .reportes import *

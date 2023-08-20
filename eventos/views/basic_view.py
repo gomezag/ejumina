@@ -43,3 +43,12 @@ class AdminView(BasicView):
 
     def test_func(self):
         return self.request.user.groups.filter(name='admin').exists()
+
+
+class SuperAdminView(BasicView):
+    def handle_no_permission(self):
+        return HttpResponseRedirect('/')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
