@@ -1,0 +1,21 @@
+name: Build & Deploy
+on:
+  push:
+    tags:
+      - '1.0b'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{vars.NC_HST}} # Remote server address / ip - required
+          username: ${{vars.NC_USR}} # Remote server user - required
+          port: ${{secrets.NC_PORT}}
+          key: ${{secrets.NC_DEPLOY_KEY}} # Private ssh key registered on the remote server - required
+          passphrase: ${{secrets.NC_DEPLOY_PWD}}
+          script: ~/scripts/build_ejumina.sh test
+          debug: true
