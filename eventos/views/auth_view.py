@@ -7,6 +7,7 @@ Use of this code for any commercial purpose is NOT AUTHORIZED.
 El uso de éste código para cualquier propósito comercial NO ESTÁ AUTORIZADO.
 */
 """
+
 from django.views import View
 from django.contrib.auth.forms import authenticate, AuthenticationForm
 from django.shortcuts import render
@@ -14,6 +15,7 @@ from django.contrib.auth import login
 from django.http import HttpResponseRedirect
 from django.conf import settings
 
+from eventos.models.users import Usuario
 
 import urllib
 import os
@@ -56,7 +58,10 @@ class LoginView(View):
             username = request.POST['username']
             password = request.POST['password']
 
-            user = authenticate(username=username, password=password)
+            user = authenticate(
+                request=request,
+                username=username,
+                password=password)
 
             if user is not None:
                 if user.is_active:
@@ -67,6 +72,11 @@ class LoginView(View):
                         return HttpResponseRedirect('/')
                 else:
                     c['alert_msg'] = ['Usuario desactivado. Contacta con tu administrador.']
+            else:
+                form = self.form_class(request=request)
+                print()
+                c['form_error'] = form.get_invalid_login_error()
+                print(form.errors)
         else:
             captcha_error = True
         c['recaptcha_error'] = captcha_error
