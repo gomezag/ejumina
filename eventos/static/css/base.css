@@ -354,6 +354,20 @@ html {
     font-size: 2rem;
 }
 
+.body-content.left {
+    width:100%;
+}
+
+.body-content.small {
+    font-size: 1rem;
+}
+
+.body-list {
+    color: white;
+    list-style: initial;
+    font-size: 1.5rem;
+}
+
 .button-container {
     position: fixed;
     bottom: 30px;
