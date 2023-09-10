@@ -574,4 +574,23 @@ hr {
     transform: translateY(-4px) rotate(-45deg)
     }
     .pagination {font-size:var(--fontsize-ls);}
+
+    .body-content.left {
+        width:100%;
+        font-size: var(--fontsize-l);
+    }
+
+    .body-content.small {
+        font-size: var(--fontsize);
+    }
+
+    .body-list {
+        color: white;
+        list-style: initial;
+        font-size: var(--fontsize);
+        margin-left:5%;
+    }
+    .middle-window{
+        margin-top: 40%;
+    }
 }
