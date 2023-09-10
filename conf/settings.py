@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
     'eventos',
-    'api'
+    'api',
+    'axes'
 ]
 
 MIDDLEWARE = [
@@ -51,7 +52,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    # AxesStandaloneBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesStandaloneBackend',
+
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 3
+AXES_LOCK_OUT_AT_FAILURE = True
+
+import datetime as dt
+delta = dt.timedelta(seconds=10)
+
+AXES_COOLOFF_TIME = delta
+AXES_LOCKOUT_TEMPLATE = 'errors/lockout.html'
 
 ROOT_URLCONF = 'conf.urls'
 

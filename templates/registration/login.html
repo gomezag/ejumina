@@ -10,6 +10,7 @@
   <div class="field">
     <label class="label">{{field.label}}</label>
     <div class="control">{{field}}</div>
+    <p>{{field.errors}}</p>
   </div>
   {% endfor %}
   <div class="field">
@@ -17,5 +18,8 @@
   </div>
   <a href="{% url 'password_reset' %}">Olvidaste la contraseña?</a>
 </form>
+{% for error in form_error %}
+{{ error }}
+{% endfor %}
 {% include 'google_captcha_setup.html' %}
 {% endblock %}
