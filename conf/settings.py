@@ -116,6 +116,7 @@ SESSION_COOKIE_NAME = '__Secure-sessionid'
 CSRF_COOKIE_NAME = '__Secure-csrftoken'
 ROOT_URLCONF = 'conf.urls'
 CSRF_COOKIE_HTTPONLY = True
+CSRF_FAILURE_VIEW = 'eventos.views.errors.csrf_fail'
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Password validation
