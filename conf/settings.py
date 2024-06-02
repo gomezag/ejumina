@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -189,9 +190,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = os.getenv('STATIC_URL')
-STATIC_ROOT = os.getenv('STATIC_ROOT')
+STATIC_ROOT = os.path.join(BASE_DIR, os.getenv('STATIC_ROOT'))
+
 MEDIA_ROOT = os.path.join(BASE_DIR, os.getenv('MEDIA_ROOT'))
 MEDIA_URL = os.getenv('MEDIA_URL')
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
