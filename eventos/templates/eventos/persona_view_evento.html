@@ -62,7 +62,6 @@
         let buttonSend = form.getElementsByClassName('is-info')[0]
         let frees = Number(document.getElementById('id_frees').value);
         let invis = Number(document.getElementById('id_invitaciones').value);
-        console.log(invis);
         if (frees+invis>0) {
           buttonSend.disabled = false;
         } else {

@@ -1,57 +1,68 @@
 {% load auth_extras %}
-
+{% load static %}
+<script src="{% static 'js/sort.js' %}"></script>
 <div class="container">
     <div class="field has-addons">
         <div class="control">
             <input class="input searchbar " id="searchbar" type="text">
         </div>
         <div class="control">
-            <button class="button searchbar" onclick="search('');"><i class="fa fa-search"></i></button>
+            <button class="button searchbar"><i class="fa fa-search"></i></button>
         </div>
     </div>
 {% if query_key %}
-<button class="button filter-button" onclick="search('delete');"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
+<button class="button filter-button"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
         class="fa fa-close"></i></button>
 {% endif %}
 <script nonce="{{request.csp_nonce}}">
-function search(do_delete) {
-  if(do_delete){
-    var key = '';
-  }
-  else{
-    var key = document.getElementById("searchbar").value;
-  }
 
-  var url = window.location.href;
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if query_key %}
+        var button = document.querySelector('.filter-button.button');
+        button.addEventListener('click', function () { search('delete'); });
+        {% endif %}
+        button = document.querySelector('.searchbar.button')
+        button.addEventListener('click', function () { search(''); });
+    });
 
-  // Remove any existing persona parameter
-    if (url.includes('persona=')) {
-        url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
+    function search(do_delete) {
+      if(do_delete){
+        var key = '';
+      }
+      else{
+        var key = document.getElementById("searchbar").value;
+      }
+
+      var url = window.location.href;
+
+      // Remove any existing persona parameter
+        if (url.includes('persona=')) {
+            url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
+        }
+        else{
+            url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
+        }
+
+      // Check if page parameter is already present
+      if (url.includes('page=')) {
+        if(key){
+            // Modify page parameter to 1 and add persona parameter
+            url = url.replace(/(page=).*?(&)/, '$1' +'1'+'$2');
+        }
+      }
+      else {
+        url += (url.includes('?') ? '&' : '?') + "page=1";
+      }
+
+      window.location.href = url;
     }
-    else{
-        url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
-    }
 
-  // Check if page parameter is already present
-  if (url.includes('page=')) {
-    if(key){
-        // Modify page parameter to 1 and add persona parameter
-        url = url.replace(/(page=).*?(&)/, '$1' +'1'+'$2');
-    }
-  }
-  else {
-    url += (url.includes('?') ? '&' : '?') + "page=1";
-  }
-
-  window.location.href = url;
-}
-
-document.getElementById("searchbar").addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        search('');
-    }
-});
+    document.getElementById("searchbar").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            search('');
+        }
+    });
 </script>
 {% if personas_page %}
 {% if personas_page.has_other_pages %}
@@ -91,13 +102,13 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
 
 <table class="tabla-personas table" id="tabla_personas">
     <tr>
-        <th onclick="sortTable(0)">
+        <th data-sort="0">
             Nombre
         </th>
-        <th onclick="sortTable(1)">
+        <th data-sort="1">
             Cédula
         </th>
-        <th onclick="sortTable(2);">
+        <th>
             Acciones
         </th>
     </tr>
@@ -119,25 +130,22 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
             <div class="table-btn-container">
                 {% if request.user|has_group:'admin' %}
                 {% if persona.estado == 'ACT' %}
-                <button class="plus-button in-table blue" onclick="openEditModal('{{persona.pk}}',
-                                                                  '{{persona.nombre}}', '{{persona.cedula}}');">
-                    <i class="fa fa-pencil"></i>
+                <button class="plus-button in-table blue">
+                    <i class="fa fa-pencil" data-pk='{{persona.pk}}' data-name='{{persona.nombre}}'
+                        data-id='{{persona.cedula}}'></i>
                 </button>
-                <form method="POST" action=""
-                onsubmit="return confirm('Banear a esta persona?');">
+                <form method="POST" action=""  data-confirm='Banear a esta persona?'>
                        {% csrf_token %}
                         <input type="hidden" name="deactivate" value="{{persona.pk}}">
                         <button class="plus-button in-table red" type="submit" value="deactivate"><i class="fa fa-times"></i></button>
                 </form>
                 {% else %}
-                <form method="POST" action=""
-                onsubmit="return confirm('Queres volver a activar esta persona?');">
+                <form method="POST" action=""  data-confirm='Queres volver a activar esta persona?'>
                        {% csrf_token %}
                         <input type="hidden" name="reactivate" value="{{persona.pk}}">
                         <button class="plus-button in-table green" type="submit" value="reactivate"><i class="fa fa-share-square-o"></i></button>
                 </form>
-                <form method="POST" action=""
-                onsubmit="return confirm('Queres BORRAR a esta persona?');">
+                <form method="POST" action="" data-confirm="Queres BORRAR a esta persona?">
                        {% csrf_token %}
                         <input type="hidden" name="delete" value="{{persona.pk}}">
                         <button class="plus-button in-table red" type="submit" value="delete"><i class="fa fa-trash"></i></button>
@@ -149,3 +157,43 @@ document.getElementById("searchbar").addEventListener("keyup", function(event) {
         </tr>
     {% endfor %}
 </table>
+<script nonce="{{request.csp_nonce}}">
+    document.addEventListener('DOMContentLoaded', function() {
+        var headers = document.querySelectorAll('#tabla_personas th');
+        headers.forEach(function(header, index) {
+            var sort = header.getAttribute('data-sort');
+            if(sort){
+                header.addEventListener('click', function(el) {
+                    var index = el.target.getAttribute('data-sort');
+                    sortTable(index);
+                });
+            }
+        });
+        var editButtons = document.querySelectorAll('#tabla_personas .fa-pencil');
+        editButtons.forEach(function(button, index) {
+
+            button.addEventListener('click', function(el) {
+                var name = el.target.getAttribute('data-name');
+                var id = el.target.getAttribute('data-id');
+                var pk = el.target.getAttribute('data-pk');
+                openEditModal(pk, name, id);
+            });
+        });
+        var deleteButtons = document.querySelectorAll('#tabla_personas form');
+        deleteButtons.forEach(function(button,index) {
+            var confirm_msg = button.getAttribute('data-confirm');
+            if(confirm_msg) {
+                button.addEventListener('submit', function(el) {
+                    var msg = el.target.getAttribute('data-confirm');
+                    var confirmation = confirm(msg);
+                    if(!confirmation) {
+                        el.preventDefault();
+                    }
+                    else {
+                        el.target.submit();
+                    }
+                });
+            }
+        });
+    });
+</script>

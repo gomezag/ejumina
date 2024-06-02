@@ -277,7 +277,7 @@ class PanelEvento(BasicView):
         user = request.user
         if evento.estado != 'ACT' and (validate_in_group(user, ('admin',))):
             HttpResponseRedirect('/')
-        c = {}
+        c = dict(alert_msg=[])
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
         if validate_in_group(user, ('rrpp', 'admin')) and invitar:
@@ -294,12 +294,13 @@ class PanelEvento(BasicView):
                 frees = checkin_form.cleaned_data['check_frees']
                 c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
-                c['checkin_errors'] = checkin_form.errors
-                print(c['checkin_errors'])
+                c['form_errors'] = checkin_form.errors
             c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
         c.update(self.get_context_data(user, evento,
                                        persona=request.GET.get('persona', None),
                                        page=request.GET.get('page', None)))
+        if c.get('form_errors'):
+            c['alert_msg'].extend(['Form Errors', c.get('checkin_errors')])
         return render(request, self.template_name, context=c)
 
 
@@ -408,7 +409,6 @@ class PanelEventoPersona(BasicView):
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('id_lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
-            print(checkin, id_lista, evento)
             if checkin_form.is_valid(evento=evento):
                 checkin_form.save()
                 invis = checkin_form.cleaned_data['check_invis']
@@ -416,7 +416,6 @@ class PanelEventoPersona(BasicView):
                 c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
                 c['checkin_errors'] = checkin_form.errors
-                print(checkin_form.errors)
             c['checkin_form'] = checkin_form
         elif validate_in_group(request.user, ('rrpp', 'admin')):
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST, evento=evento)

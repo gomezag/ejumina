@@ -45,8 +45,7 @@ def test_navbar_logged_in(driver, user):
 
     other_items = navbar_start.find_elements_by_xpath('./a[@class="navbar-item"]')
     if user == 'admin':
-        assert [el.text for el in other_items] == ['Importar Excel', 'Personas', 'Usuarios', 'Listas', 'Admin Panel',
-                                                   'Reportes']
+        assert [el.text for el in other_items] == ['Importar Excel', 'Personas', 'Usuarios', 'Listas']
     elif user == 'rrpp':
         assert [el.text for el in other_items] == []
     elif user == 'entrada':

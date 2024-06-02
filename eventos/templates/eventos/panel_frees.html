@@ -24,10 +24,9 @@
                     Frees
                 </th>
                 <th>
-                    Agregar Frees
+                    Editar Frees
                 </th>
                 <th>
-                    Editar Frees
                 </th>
             </tr>
             </thead>
@@ -44,7 +43,7 @@
                     {{user.usedfree_count}}/{{user.free_count}}
                 </td>
                 {% if not user|has_group:'admin' %}
-                <td class="table-btn-container">
+                <td>
                     {% with nonusedfrees=user.free_count|sub:user.usedfree_count %}
                     {% include 'eventos/forms/free-form.html' with inputId=user.input_id frees=nonusedfrees %}
                     {% endwith %}
@@ -54,7 +53,7 @@
                 </td>
                 {% else %}
                 <td>
-                    <p> Es admin. </p>
+                    <div> Es admin. </div>
                 </td>
                 <td>
                     <a href="./u/{{user.pk}}"> Invitados </a>
@@ -69,5 +68,26 @@
         <input type="submit" class="button is-info" value="Guardar">
     </div>
 </form>
-    </div>
+</div>
+
+<script nonce="{{request.csp_nonce}}">
+    document.addEventListener('DOMContentLoaded', function() {
+        var plusButtons = document.querySelectorAll('.field.int-input .fa-plus-circle');
+        var minusButtons = document.querySelectorAll('.field.int-input .fa-minus-circle');
+
+        plusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = button.getAttribute('data-target');
+                stepOnUp(document.getElementById(targetId));
+            });
+        });
+
+        minusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = button.getAttribute('data-target');
+                stepOnDown(document.getElementById(targetId));
+            });
+        });
+    });
+</script>
 {% endblock %}

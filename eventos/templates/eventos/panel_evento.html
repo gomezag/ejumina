@@ -10,13 +10,7 @@
 <script src="{% static 'js/autocomplete.js' %}"></script>
 <script src="{% static 'js/form_autocomplete.js' %}"></script>
 <script src="{% static 'js/sort.js' %}"></script>
-{% if checkin_errors %}
-<script nonce="{{request.csp_nonce}}">
-    window.alert({{checkin_errors}});
 
-
-</script>
-{% endif %}
 
 <p class="title is-1">
     {{evento.name}} &nbsp; &nbsp;
@@ -53,57 +47,69 @@
             <input class="input searchbar " id="searchbar" type="text">
         </div>
         <div class="control">
-            <button class="button searchbar" onclick="search('');"><i class="fa fa-search"></i></button>
+            <button class="button searchbar"><i class="fa fa-search"></i></button>
         </div>
     </div>
 {% if query_key %}
-<button class="button filter-button" onclick="search('delete');"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
+<button class="button filter-button"><i> Filtro: '{{query_key}}'</i> &nbsp; &nbsp; <i
         class="fa fa-close"></i></button>
 {% endif %}
 
 </div>
 <script nonce="{{request.csp_nonce}}">
-function search(do_delete) {
-  if(do_delete){
-    var key = '';
-  }
-  else{
-    var key = document.getElementById("searchbar").value;
-  }
 
-  var url = window.location.href;
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if query_key %}
+        var button = document.querySelector('.filter-button.button');
+        button.addEventListener('click', function () { search('delete'); });
+        {% endif %}
+        button = document.querySelector('.searchbar.button')
+        button.addEventListener('click', function () { search(''); });
+    });
 
-  // Remove any existing persona parameter
-    if (url.includes('persona=')) {
-        url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
+    function search(do_delete) {
+      if(do_delete){
+        var key = '';
+      }
+      else{
+        var key = document.getElementById("searchbar").value;
+      }
+
+      var url = window.location.href;
+
+      // Remove any existing persona parameter
+        if (url.includes('persona=')) {
+            url = url.replace(/(persona=).*?(&|$)/, '$1'+key.replace(/ /g,'')+'$2');
+        }
+        else{
+            url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
+        }
+
+      // Check if page parameter is already present
+      if (url.includes('page=')) {
+        if(key){
+            // Modify page parameter to 1 and add persona parameter
+            url = url.replace(/(page=).*?(&)/, '$1' +'1'+'$2');
+        }
+      }
+      else {
+        url += (url.includes('?') ? '&' : '?') + "page=1";
+      }
+
+      window.location.href = url;
     }
-    else{
-        url += (url.includes('?') ? '&' : '?') + "persona="+key.replace(/ /g,'');
-    }
 
-  // Check if page parameter is already present
-  if (url.includes('page=')) {
-    if(key){
-        // Modify page parameter to 1 and add persona parameter
-        url = url.replace(/(page=).*?(&)/, '$1' +'1'+'$2');
-    }
-  }
-  else {
-    url += (url.includes('?') ? '&' : '?') + "page=1";
-  }
-
-  window.location.href = url;
-}
-
-document.getElementById("searchbar").addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        search('');
-    }
-});
+    document.getElementById("searchbar").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            search('');
+        }
+    });
 
 
 </script>
+
+
 <div class="table-container">
     {% include 'eventos/tablas/tabla_personas.html' %}
 </div>

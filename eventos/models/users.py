@@ -47,6 +47,6 @@ class Usuario(AbstractUser):
 
 
 if not hasattr(Group, 'parent'):
-    field = CharField(max_length=10)
+    field = CharField(max_length=10, null=True, blank=True)
     field.contribute_to_class(Group, 'label')
 

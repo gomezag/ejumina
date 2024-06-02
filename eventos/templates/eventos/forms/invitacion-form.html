@@ -1,4 +1,4 @@
-<div class="field is-grouped">
+<div class="field is-grouped" id="invi-form">
     <div class="field int-input">
         <label class="label">{{form.invitaciones.label}}</label>
         <div class="control">{{form.invitaciones}}</div>
@@ -6,8 +6,8 @@
 
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.invitaciones.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.invitaciones.id_for_label}}'));"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
     </div>
     <div class="field int-input">
         <label class="label">{{form.frees.label}}</label>
@@ -15,8 +15,8 @@
         <p class="help errors">{% for error in form.frees.errors %} <li>{{error}}</li>{% endfor %}</p>
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.frees.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.frees.id_for_label}}'));"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
     </div>
 </div>
 <div class="field">
@@ -42,11 +42,34 @@
     <p class="help errors">{% for error in form.email.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
  {% for field in form.hidden_fields %}
-     <div style="display:none;">{{ field }}</div>
+     <div class="hidden">{{ field }}</div>
  {% endfor %}
 <div class="field">
   <input type="submit" class="button is-info modal-button" value="Invitar" disabled>
 </div>
 
 <script nonce="{{request.csp_nonce}}">
+</script>
+
+
+<script nonce="{{request.csp_nonce}}">
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var plusButtons = document.querySelectorAll('#invi-form .fa-plus-circle');
+        var minusButtons = document.querySelectorAll('#invi-form .fa-minus-circle');
+
+        plusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = el.target.getAttribute('data-target');
+                stepOnUp(document.getElementById(targetId));
+            });
+        });
+
+        minusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = el.target.getAttribute('data-target');
+                stepOnDown(document.getElementById(targetId));
+            });
+        });
+    });
 </script>

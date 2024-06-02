@@ -34,29 +34,35 @@
                     {% if request.user|has_group:'admin' %}
                         {% if evento.estado == 'ACT' %}
                             <form method="POST" action=""
-                            onsubmit="return confirm('Seguro que queres desactivar este evento?');">
+                            data-confirm="Seguro que queres desactivar este evento?">
                                    {% csrf_token %}
                                     <input type="hidden" name="delete" value="{{evento.pk}}">
                                     <button class="plus-button in-table red" type="submit" value="DELETE"><i class="fa fa-ban"></i></button>
                             </form>
                         {% else %}
                             <form method="POST" action=""
-                            onsubmit="return confirm('Seguro que queres reactivar este evento?');">
+                            data-confirm="Seguro que queres reactivar este evento?">
                                    {% csrf_token %}
                                     <input type="hidden" name="delete" value="{{evento.pk}}">
                                     <button class="plus-button in-table green" type="submit" value="DELETE"><i class="fa fa-repeat"></i></button>
                             </form>
                         {% endif %}
-                        <button class="plus-button blue" onclick="openEditModal('{{evento.pk}}',
-                        '{{evento.name}}', '{{evento.fecha|date:'Y-m-d'}}');">
-                            <i class="fa fa-pencil"></i>
+                        <button class="plus-button blue">
+                            <i class="fa fa-pencil"
+                               data-pk="{{evento.pk}}"
+                               data-name="{{evento.name}}"
+                               data-date="{{evento.fecha|date:'Y-m-d'}}"
+                            ></i>
                         </button>
                         {% if evento.estado == 'ACT' %}
-                            <button onclick=window.location.href='e/{{evento.slug}}/frees' class="plus-button yellow"> <i class="fa fa-ticket"></i></button>
+                            <button class="plus-button yellow">
+                                <i class="fa fa-ticket"
+                                   data-slug="{{evento.slug}}"></i>
+                            </button>
                         {% endif %}
                     {% endif %}
                     <form method="POST" action=""
-                        onsubmit="return confirm('Seguro que queres enviarte la lista de invitados?');">
+                        data-confirm="Seguro que queres enviarte la lista de invitados?">
                                {% csrf_token %}
                                 <input type="hidden" name="mail_csv" value="{{evento.pk}}">
                                 <button class="plus-button in-table yellow" type="submit" value="mail_csv"><i class="fa fa-envelope"></i></button>
@@ -70,3 +76,41 @@
     {% endfor %}
     </tbody>
 </table>
+
+<script nonce="{{request.csp_nonce}}">
+    document.addEventListener('DOMContentLoaded', function() {
+        var editButtons = document.querySelectorAll('#tabla_personas .fa-pencil');
+        editButtons.forEach(function(button, index) {
+            button.addEventListener('click', function(el) {
+                btn = el.target;
+                var name = btn.getAttribute('data-name');
+                var date = btn.getAttribute('data-date');
+                var pk = btn.getAttribute('data-pk');
+                openEditModal(pk, name, date);
+            });
+        });
+        var deleteButtons = document.querySelectorAll('#tabla_personas form');
+        deleteButtons.forEach(function(button,index) {
+            var confirm_msg = button.getAttribute('data-confirm');
+            if(confirm_msg) {
+                button.addEventListener('submit', function(el) {
+                    var msg = el.target.getAttribute('data-confirm');
+                    var confirmation = confirm(msg);
+                    if(!confirmation) {
+                        el.preventDefault();
+                    }
+                    else {
+                        el.target.submit();
+                    }
+                });
+            }
+        });
+        var ticketButtons = document.querySelectorAll('#tabla_personas .fa-ticket');
+        ticketButtons.forEach(function(button,index) {
+            button.addEventListener('click', function(el){
+                var slug = el.target.getAttribute('data-slug');
+                window.location.href='e/'+slug+'/frees';
+            });
+        });
+    });
+</script>

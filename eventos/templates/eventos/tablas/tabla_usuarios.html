@@ -10,12 +10,13 @@
                   {% if not forloop.last %},{% endif %} {% endfor %}</a>
                     {% if request.user|has_group:"admin" %}
                     <div class="table-btn-container">
-                    <button class="plus-button blue" onclick="openEditModal('{{user.pk}}',
-                    '{{user.first_name}}', '{{user.email}}',
-                    [{% for group in user.groups.all %}
-                        '{{group.pk}}'
-                        {% if not forloop.last %},{% endif %}
-                    {% endfor %} ]);"><i class="fa fa-pencil"></i></button>
+                        <button class="plus-button blue">
+                        <i class="fa fa-pencil"
+                           data-pk='{{user.pk}}'
+                           data-name='{{user.first_name}}'
+                           data-email='{{user.email}}'
+                           data-groups="{% for group in user.groups.all %}'{{group.pk}}'{% if not forloop.last %},{% endif %}{% endfor %}"
+                        ></i></button>
                     </div>
                     {% endif %}
                     {% if not user.is_active %} <p>(Desactivado)</p> {% endif %}
@@ -30,14 +31,14 @@
                         {% if request.user|has_group:"admin" %}
                         {% if user.is_active%}
                         <form method="POST" action="" class="table-form"
-                                onsubmit="return confirm('Enviar correo a este usuario?');">
+                                data-confirm="Enviar correo a este usuario?">
                                {% csrf_token %}
                                 <input type="hidden" name="reset" value="{{user.pk}}">
                                 <input class="button is-info" type="submit" value="Rest. Contraseña">
                         </form>
                         {% if user != request.user %}
                         <form method="POST" action="" class="table-form"
-                                onsubmit="return confirm('Desactivar este usuario?');">
+                                data-confirm="Desactivar este usuario?">
                                {% csrf_token %}
                                 <input type="hidden" name="delete" value="{{user.pk}}">
                                 <input class="button is-danger" type="submit" value="Desactivar">
@@ -45,7 +46,7 @@
                         {% endif %}
                         {% else %}
                         <form method="POST" action="" class="table-form"
-                                onsubmit="return confirm('Reactivar este usuario?');">
+                                data-confirm="Reactivar este usuario?">
                                {% csrf_token %}
                                 <input type="hidden" name="reactivate" value="{{user.pk}}">
                                 <input class="button is-warning" type="submit" value="Reactivar">
@@ -59,3 +60,36 @@
     {% endfor %}
     </div>
 </div>
+
+<script nonce="{{request.csp_nonce}}">
+    document.addEventListener('DOMContentLoaded', function() {
+        var editButtons = document.querySelectorAll('.user-card .fa-pencil');
+        editButtons.forEach(function(button, index) {
+            button.addEventListener('click', function(el) {
+                btn = el.target;
+                var groupsStr = btn.getAttribute('data-groups');
+                var groups = groupsStr.split(',');
+                var name = btn.getAttribute('data-name');
+                var email = btn.getAttribute('data-email');
+                var pk = btn.getAttribute('data-pk');
+                openEditModal(pk, name, email, groups);
+            });
+        });
+        var deleteButtons = document.querySelectorAll('.user-card form');
+        deleteButtons.forEach(function(button,index) {
+            var confirm_msg = button.getAttribute('data-confirm');
+            if(confirm_msg) {
+                button.addEventListener('submit', function(el) {
+                    var msg = el.target.getAttribute('data-confirm');
+                    var confirmation = confirm(msg);
+                    if(!confirmation) {
+                        el.preventDefault();
+                    }
+                    else {
+                        el.target.submit();
+                    }
+                });
+            }
+        });
+    });
+</script>

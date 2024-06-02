@@ -10,6 +10,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+from django.urls import reverse_lazy
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
+    'cspreports',
     'eventos',
     'api',
     'axes'
@@ -54,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -227,7 +231,11 @@ else:
 
 # CSP rules
 
-CSP_REPORT_URI = '<add your reporting uri>'
+CSP_REPORT_URI = reverse_lazy('report_csp')
+CSP_REPORTS_EMAIL_ADMINS = True
+CSP_REPORTS_SAVE = True
+CSP_REPORT_PERCENTAGE = 1
+
 
 # default source as self
 CSP_DEFAULT_SRC = ("'none'",)
@@ -236,6 +244,7 @@ CSP_DEFAULT_SRC = ("'none'",)
 CSP_STYLE_SRC = ("'self'",
                  "cdn.jsdelivr.net",
                  "www.google.com",
+                 "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='",
                  os.getenv('STATIC_URL'))
 
 # scripts from our domain and other domains
@@ -243,26 +252,26 @@ CSP_SCRIPT_SRC = ("'self'",
                   "ajax.googleapis.com",
                   "https://www.google.com/recaptcha/",
                   "https://www.gstatic.com/recaptcha/",
+                  "https://vercel.live/",
                   os.getenv('STATIC_URL')
                  )
 
-CSP_FRAME_SRC = ("https://www.google.com/recaptcha/")
+CSP_FRAME_SRC = ("https://www.google.com/recaptcha/", "https://vercel.live/")
 
 # images from our domain and other domains
 CSP_IMG_SRC = ("'self'",
+               "data:",
                os.getenv('STATIC_URL'),
                os.getenv('MEDIA_URL'))
 
 # loading manifest, workers, frames, etc
 CSP_FONT_SRC = ("'self'", "cdn.jsdelivr.net", os.getenv('STATIC_URL'))
-CSP_CONNECT_SRC = ("'self'",)
+CSP_CONNECT_SRC = ("'self'", "https://vercel.live/")
 CSP_OBJECT_SRC = ("'self'",)
 CSP_BASE_URI = ("'self'",)
 CSP_FRAME_ANCESTORS = ("'self'",)
 CSP_FORM_ACTION = ("'self'",)
-CSP_INCLUDE_NONCE_IN = ('script-src', 'style-src')
+CSP_INCLUDE_NONCE_IN = ('style-src', 'script-src')
 CSP_MANIFEST_SRC = ("'self'",)
 CSP_WORKER_SRC = ("'self'",)
 CSP_MEDIA_SRC = ("'self'",)
-
-CSP_REPORT_PERCENTAGE = 0.1

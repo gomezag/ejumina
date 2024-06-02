@@ -39,19 +39,19 @@
 <table class="tabla-personas table is-bordered is-fullwidth is-hoverable" id="tabla_personas">
     <thead>
     <tr>
-        <th onclick="sortTable(0)">
+        <th data-sort="0">
             Inv.
         </th>
-        <th onclick="sortTable(1)">
+        <th data-sort="1">
             Free
         </th>
-        <th onclick="sortTable(2);">
+        <th data-sort="2">
             Nombre
         </th>
-        <th onclick="sortTable(3);">
+        <th data-sort="3">
             Cédula
         </th>
-        <th onclick="sortTable(4);">
+        <th data-sort="4">
             Lista
         </th>
         {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
@@ -81,7 +81,7 @@
             </td>
             <td id="{{persona.pk}}-listas">
                 <i>Cargando...</i>
-                <script>
+                <script nonce="{{request.csp_nonce}}">
                     var csrftoken = getCookie('csrftoken');
                     var data = {
                               csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -103,9 +103,14 @@
             {% if request.user|has_group:"admin" or request.user|has_group:"entrada" %}
             <td>
                 <div class="table-btn-container">
-                <button class="plus-button green" onclick="openCheckInModal({{persona.pk}},
-                {{persona.frees}}, {{persona.used_frees}}, {{persona.invis}}, {{persona.used_invis}});">
-                    <i class="fa fa-check"></i>
+                <button class="plus-button green">
+                    <i class="fa fa-check"
+                       data-pk="{{persona.pk}}"
+                       data-frees="{{persona.frees}}"
+                       data-usedfrees="{{persona.used_frees}}"
+                       data-invis="{{persona.invis}}"
+                       data-usedinvis="{{persona.used_invis}}"
+                    ></i>
                 </button>
                 </div>
             </td>
@@ -114,3 +119,30 @@
     {% endfor %}
     </tbody>
 </table>
+
+<script nonce="{{request.csp_nonce}}">
+    document.addEventListener('DOMContentLoaded', function() {
+        var buttons = document.querySelectorAll('#tabla_personas .table-btn-container .plus-button.green');
+        buttons.forEach(function(button) {
+                button.addEventListener('click', function(el) {
+                    btn = el.target;
+                    var pk = btn.getAttribute('data-pk');
+                    var frees = btn.getAttribute('data-frees');
+                    var usedfrees = btn.getAttribute('data-usedfrees');
+                    var invis = btn.getAttribute('data-invis');
+                    var usedinvis = btn.getAttribute('data-usedinvis');
+                    openCheckInModal(pk, frees, usedfrees, invis, usedinvis);
+                });
+        });
+        var headers = document.querySelectorAll('#tabla_personas th');
+        headers.forEach(function(header, index) {
+            var sort = header.getAttribute('data-sort');
+            if(sort){
+                header.addEventListener('click', function(el) {
+                    var index = el.target.getAttribute('data-sort');
+                    sortTable(index);
+                });
+            }
+        });
+    });
+</script>

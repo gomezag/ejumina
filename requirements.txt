@@ -1,6 +1,8 @@
 asgiref==3.6.0
 Django==4.1.7
 django-cors-headers==3.14.0
+django-csp==3.8
+django-csp-reports==1.9.0
 django-rest-framework==0.1.0
 django-simple-history==3.3.0
 djangorestframework==3.14.0

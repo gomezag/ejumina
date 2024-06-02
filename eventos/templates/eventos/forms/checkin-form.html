@@ -1,4 +1,4 @@
-<div class="field is-grouped">
+<div class="field is-grouped" id="check-in-form">
     <div class="field int-input">
         <label class="label">{{form.check_invis.label}}</label>
         <div class="control">{{form.check_invis}}</div>
@@ -6,8 +6,12 @@
 
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.check_invis.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.check_invis.id_for_label}}'));"></i></div>
+        <div class="plus-button">
+            <i class="fa fa-plus-circle" data-target="{{form.check_invis.id_for_label}}"></i>
+        </div>
+        <div class="plus-button">
+            <i class="fa fa-minus-circle" data-target="{{form.check_invis.id_for_label}}"></i>
+        </div>
     </div>
     <div class="field int-input">
         <label class="label">{{form.check_frees.label}}</label>
@@ -16,12 +20,38 @@
 
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.check_frees.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.check_frees.id_for_label}}'));"></i></div>
+        <div class="plus-button">
+            <i class="fa fa-plus-circle" data-target="{{form.check_frees.id_for_label}}"></i>
+        </div>
+        <div class="plus-button">
+            <i class="fa fa-minus-circle" data-target="{{form.check_frees.id_for_label}}"></i>
+        </div>
     </div>
 </div>
-    <div style="display:none;">{{ form.persona }}</div>
-    <div style="display:none;"><input type="hidden" name="checkin" value="True"></div>
+    <div class="hidden">{{ form.persona }}</div>
+    <div class="hidden"><input type="hidden" name="checkin" value="True"></div>
 <div class="field" disabled>
   <input type="submit" class="button is-info modal-button" value="Check-In" disabled>
 </div>
+
+<script nonce="{{request.csp_nonce}}">
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var plusButtons = document.querySelectorAll('#check-in-form .fa-plus-circle');
+        var minusButtons = document.querySelectorAll('#check-in-form .fa-minus-circle');
+
+        plusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = button.getAttribute('data-target');
+                stepOnUp(document.getElementById(targetId));
+            });
+        });
+
+        minusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = button.getAttribute('data-target');
+                stepOnDown(document.getElementById(targetId));
+            });
+        });
+    });
+</script>

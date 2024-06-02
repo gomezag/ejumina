@@ -1,5 +1,5 @@
 {% load auth_extras %}
-<table class="table tabla-personas">
+<table class="table tabla-personas" id="tabla-invitaciones">
     <thead>
     <tr>
         <th>
@@ -45,7 +45,7 @@
                     {% if invitacion.rrpp == request.user or request.user|has_group:"admin"%}
                     <div class="field">
                     <form method="post" class="table-form" action=""
-                    onsubmit="return confirm('Seguro que queres borrar estas entradas?');">
+                    data-confirm="Seguro que queres borrar estas entradas?">
                         {% csrf_token %}
                         <input type="hidden" name="delete" value="1">
                         <input type="hidden" name="lista" value="{{invitacion.lista_id}}">
@@ -61,10 +61,15 @@
                     {% endif %}
                     {% if request.user|has_group:"entrada" or request.user|has_group:"admin"%}
                     <div class="field">
-                        <button class="plus-button in-table green"
-                                onclick="openCheckInModal({{invitacion.rrpp.pk}}, {{invitacion.frees}},
-                                {{invitacion.used_frees}}, {{invitacion.invis}}, {{invitacion.used_invis}}, {{invitacion.lista_id}});">
-                            <i class="fa fa-check"></i>
+                        <button class="plus-button in-table green">
+                            <i class="fa fa-check"
+                               data-pk="{{invitacion.rrpp.pk}}"
+                               data-frees="{{invitacion.frees}}"
+                               data-usedfrees="{{invitacion.used_frees}}"
+                               data-invis="{{invitacion.invis}}"
+                               data-usedinvis="{{invitacion.used_invis}}"
+                               data-listaid="{{invitacion.lista_id}}"
+                            ></i>
                         </button>
                     </div>
                     {% endif %}
@@ -74,3 +79,38 @@
     {% endfor %}
     </tbody>
 </table>
+<script nonce="{{request.csp_nonce}}">
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var editButtons = document.querySelectorAll('#tabla-invitaciones .table-btn-container .fa-check');
+        editButtons.forEach(function(button, index) {
+            button.addEventListener('click', function(el) {
+                btn = el.target;
+                var pk = btn.getAttribute('data-pk');
+                var frees = btn.getAttribute('data-frees');
+                var usedfrees = btn.getAttribute('data-usedfrees');
+                var invis = btn.getAttribute('data-invis');
+                var usedinvis = btn.getAttribute('data-usedinvis');
+                var listaid = btn.getAttribute('data-listaid');
+                openCheckInModal(pk, frees, usedfrees, invis, usedinvis, listaid);
+            });
+        });
+
+        var deleteButtons = document.querySelectorAll('#tabla-invitaciones form');
+        deleteButtons.forEach(function(button,index) {
+            var confirm_msg = button.getAttribute('data-confirm');
+            if(confirm_msg) {
+                button.addEventListener('submit', function(el) {
+                    var msg = el.target.getAttribute('data-confirm');
+                    var confirmation = confirm(msg);
+                    if(!confirmation) {
+                        el.preventDefault();
+                    }
+                    else {
+                        el.target.submit();
+                    }
+                });
+            }
+        });
+    });
+</script>
