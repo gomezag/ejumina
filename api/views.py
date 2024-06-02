@@ -18,8 +18,6 @@ class Personas(BasicView, View):
         name = data.get('invi_persona', None)
         cedula = data.get('invi_cedula', None)
         personas = Persona.objects.all()
-        print(name, cedula)
-        print(request.POST)
         if not name and not cedula:
             return JsonResponse(data={'personas': []})
         if name:

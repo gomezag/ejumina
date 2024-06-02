@@ -100,7 +100,7 @@ EMAIL_PORT = os.environ.get('MAIL_PRT', '')
 
 DEFAULT_FROM_EMAIL = 'Ejumina <{}>'.format(os.environ.get('MAIL_USR', ''))
 
-WSGI_APPLICATION = 'conf.wsgi.application'
+WSGI_APPLICATION = 'conf.wsgi.app'
 
 
 # Database
@@ -117,22 +117,38 @@ if os.environ.get('DB_ENGINE', 'SQLITE3') == 'MYSQL':
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
+elif os.environ.get('DB_ENGINE', 'SQLITE3') == 'XATA':
+    engine = {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_SCHEMA'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PWD'),
+        'HOST': f'{os.getenv("XATA_REGION")}.sql.xata.sh',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 500,
+        'OPTIONS': {
+            'sslmode': 'require'
+        }
+    }
 else:
     engine = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
     options = {}
+
 DATABASES = {
     'default': engine
 }
 
+# Cookie settings
 
-CSRF_COOKIE_SECURE = True
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_NAME = '__Secure-sessionid'
+    CSRF_COOKIE_NAME = '__Secure-csrftoken'
 CSRF_USE_SESSIONS = True
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_NAME = '__Secure-sessionid'
-CSRF_COOKIE_NAME = '__Secure-csrftoken'
 ROOT_URLCONF = 'conf.urls'
 CSRF_COOKIE_HTTPONLY = True
 CSRF_FAILURE_VIEW = 'eventos.views.errors.csrf_fail'
@@ -181,6 +197,8 @@ MEDIA_URL = os.getenv('MEDIA_URL')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Redirect and security
+## Strict-Transport-Security
 
 LOGOUT_REDIRECT_URL = '/'
 X_FRAME_OPTIONS = 'DENY'
@@ -193,16 +211,14 @@ if os.getenv('DEBUG'):
     SECURE_SSL_REDIRECT = False
 else:
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    ## Strict-Transport-Security
     SECURE_HSTS_SECONDS = 15768000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
 
-
+# CSP rules
 
 CSP_REPORT_URI = '<add your reporting uri>'
-
 
 # default source as self
 CSP_DEFAULT_SRC = ("'none'",)

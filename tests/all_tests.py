@@ -45,7 +45,8 @@ def test_navbar_logged_in(driver, user):
 
     other_items = navbar_start.find_elements_by_xpath('./a[@class="navbar-item"]')
     if user == 'admin':
-        assert [el.text for el in other_items] == ['Importar Excel', 'Personas', 'Usuarios', 'Listas', 'Admin Panel']
+        assert [el.text for el in other_items] == ['Importar Excel', 'Personas', 'Usuarios', 'Listas', 'Admin Panel',
+                                                   'Reportes']
     elif user == 'rrpp':
         assert [el.text for el in other_items] == []
     elif user == 'entrada':
@@ -265,7 +266,7 @@ class TestsWithInvite:
                     time.sleep(0.2)
                     err_cnt += 1
             if err_cnt == 2:
-                time.sleep(0.2)
+                time.sleep(0.5)
                 modal = driver.find_element_by_id('alert-dialog')
                 assert 'is-active' in modal.get_attribute('class')
             msg = modal.find_element(By.CSS_SELECTOR, 'div.modal-card-body p').text
