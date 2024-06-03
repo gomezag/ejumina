@@ -34,6 +34,10 @@ class ListaInvitadosForm(forms.ModelForm):
         model = ListaInvitados
         fields = ['nombre', 'administradores', 'color']
 
+    def __init__(self, *args, **kwargs):
+        super(ListaInvitadosForm, self).__init__(*args, **kwargs)
+        self.fields["administradores"].queryset = Usuario.objects.filter(is_superuser=False)
+
 
 class MultiInviAssignToPersona(forms.Form):
     invitaciones = forms.IntegerField(min_value=0, initial=0)
