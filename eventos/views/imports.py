@@ -125,6 +125,7 @@ class ImportExcelToEvento(BasicView):
         evento = Evento.objects.get(pk=evento_pk)
         errors = []
         if parsed_data and evento:
+            parsed_invis = 0
             for row in parsed_data:
                 if 'error' not in [r[0] for r in row['errors']]:
                     form = InvitacionAssignForm(request.user, data={
@@ -137,9 +138,10 @@ class ImportExcelToEvento(BasicView):
                     })
                     if form.is_valid():
                         form.save(request.user, evento)
-                    else:
-                        errors.append((row['persona']['nombre'], row['lista']['nombre'], form.errors))
-        if errors:
-            request.session.update({'import_errors': errors})
-            return HttpResponseRedirect('/importar')
+                        parsed_invis += 1
+                else:
+                    errors.append(f"{row['persona']['nombre']}, {row['lista']['nombre']},{row['errors'][0][1]}")
+
+        errors.append(f"{parsed_invis} registros procesados con éxito.")
+        request.session.update({'alert_msg': errors})
         return HttpResponseRedirect('/e/{}'.format(evento.slug))

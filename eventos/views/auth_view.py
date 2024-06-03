@@ -74,9 +74,7 @@ class LoginView(View):
                     c['alert_msg'] = ['Usuario desactivado. Contacta con tu administrador.']
             else:
                 form = self.form_class(request=request)
-                print()
                 c['form_error'] = form.get_invalid_login_error()
-                print(form.errors)
         else:
             captcha_error = True
         c['recaptcha_error'] = captcha_error

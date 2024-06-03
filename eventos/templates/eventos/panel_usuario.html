@@ -42,7 +42,7 @@
     </tr>
     {% endfor %}
 </table>
-{% if request.user|has_group:"admin" %}
+{% if request.user|has_group:"admin"  and not id_usuario|has_group:'admin'%}
 <h2 class="title is-2"> Asignar Frees: </h2>
 
 <form class="body-form" action="" method="post">
@@ -52,5 +52,9 @@
       <input type="submit" class="button is-info modal-button" value="Asignar Frees">
     </div>
 </form>
+{% else %}
+<div class="body-content">
+<p>Este usuario es administrador, y puede asignar frees ilimitados.</p>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,21 +1,21 @@
 <table class="tabla-personas table" id="tabla_personas">
     <tr>
-    <th onclick="sortTable(0)">
+    <th data-sort="0">
         Nombre
     </th>
-    <th onclick="sortTable(1)">
+    <th data-sort="1">
         Cedula
     </th>
-    <th onclick="sortTable(2)">
+    <th data-sort="2">
        Invitaciones
     </th>
-    <th onclick="sortTable(3)">
+    <th data-sort="3">
         Frees
     </th>
-    <th onclick="sortTable(4)">
+    <th data-sort="4">
         Lista
     </th>
-    <th onclick="sortTable(5)">
+    <th data-sort="5">
         Aviso
     </th>
     </tr>
@@ -48,3 +48,18 @@
     </tr>
     {% endfor %}
 </table>
+
+<script nonce="{{request.csp_nonce}}">
+    var headers = document.querySelectorAll('#tabla_personas th');
+    headers.forEach(function(header, index) {
+        var sort = header.getAttribute('data-sort');
+        if(sort){
+            header.addEventListener('click', function(el) {
+                var index = el.target.getAttribute('data-sort');
+                sortTable(index);
+            });
+            // Remove onclick attribute
+            header.removeAttribute('onclick');
+        }
+    });
+</script>

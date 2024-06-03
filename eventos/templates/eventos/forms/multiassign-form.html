@@ -1,12 +1,12 @@
-<div class="field is-grouped">
+<div class="field is-grouped" id="multi-form">
     <div class="field int-input">
         <label class="label">{{form.invitaciones.label}}</label>
         <div class="control">{{form.invitaciones}}</div>
         <p class="help errors">{% for error in form.invitaciones.errors %} <li>{{error}}</li>{% endfor %}</p>
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.invitaciones.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.invitaciones.id_for_label}}'));"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
     </div>
     <div class="field int-input">
         <label class="label">{{form.frees.label}}</label>
@@ -14,8 +14,8 @@
         <p class="help errors">{% for error in form.frees.errors %} <li>{{error}}</li>{% endfor %}</p>
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" onclick="stepOnUp(document.getElementById('{{form.frees.id_for_label}}'));"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" onclick="stepOnDown(document.getElementById('{{form.frees.id_for_label}}'));"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
     </div>
 </div>
 <div class="field">
@@ -30,3 +30,26 @@
         <input type="submit" class="button is-info" value="Asignar Entradas" disabled>
     </p>
 </div>
+
+
+<script nonce="{{request.csp_nonce}}">
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var plusButtons = document.querySelectorAll('#multi-form .fa-plus-circle');
+        var minusButtons = document.querySelectorAll('#multi-form .fa-minus-circle');
+
+        plusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = el.target.getAttribute('data-target');
+                stepOnUp(document.getElementById(targetId));
+            });
+        });
+
+        minusButtons.forEach(function(button) {
+            button.addEventListener('click', function(el) {
+                var targetId = el.target.getAttribute('data-target');
+                stepOnDown(document.getElementById(targetId));
+            });
+        });
+    });
+</script>

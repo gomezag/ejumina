@@ -29,7 +29,7 @@ class BasicView(UserPassesTestMixin, View):
         c['groups'] = [g.name for g in user.groups.all()]
         c['nav_eventos'] = Evento.objects.filter(estado='ACT').order_by('-fecha')
         c['back'] = '/'
-
+        c['alert_msg'] = self.request.session.pop('alert_msg', [])
         return c
 
     def get(self, request, c):

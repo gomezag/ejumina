@@ -15,7 +15,7 @@
                            data-pk='{{user.pk}}'
                            data-name='{{user.first_name}}'
                            data-email='{{user.email}}'
-                           data-groups="{% for group in user.groups.all %}'{{group.pk}}'{% if not forloop.last %},{% endif %}{% endfor %}"
+                           data-groups="{% for group in user.groups.all %}{{group.pk}}{% if not forloop.last %},{% endif %}{% endfor %}"
                         ></i></button>
                     </div>
                     {% endif %}
@@ -66,7 +66,7 @@
         var editButtons = document.querySelectorAll('.user-card .fa-pencil');
         editButtons.forEach(function(button, index) {
             button.addEventListener('click', function(el) {
-                btn = el.target;
+                var btn = el.target;
                 var groupsStr = btn.getAttribute('data-groups');
                 var groups = groupsStr.split(',');
                 var name = btn.getAttribute('data-name');

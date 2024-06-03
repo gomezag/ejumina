@@ -217,7 +217,6 @@ class TestsWithInvite:
             modal = driver.find_element_by_id('alert-dialog')
             assert 'is-active' in modal.get_attribute('class')
             assert modal.find_elements(By.CSS_SELECTOR, 'div.modal-card-body p')[1].text == '1 Invitados y 0 Frees'
-
             modal.find_element_by_id('alert-close').click()
 
             # Find person in list
@@ -238,6 +237,8 @@ class TestsWithInvite:
 
             # Get alert message
             modal = driver.find_element_by_id('alert-dialog')
+            assert 'is-active' in modal.get_attribute('class')
+            assert modal.find_elements(By.CSS_SELECTOR, 'div.modal-card-body p')[1].text == '-1 Invitados y 0 Frees'
             modal.find_element_by_id('alert-close').click()
 
             # Find person in list
@@ -300,11 +301,19 @@ def test_can_assign_frees_to_rrpp(driver, user, evento):
         frees_old = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
         driver.find_element_by_id('rrpp_frees').send_keys('4')
         driver.find_element(By.CSS_SELECTOR, 'div.field input[type="submit"].button.is-info').click()
+        modal = driver.find_element_by_id('alert-dialog')
+        assert 'is-active' in modal.get_attribute('class')
+        assert modal.find_elements(By.CSS_SELECTOR, 'div.modal-card-body p')[0].text == 'Free(s) asignado(s) con éxito.'
+        modal.find_element_by_id('alert-close').click()
         user_row = find_user_in_page(driver, 'rrpp')
         frees_now = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
         assert int(frees_now) - int(frees_old) == 4
         driver.find_element_by_id('rrpp_frees').send_keys('-4')
         driver.find_element(By.CSS_SELECTOR, 'div.field input[type="submit"].button.is-info').click()
+        modal = driver.find_element_by_id('alert-dialog')
+        assert 'is-active' in modal.get_attribute('class')
+        assert modal.find_elements(By.CSS_SELECTOR, 'div.modal-card-body p')[0].text == 'Free(s) borrado(s) con éxito.'
+        modal.find_element_by_id('alert-close').click()
         user_row = find_user_in_page(driver, 'rrpp')
         frees_now = user_row.find_elements_by_tag_name('td')[2].text.split('/')[1]
         assert int(frees_now) - int(frees_old) == 0
@@ -339,8 +348,8 @@ def test_cant_give_frees_not_assigned(driver, user, evento):
         input_frees.send_keys('1')
 
         confirm_btn = modal.find_element(By.CSS_SELECTOR, 'input[type="submit"].button')
-
         confirm_btn.click()
+
         assert 'is-active' in modal.get_attribute('class')
     elif user == 'admin':
         pytest.skip('Admins can always give out frees.')
@@ -382,6 +391,8 @@ def test_can_give_frees(driver, user, evento, free_assign):
         assert confirm_btn.get_attribute('value') == 'Invitar'
 
         confirm_btn.click()
+        modal = driver.find_element_by_id('alert-dialog')
+        modal.find_element_by_id('alert-close').click()
         # Remove invitation
         invi_row = find_invitacion_from_user(driver, user, test_person, evento)
 

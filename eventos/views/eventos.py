@@ -13,7 +13,7 @@ from django.db.models import Count, Q, F, Value,  Case, When, IntegerField
 from django.db.models.functions import Concat
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import itertools
 
 from eventos.forms import EventoForm, InvitacionAssignForm, CheckInForm, MultiInviAssignToPersona, EventoDeleteForm, \
@@ -49,7 +49,7 @@ class ListaEventos(BasicView):
 
     def post(self, request):
         if not validate_in_group(request.user, ('admin', 'entrada')):
-            return self.get(request, extras={'alert_msg': ['No autorizado']})
+            return HttpResponseRedirect("")
         c = self.get_context_data(request.user)
         if request.POST.get('delete', None) is not None and validate_in_group(request.user, ('admin',)):
             try:
@@ -69,9 +69,9 @@ class ListaEventos(BasicView):
                     if dform.is_valid(evento_id):
                         Evento.objects.get(pk=evento_id).delete()
                     else:
-                        c['alert_msg'] = ['El nombre escrito no coincide con el nombre del evento!']
+                        c['err_msg'] = ['El nombre escrito no coincide con el nombre del evento!']
             except ObjectDoesNotExist:
-                c['alert_msg'] = ['El evento no existe!']
+                c['err_msg'] = ['El evento no existe!']
         elif request.POST.get('edit', None) is not None and validate_in_group(request.user, ('admin',)):
             try:
                 evento = Evento.objects.get(pk=request.POST['edit'])
@@ -79,7 +79,7 @@ class ListaEventos(BasicView):
                 if form.is_valid():
                     form.save()
                 else:
-                    c['alert_msg'] = ['El formulario tuvo errores']
+                    c['err_msg'] = ['El formulario tuvo errores']
                 c['edit_form'] = form
             except ObjectDoesNotExist:
                 pass
@@ -118,13 +118,13 @@ class ListaEventos(BasicView):
                                   'listas': list(listas)})
 
                     if not r:
-                        c['alert_msg'] = ['No se encontraron invitaciones para este evento.']
+                        c['err_msg'] = ['No se encontraron invitaciones para este evento.']
                     else:
                         mail_event_attendees(request.user, r, evento)
                         c['alert_msg'] = ['Mail enviado con éxito!', ]
                 except Exception as e:
                     print(e)
-                    c['alert_msg'] = ['Hubo un error al enviar el mail.']
+                    c['err_msg'] = ['Hubo un error al enviar el mail.']
             except ObjectDoesNotExist:
                 pass
         elif validate_in_group(request.user, ('admin',)):
@@ -132,10 +132,15 @@ class ListaEventos(BasicView):
             if form.is_valid():
                 form.save()
             else:
-                c['alert_msg'] = ['El formulario tuvo errores.']
+                c['err_msg'] = ['El formulario tuvo errores.']
             c['form'] = form
 
-        return render(request, self.template_name, context=c)
+        c['alert_msg'].extend(c.get('err_msg', []))
+        if not c.get('err_msg'):
+            self.request.session['alert_msg'] = c.get('alert_msg', [])
+            return HttpResponseRedirect(self.request.path_info)
+        else:
+            return render(request, self.template_name, context=c)
 
 
 class PanelEvento(BasicView):
@@ -269,7 +274,6 @@ class PanelEvento(BasicView):
         if any([r in c['groups'] for r in ('rrpp', 'admin')]):
             form = InvitacionAssignForm(request.user, auto_id='invi_%s', evento=evento)
             c['persona_form'] = form
-
         return render(request, self.template_name, context=c)
 
     def post(self, request, evento, *args, **kwargs):
@@ -277,13 +281,19 @@ class PanelEvento(BasicView):
         user = request.user
         if evento.estado != 'ACT' and (validate_in_group(user, ('admin',))):
             HttpResponseRedirect('/')
-        c = dict(alert_msg=[])
+        c = self.get_context_data(user, evento,
+                                   persona=request.GET.get('persona', None),
+                                   page=request.GET.get('page', None))
+        c.update({'form_errors':[]})
         checkin = request.POST.get('checkin', False)
         invitar = request.POST.get('invitar', False)
         if validate_in_group(user, ('rrpp', 'admin')) and invitar:
             form = InvitacionAssignForm(request.user, data=request.POST, auto_id='invi_%s')
             if form.is_valid():
                 form.save(request.user, evento)
+                c['alert_msg'].extend(['Invitación guardada.'])
+            else:
+                c['form_errors'].extend(['Hubo problemas con el formulario.'])
             c['persona_form'] = form
 
         elif validate_in_group(user, ('entrada', 'admin')) and checkin:
@@ -292,16 +302,17 @@ class PanelEvento(BasicView):
                 checkin_form.save()
                 invis = checkin_form.cleaned_data['check_invis']
                 frees = checkin_form.cleaned_data['check_frees']
-                c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
+                c['alert_msg'].extend(['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)])
             else:
-                c['form_errors'] = checkin_form.errors
+                c['form_errors'].extend(checkin_form.errors)
             c['persona_form'] = InvitacionAssignForm(request.user, auto_id='invi_%s')
-        c.update(self.get_context_data(user, evento,
-                                       persona=request.GET.get('persona', None),
-                                       page=request.GET.get('page', None)))
+
         if c.get('form_errors'):
-            c['alert_msg'].extend(['Form Errors', c.get('checkin_errors')])
-        return render(request, self.template_name, context=c)
+            c['alert_msg'].extend(c.get('form_errors'))
+            return render(request, self.template_name, context=c)
+        else:
+            self.request.session['alert_msg'] = c.get('alert_msg', [])
+            return HttpResponseRedirect(self.request.path_info)
 
 
 class PanelEventoPersona(BasicView):
@@ -350,6 +361,8 @@ class PanelEventoPersona(BasicView):
         c['invitaciones'] = invitaciones
         c['frees'] = persona.free_set.filter(evento=evento)
         c['invitaciones'] = self.parse_invitaciones(persona, evento, user)
+        if validate_in_group(self.request.user, ('admin', 'entrada')):
+            c['checkin_form'] = CheckInForm()
         c['back'] = '/e/{}'.format(evento.slug)
         return c
 
@@ -376,7 +389,7 @@ class PanelEventoPersona(BasicView):
         delete = request.POST.get('delete', None)
         form = None
         c = self.get_context_data(request.user, persona, evento)
-        c['alert_msg'] = []
+        c['form_errors'] = []
         if validate_in_group(request.user, ('rrpp', 'admin')) and delete:
             try:
                 integer_validator(request.POST['lista'])
@@ -386,7 +399,7 @@ class PanelEventoPersona(BasicView):
             except Exception as e:
                 return HttpResponseRedirect('')
             if (not validate_in_group(request.user, ('admin',))) and (rrpp != request.user):
-                c['alert_msg'].append('No podes borrar entradas que no son tuyas!')
+                c['form_errors'].append('No podes borrar entradas que no son tuyas!')
             else:
                 invitaciones = Invitacion.objects.filter(cliente=persona, vendedor=rrpp,
                                                          lista=lista, evento=evento)
@@ -400,12 +413,12 @@ class PanelEventoPersona(BasicView):
                             free.cliente = None
                             free.save()
                     else:
-                        c['alert_msg'] = ['No se puede borrar una entrada usada!']
+                        c['form_errors'].append('No se puede borrar una entrada usada!')
                 for invi in invitaciones:
                     if invi.estado == 'ACT':
                         invi.delete()
                     else:
-                        c['alert_msg'] = ['No se puede borrar una entrada usada!']
+                        c['form_errors'].append('No se puede borrar una entrada usada!')
         elif validate_in_group(request.user, ('entrada', 'admin')) and checkin:
             id_lista = request.POST.get('id_lista')
             checkin_form = CheckInForm(request.POST, vendedor=checkin, lista=id_lista)
@@ -415,21 +428,30 @@ class PanelEventoPersona(BasicView):
                 frees = checkin_form.cleaned_data['check_frees']
                 c['alert_msg'] = ['Checked in: ', '{} Invitados y {} Frees'.format(invis, frees)]
             else:
-                c['checkin_errors'] = checkin_form.errors
+                c['form_errors'] = checkin_form.errors
             c['checkin_form'] = checkin_form
+
         elif validate_in_group(request.user, ('rrpp', 'admin')):
             form = MultiInviAssignToPersona(request.user, persona, data=request.POST, evento=evento)
             if form.is_valid():
                 form.save(request.user, persona, evento)
+                c['alert_msg'] = [f"{form.cleaned_data['invitaciones']} invitaciones y {form.cleaned_data['frees']} frees registrados."]
 
-        c.update(self.get_context_data(request.user, persona, evento))
         if not form:
             form = MultiInviAssignToPersona(request.user, persona, evento=evento)
             if not validate_in_group(request.user, ('admin',)):
                 form.fields['frees'].widget.max_value = request.user.free_set.filter(estado='ACT', evento=evento,
                                                                                cliente__isnull=True).count()
         c['form'] = form
-        return render(request, self.template_name, context=c)
+        if c.get('form_errors'):
+            c['alert_msg'].extend(c.get('form_errors'))
+            # alert_msg = c['alert_msg']
+            # c.update(self.get_context_data(request.user, persona, evento))
+            # c['alert_msg'] = alert_msg
+            return render(request, self.template_name, context=c)
+        else:
+            self.request.session['alert_msg'] = c['alert_msg']
+            return HttpResponseRedirect(self.request.path_info)
 
 
 class PanelFrees(AdminView):
@@ -439,6 +461,7 @@ class PanelFrees(AdminView):
         c = super().get_context_data(user, *args, **kwargs)
         evento = Evento.objects.get(slug=evento)
         users = Usuario.objects.filter(Q(groups__name='rrpp') | Q(groups__name='admin'))
+        users = users.filter(is_superuser=False)
         users = users.annotate(free_count=Count('free', filter=Q(free__evento=evento)),
                                usedfree_count=Count('free', filter=Q(free__cliente__isnull=False,
                                                                      free__evento=evento)),
@@ -453,6 +476,7 @@ class PanelFrees(AdminView):
 
     def post(self, request, evento, *args, **kwargs):
         c = self.get_context_data(request.user, evento)
+        success = False
         for user in c['users']:
             try:
                 frees = int(request.POST[user.input_id])
@@ -461,6 +485,8 @@ class PanelFrees(AdminView):
                     form = FreeAssign(data={'free': frees})
                     if form.is_valid():
                         form.save(request.user, rrpp, c['evento'])
+                        success = True
+                        success_msg = 'Free(s) asignado(s) con éxito.'
                     else:
                         print('FreeAssign Errors:')
                         print(form.errors)
@@ -471,6 +497,8 @@ class PanelFrees(AdminView):
                         try:
                             free = free_list[n]
                             free.delete()
+                            success = True
+                            success_msg = 'Free(s) borrado(s) con éxito.'
                         except IndexError:
                             print('Se intentaron borrar mas frees de los que tenia un usuario')
                             pass
@@ -479,7 +507,11 @@ class PanelFrees(AdminView):
             except ValueError:
                 pass
         c.update(**self.get_context_data(request.user, evento))
-        return render(request, self.template_name, context=c)
+        if success:
+            self.request.session['alert_msg'] = [success_msg]
+            return HttpResponseRedirect(self.request.path_info)
+        else:
+            return render(request, self.template_name, context=c)
 
 
 class PanelEventoUsuario(AdminView):

@@ -2,10 +2,10 @@
 <table class="tabla-personas table" id="tabla_personas">
     <thead>
     <tr>
-        <th onclick="sortTable(0)">
+        <th data-sort="0">
             Nombre
         </th>
-        <th onclick="sortTable(0)">
+        <th data-sort="0">
             Fecha
         </th>
         {% if request.user|has_group:'admin' %}
@@ -112,5 +112,18 @@
                 window.location.href='e/'+slug+'/frees';
             });
         });
+    });
+
+    var headers = document.querySelectorAll('#tabla_personas th');
+    headers.forEach(function(header, index) {
+        var sort = header.getAttribute('data-sort');
+        if(sort){
+            header.addEventListener('click', function(el) {
+                var index = el.target.getAttribute('data-sort');
+                sortTable(index);
+            });
+            // Remove onclick attribute
+            header.removeAttribute('onclick');
+        }
     });
 </script>
