@@ -110,25 +110,30 @@ class ListaUsuarios(BasicView):
                     edit_form.save()
                 form = NewUserForm()
             elif reset:
-                target = Usuario.objects.get(pk=reset)
-                pwd_form = PasswordResetForm(data={
-                    'email': target.email
-                })
-                if pwd_form.is_valid():
-                    try:
-                        pwd_form.save(
-                            request=request,
-                            use_https=True,
-                            email_template_name='registration/password_reset_email.html'
-                        )
-                        msg = ['Mail enviado!']
-                    except Exception as e:
-                        print(str(e))
-                        msg.append('La dirección de email fue rechazada por el servidor.')
-                        msg.append('Verificá la dirección de correo e intentá de vuelta.')
-                        msg.append('Si el problema persiste, contactá con el administrador.')
-                form = NewUserForm()
-                edit_form = EditUserForm()
+                if request.user.is_superuser:
+                    target = Usuario.objects.get(pk=reset)
+                    pwd_form = PasswordResetForm(data={
+                        'email': target.email
+                    })
+                    if pwd_form.is_valid():
+                        try:
+                            pwd_form.save(
+                                request=request,
+                                use_https=True,
+                                email_template_name='registration/password_reset_email.html'
+                            )
+                            msg = ['Mail enviado!']
+                        except Exception as e:
+                            print(str(e))
+                            msg.append('La dirección de email fue rechazada por el servidor.')
+                            msg.append('Verificá la dirección de correo e intentá de vuelta.')
+                            msg.append('Si el problema persiste, contactá con el administrador.')
+                    form = NewUserForm()
+                    edit_form = EditUserForm()
+                else:
+                    form = NewUserForm()
+                    edit_form = EditUserForm()
+                    msg.append('En esta versión de prueba no podes cambiar la contraseña de las cuentas.')
             else:
                 form = NewUserForm(request.POST)
                 if form.is_valid():
