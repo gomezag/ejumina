@@ -28,7 +28,8 @@ urlpatterns = [
     path('', include('eventos.urls')),
     path('api/', include('api.urls')),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path('csp/', include('cspreports.urls'))
+    path('csp/', include('cspreports.urls')),
+    path("pricing", TemplateView.as_view(template_name="pricing.html"))
 ]
 
 

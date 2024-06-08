@@ -91,26 +91,26 @@ class ListaUsuarios(BasicView):
             reset = request.POST.get('reset', None)
             edit = request.POST.get('edit', None)
             msg = []
-            if delete:
-                user = Usuario.objects.get(pk=delete)
-                user.is_active = False
-                user.save()
-                form = NewUserForm()
-                edit_form = EditUserForm()
-            elif reactivate:
-                user = Usuario.objects.get(pk=reactivate)
-                user.is_active = True
-                user.save()
-                form = NewUserForm()
-                edit_form = EditUserForm()
-            elif edit:
-                user = Usuario.objects.get(pk=edit)
-                edit_form = EditUserForm(request.POST, instance=user)
-                if edit_form.is_valid():
-                    edit_form.save()
-                form = NewUserForm()
-            elif reset:
-                if request.user.is_superuser:
+            if request.user.is_superuser:
+                if delete:
+                    user = Usuario.objects.get(pk=delete)
+                    user.is_active = False
+                    user.save()
+                    form = NewUserForm()
+                    edit_form = EditUserForm()
+                elif reactivate:
+                    user = Usuario.objects.get(pk=reactivate)
+                    user.is_active = True
+                    user.save()
+                    form = NewUserForm()
+                    edit_form = EditUserForm()
+                elif edit:
+                    user = Usuario.objects.get(pk=edit)
+                    edit_form = EditUserForm(request.POST, instance=user)
+                    if edit_form.is_valid():
+                        edit_form.save()
+                    form = NewUserForm()
+                elif reset:
                     target = Usuario.objects.get(pk=reset)
                     pwd_form = PasswordResetForm(data={
                         'email': target.email
@@ -131,14 +131,14 @@ class ListaUsuarios(BasicView):
                     form = NewUserForm()
                     edit_form = EditUserForm()
                 else:
-                    form = NewUserForm()
+                    form = NewUserForm(request.POST)
+                    if form.is_valid():
+                        form.save()
                     edit_form = EditUserForm()
-                    msg.append('En esta versión de prueba no podes cambiar la contraseña de las cuentas.')
             else:
-                form = NewUserForm(request.POST)
-                if form.is_valid():
-                    form.save()
+                form = NewUserForm()
                 edit_form = EditUserForm()
+                msg.append('En esta versión de prueba no podes cambiar los usuarios.')
             c = self.get_context_data(request.user)
             c['form'] = form
             c['edit_form'] = edit_form
