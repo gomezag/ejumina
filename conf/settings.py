@@ -155,7 +155,7 @@ if not DEBUG:
     SESSION_COOKIE_NAME = '__Secure-sessionid'
     CSRF_COOKIE_NAME = '__Secure-csrftoken'
     SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-    SESSION_COOKIE_AGE = 5 * 60
+    SESSION_COOKIE_AGE = 10 * 60
 
 CSRF_USE_SESSIONS = True
 ROOT_URLCONF = 'conf.urls'
