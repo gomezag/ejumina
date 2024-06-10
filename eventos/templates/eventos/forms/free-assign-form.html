@@ -6,8 +6,8 @@
 
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.free.id_for_label}}"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.free.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle form-control-stepup" data-target="{{form.free.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle form-control-stepdown" data-target="{{form.free.id_for_label}}"></i></div>
     </div>
 </div>
 <div class="field">
@@ -15,24 +15,3 @@
     <div class="select">{{form.evento}}</div>
     <p class="help errors">{% for error in field.errors %} <li>{{error}}</li>{% endfor %}</p>
 </div>
-
-<script nonce="{{request.csp_nonce}}">
-    document.addEventListener('DOMContentLoaded', function() {
-        var plusButtons = document.querySelectorAll('#free-form .fa-plus-circle');
-        var minusButtons = document.querySelectorAll('#free-form .fa-minus-circle');
-
-        plusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = el.target.getAttribute('data-target');
-                stepOnUp(document.getElementById(targetId));
-            });
-        });
-
-        minusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = el.target.getAttribute('data-target');
-                stepOnDown(document.getElementById(targetId));
-            });
-        });
-    });
-</script>

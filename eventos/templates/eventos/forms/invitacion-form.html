@@ -6,8 +6,8 @@
 
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.invitaciones.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle form-control-stepup" data-target="{{form.invitaciones.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle form-control-stepdown" data-target="{{form.invitaciones.id_for_label}}"></i></div>
     </div>
     <div class="field int-input">
         <label class="label">{{form.frees.label}}</label>
@@ -15,8 +15,8 @@
         <p class="help errors">{% for error in form.frees.errors %} <li>{{error}}</li>{% endfor %}</p>
     </div>
     <div class="field">
-        <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
-        <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{form.frees.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-plus-circle form-control-stepup" data-target="{{form.frees.id_for_label}}"></i></div>
+        <div class="plus-button"><i class="fa fa-minus-circle form-control-stepdown" data-target="{{form.frees.id_for_label}}"></i></div>
     </div>
 </div>
 <div class="field">
@@ -49,27 +49,4 @@
 </div>
 
 <script nonce="{{request.csp_nonce}}">
-</script>
-
-
-<script nonce="{{request.csp_nonce}}">
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var plusButtons = document.querySelectorAll('#invi-form .fa-plus-circle');
-        var minusButtons = document.querySelectorAll('#invi-form .fa-minus-circle');
-
-        plusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = el.target.getAttribute('data-target');
-                stepOnUp(document.getElementById(targetId));
-            });
-        });
-
-        minusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = el.target.getAttribute('data-target');
-                stepOnDown(document.getElementById(targetId));
-            });
-        });
-    });
 </script>

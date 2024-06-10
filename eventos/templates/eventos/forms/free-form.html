@@ -1,13 +1,13 @@
 <div class="field has-addons">
     <div class="field int-input is-grouped ">
         <div class="control">
-            <div class="plus-button"><i class="fa fa-plus-circle" data-target="{{inputId}}"></i></div>
+            <div class="plus-button"><i class="fa fa-plus-circle form-control-stepup" data-target="{{inputId}}"></i></div>
         </div>
         <div class="control">
           <input type="number" value="{{initial}}" min=-{{frees}} name="{{inputId}}" id="{{inputId}}" class="is-small">
         </div>
         <div class="control">
-            <div class="plus-button"><i class="fa fa-minus-circle" data-target="{{inputId}}"></i></div>
+            <div class="plus-button"><i class="fa fa-minus-circle form-control-stepdown" data-target="{{inputId}}"></i></div>
         </div>
         <p class="help errors">{% for error in errors %} <li>{{error}}</li>{% endfor %}</p>
         <input type="hidden" value="{{user.pk}}">

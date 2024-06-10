@@ -3,7 +3,6 @@
 {% load static %}
 
 {% block content %}
-
 <h1 class="title is-1">
     {{evento.name}}
 </h1>
@@ -70,24 +69,4 @@
 </form>
 </div>
 
-<script nonce="{{request.csp_nonce}}">
-    document.addEventListener('DOMContentLoaded', function() {
-        var plusButtons = document.querySelectorAll('.field.int-input .fa-plus-circle');
-        var minusButtons = document.querySelectorAll('.field.int-input .fa-minus-circle');
-
-        plusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = button.getAttribute('data-target');
-                stepOnUp(document.getElementById(targetId));
-            });
-        });
-
-        minusButtons.forEach(function(button) {
-            button.addEventListener('click', function(el) {
-                var targetId = button.getAttribute('data-target');
-                stepOnDown(document.getElementById(targetId));
-            });
-        });
-    });
-</script>
 {% endblock %}

@@ -49,15 +49,9 @@
     <a href="mailto:ejumina.py@gmail.com"><u><i class="fa fa-copyright"></i>Ejumina</u></a>
 </div>
 </footer>
+<script src="{% static 'js/register_form_controls.js' %}"></script>
 <script nonce="{{request.csp_nonce}}">
-    function stepOnUp(inp){
-        inp.stepUp();
-        inp.dispatchEvent(new Event('input'));
-    }
-    function stepOnDown(inp){
-        inp.stepDown();
-        inp.dispatchEvent(new Event('input'));
-    }
+
     window.onload = (event) => {
         document.querySelectorAll(".navbar-link").forEach(function(navbarLink) {
       navbarLink.addEventListener("click", function(el) {
